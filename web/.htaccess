@@ -2,9 +2,9 @@
 # MyLMS — Production Apache Router
 # ============================================================
 # Architecture:
-#   /api/*       → web/backend/public/ (Laravel)
-#   /sanctum/*   → web/backend/public/ (Laravel Sanctum)
-#   /*           → web/frontend/dist/  (React SPA)
+#   /api/*       → backend/public/ (Laravel)
+#   /sanctum/*   → backend/public/ (Laravel Sanctum)
+#   /*           → frontend/dist/  (React SPA)
 # ============================================================
 
 <IfModule mod_rewrite.c>
@@ -20,7 +20,7 @@
     # 2. Block access to sensitive files
     # ----------------------------------------------------------
     RewriteRule ^(\.env|artisan|composer\.(json|lock)|package(-lock)?\.json)$ - [F,L]
-    RewriteRule ^web/backend/(\.env|artisan|composer\.(json|lock))$ - [F,L]
+    RewriteRule ^backend/(\.env|artisan|composer\.(json|lock))$ - [F,L]
 </IfModule>
 
 # ----------------------------------------------------------
@@ -68,30 +68,30 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Laravel API — forward to web/backend/public/
+    # Laravel API — forward to backend/public/
     RewriteCond %{REQUEST_URI} ^/api/ [NC]
-    RewriteRule ^(.*)$ web/backend/public/$1 [L,QSA]
+    RewriteRule ^(.*)$ backend/public/$1 [L,QSA]
 
     # Laravel Sanctum CSRF Cookie
     RewriteCond %{REQUEST_URI} ^/sanctum/ [NC]
-    RewriteRule ^(.*)$ web/backend/public/$1 [L,QSA]
+    RewriteRule ^(.*)$ backend/public/$1 [L,QSA]
 
     # Pass Authorization headers so Sanctum tokens work
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Serve real static files from web/frontend/dist/
+    # Serve real static files from frontend/dist/
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{DOCUMENT_ROOT}/web/frontend/dist%{REQUEST_URI} -f
-    RewriteRule ^(.*)$ web/frontend/dist/$1 [L]
+    RewriteCond %{DOCUMENT_ROOT}/frontend/dist%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ frontend/dist/$1 [L]
 
-    # Serve real directories from web/frontend/dist/
+    # Serve real directories from frontend/dist/
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{DOCUMENT_ROOT}/web/frontend/dist%{REQUEST_URI} -d
-    RewriteRule ^(.*)$ web/frontend/dist/$1 [L]
+    RewriteCond %{DOCUMENT_ROOT}/frontend/dist%{REQUEST_URI} -d
+    RewriteRule ^(.*)$ frontend/dist/$1 [L]
 
     # SPA fallback — everything else → React index.html
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(?!api|sanctum|web/backend)(.*)$ web/frontend/dist/index.html [L]
+    RewriteRule ^(?!api|sanctum|backend)(.*)$ frontend/dist/index.html [L]
 </IfModule>
