@@ -20,8 +20,8 @@ fail() { echo -e "${RED}✘ $1${NC}"; exit 1; }
 
 # ── Config — Edit these ───────────────────────────────────────────────────────
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
-BACKEND_DIR="$REPO_ROOT/backend"
-FRONTEND_DIR="$REPO_ROOT/frontend"
+BACKEND_DIR="$REPO_ROOT/web/backend"
+FRONTEND_DIR="$REPO_ROOT/web/frontend"
 DIST_DIR="$FRONTEND_DIR/dist"
 
 echo ""
