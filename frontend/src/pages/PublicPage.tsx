@@ -18,7 +18,7 @@ export default function PublicPage() {
       setLoading(true);
       setNetworkError(false);
       try {
-        const res = await client.get(`/pages/${slug || "index"}`);
+        const res = await client.get(`/pages/${slug || "home"}`);
         let puckData = res.data.puck_json;
         if (typeof puckData === "string") {
             try { puckData = JSON.parse(puckData); } catch(e) {}
