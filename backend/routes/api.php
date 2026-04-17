@@ -124,6 +124,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/branding', [BrandingController::class, 'update']);
         Route::post('/branding/upload', [BrandingController::class, 'uploadAsset']);
 
+        // Manage CMS Pages (Admins)
+        Route::get('/admin/pages', [PageController::class, 'index']);
+        Route::get('/admin/pages/{slug}', [PageController::class, 'showAdmin']);
+        Route::post('/admin/pages', [PageController::class, 'store']);
+        Route::patch('/admin/pages/{id}', [PageController::class, 'update']);
+        Route::delete('/admin/pages/{id}', [PageController::class, 'destroy']);
+
         // Command Center — Secure Artisan Runner (Admin only, whitelist-enforced)
         Route::get('/admin/commands', [CommandCenterController::class, 'index']);
         Route::post('/admin/commands/run', [CommandCenterController::class, 'run']);
