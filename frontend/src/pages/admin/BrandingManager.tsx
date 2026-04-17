@@ -28,6 +28,7 @@ export default function BrandingManager() {
   const [branding, setBranding] = useState<Branding | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState<string | null>(null); // track which field is uploading
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'success' | 'error' | null>(null);
 
@@ -70,6 +71,42 @@ export default function BrandingManager() {
   const updateField = (field: keyof Branding, value: any) => {
     if (!branding) return;
     setBranding({ ...branding, [field]: value });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'logo_light' | 'favicon') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(type);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+
+    try {
+      const response = await client.post('/branding/upload', formData, {
+        headers: {
+          ...headers,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        const fieldMap: Record<string, keyof Branding> = {
+          'logo': 'logo_url',
+          'logo_light': 'logo_light_url',
+          'favicon': 'favicon_url'
+        };
+        updateField(fieldMap[type], response.data.url);
+        setMessage(`${type.replace('_', ' ')} uploaded successfully`);
+        setStatus('success');
+      }
+    } catch (err: any) {
+      console.error('Upload failed:', err);
+      setMessage(err.response?.data?.message || 'Upload failed');
+      setStatus('error');
+    } finally {
+      setUploading(null);
+    }
   };
 
   const addColumn = () => {
@@ -282,12 +319,22 @@ export default function BrandingManager() {
                       <div className="w-12 h-12 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center overflow-hidden shrink-0">
                          {branding?.logo_url ? <img src={branding.logo_url} className="max-w-full max-h-full object-contain" /> : <ImageIcon size={20} className="text-gray-300" />}
                       </div>
-                      <input 
-                         type="text" 
-                         value={branding?.logo_url || ''} 
-                         onChange={(e) => updateField('logo_url', e.target.value)}
-                         className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
-                      />
+                      <div className="grow space-y-2">
+                        <input 
+                           type="text" 
+                           value={branding?.logo_url || ''} 
+                           onChange={(e) => updateField('logo_url', e.target.value)}
+                           className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
+                           placeholder="URL or Upload..."
+                        />
+                        <div className="flex items-center gap-3">
+                           <label className="cursor-pointer bg-mylms-purple/5 hover:bg-mylms-purple/10 border border-mylms-purple/10 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest text-mylms-purple transition-all flex items-center gap-2">
+                              {uploading === 'logo' ? <div className="w-3 h-3 border-2 border-mylms-purple border-t-transparent rounded-full animate-spin"></div> : <Plus size={12} />}
+                              {uploading === 'logo' ? 'Uploading...' : 'Upload File'}
+                              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'logo')} disabled={!!uploading} />
+                           </label>
+                        </div>
+                      </div>
                    </div>
                 </div>
 
@@ -297,12 +344,22 @@ export default function BrandingManager() {
                       <div className="w-12 h-12 rounded-xl bg-mylms-purple border border-border-soft flex items-center justify-center overflow-hidden shrink-0">
                          {branding?.logo_light_url ? <img src={branding.logo_light_url} className="max-w-full max-h-full object-contain" /> : <ImageIcon size={20} className="text-white/20" />}
                       </div>
-                      <input 
-                         type="text" 
-                         value={branding?.logo_light_url || ''} 
-                         onChange={(e) => updateField('logo_light_url', e.target.value)}
-                         className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
-                      />
+                      <div className="grow space-y-2">
+                        <input 
+                           type="text" 
+                           value={branding?.logo_light_url || ''} 
+                           onChange={(e) => updateField('logo_light_url', e.target.value)}
+                           className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
+                           placeholder="URL or Upload..."
+                        />
+                        <div className="flex items-center gap-3">
+                           <label className="cursor-pointer bg-mylms-purple/5 hover:bg-mylms-purple/10 border border-mylms-purple/10 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest text-mylms-purple transition-all flex items-center gap-2">
+                              {uploading === 'logo_light' ? <div className="w-3 h-3 border-2 border-mylms-purple border-t-transparent rounded-full animate-spin"></div> : <Plus size={12} />}
+                              {uploading === 'logo_light' ? 'Uploading...' : 'Upload File'}
+                              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'logo_light')} disabled={!!uploading} />
+                           </label>
+                        </div>
+                      </div>
                    </div>
                 </div>
 
@@ -312,12 +369,22 @@ export default function BrandingManager() {
                       <div className="w-12 h-12 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center overflow-hidden shrink-0">
                          {branding?.favicon_url ? <img src={branding.favicon_url} className="w-6 h-6 object-contain" /> : <Globe size={20} className="text-gray-300" />}
                       </div>
-                      <input 
-                         type="text" 
-                         value={branding?.favicon_url || ''} 
-                         onChange={(e) => updateField('favicon_url', e.target.value)}
-                         className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
-                      />
+                      <div className="grow space-y-2">
+                        <input 
+                           type="text" 
+                           value={branding?.favicon_url || ''} 
+                           onChange={(e) => updateField('favicon_url', e.target.value)}
+                           className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
+                           placeholder="URL or Upload..."
+                        />
+                        <div className="flex items-center gap-3">
+                           <label className="cursor-pointer bg-mylms-purple/5 hover:bg-mylms-purple/10 border border-mylms-purple/10 px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest text-mylms-purple transition-all flex items-center gap-2">
+                              {uploading === 'favicon' ? <div className="w-3 h-3 border-2 border-mylms-purple border-t-transparent rounded-full animate-spin"></div> : <Plus size={12} />}
+                              {uploading === 'favicon' ? 'Uploading...' : 'Upload File'}
+                              <input type="file" className="hidden" accept=".ico,.png" onChange={(e) => handleFileUpload(e, 'favicon')} disabled={!!uploading} />
+                           </label>
+                        </div>
+                      </div>
                    </div>
                 </div>
              </div>

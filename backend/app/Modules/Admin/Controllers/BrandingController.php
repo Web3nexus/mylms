@@ -165,6 +165,39 @@ class BrandingController extends Controller
             }
         }
 
-        return response()->json(['message' => 'Branding updated successfully', 'settings' => $this->index()->original]);
+    /**
+     * Upload branding asset (logo/favicon).
+     */
+    public function uploadAsset(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:png,jpg,jpeg,webp,svg,ico|max:2048',
+            'type' => 'required|string|in:logo,logo_light,favicon'
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            $filename = 'branding_' . $request->type . '_' . time() . '.' . $extension;
+            
+            // Destination path: web/assets
+            $destinationPath = base_path('../assets');
+            
+            if (!is_dir($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $file->move($destinationPath, $filename);
+
+            $url = '/assets/' . $filename;
+
+            return response()->json([
+                'success' => true,
+                'url' => $url,
+                'message' => 'Asset uploaded successfully'
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No file provided'], 400);
     }
 }

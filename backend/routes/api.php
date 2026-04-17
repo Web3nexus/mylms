@@ -119,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Manage Branding & Global Settings (Admins)
         Route::patch('/branding', [BrandingController::class, 'update']);
+        Route::post('/branding/upload', [BrandingController::class, 'uploadAsset']);
 
         // Command Center — Secure Artisan Runner (Admin only, whitelist-enforced)
         Route::get('/admin/commands', [CommandCenterController::class, 'index']);
