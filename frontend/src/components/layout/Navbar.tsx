@@ -73,21 +73,25 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex justify-between items-center">
         {/* Logo Section */}
         <Link to="/" className="flex items-center gap-4 group transition-transform hover:scale-[1.02]">
-          <div className="w-12 h-12 bg-mylms-purple flex items-center justify-center text-white shadow-lg overflow-hidden shrink-0 rounded-xl group-hover:rotate-3 transition-transform">
-            {branding?.logo_url ? (
-              <img src={branding.logo_url} className="w-full h-full object-cover" alt="Logo" />
-            ) : (
-              <GraduationCap size={28} />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <span className="block text-xl font-serif font-black text-mylms-purple tracking-tight uppercase leading-none">
-              {branding?.institutional_name || 'MyLMS'}
-            </span>
-            <span className="text-[9px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 block opacity-70">
-              {branding?.institutional_motto || 'University Network'}
-            </span>
-          </div>
+          {branding?.logo_url ? (
+             <div className="h-12 overflow-hidden shrink-0 transition-all flex items-center">
+                <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
+             </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-mylms-purple flex items-center justify-center text-white shadow-lg overflow-hidden shrink-0 rounded-xl group-hover:rotate-3 transition-transform">
+                <GraduationCap size={28} />
+              </div>
+              <div className="flex flex-col">
+                <span className="block text-xl font-serif font-black text-mylms-purple tracking-tight uppercase leading-none">
+                  {branding?.institutional_name || 'MyLMS'}
+                </span>
+                <span className="text-[9px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 block opacity-70">
+                  {branding?.institutional_motto || 'University Network'}
+                </span>
+              </div>
+            </div>
+          )}
         </Link>
 
         <nav className="hidden lg:flex items-center gap-10">

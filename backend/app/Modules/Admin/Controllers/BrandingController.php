@@ -15,7 +15,7 @@ class BrandingController extends Controller
     public function index()
     {
         $settings = [
-            'logo_url' => SystemSetting::getVal('branding_logo', 'https://images.unsplash.com/photo-1523050853063-bd805a952113?q=80&w=200'),
+            'logo_url' => SystemSetting::getVal('branding_logo_url', 'https://images.unsplash.com/photo-1523050853063-bd805a952113?q=80&w=200'),
             'primary_color' => SystemSetting::getVal('branding_primary_color', '#4b345d'),
             'accent_color' => SystemSetting::getVal('branding_accent_color', '#E90171'),
             'institutional_name' => SystemSetting::getVal('branding_name', 'MyLMS'),
