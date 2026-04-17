@@ -34,7 +34,7 @@ interface Course {
   slug: string;
 }
 
-export default function CourseList() {
+export function CourseCatalogWidget() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -111,7 +111,7 @@ export default function CourseList() {
   });
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[60vh]">
+    <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[40vh]">
       <div className="w-16 h-16 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-8 shadow-2xl"></div>
       <p className="text-mylms-purple font-black uppercase tracking-[0.5em] text-[10px]">Accessing Undergraduate Catalog...</p>
     </div>
@@ -120,11 +120,11 @@ export default function CourseList() {
   if (error) return <RegistryError onRetry={fetchCourses} source={window.location.hostname} message="The Undergraduate Registry could not be synchronized." />;
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">
+    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite transition-all selection:bg-mylms-rose/20">
       
       {/* Catalog Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-16 border-b border-border-soft pb-16 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/[0.03] rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/3 rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
         <div>
            <div className="flex items-center gap-4 mb-10 group/sub">
               <span className="w-12 h-px bg-mylms-rose group-hover/sub:w-20 transition-all duration-500"></span>
@@ -133,7 +133,7 @@ export default function CourseList() {
            <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
              {branding?.courses_hero_title.split(' ').map((word, i) => (
                <span key={i}>
-                 {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-gradient-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
+                 {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
                </span>
              ))}
            </h1>
@@ -165,7 +165,7 @@ export default function CourseList() {
             { label: "Industry Partners", val: "85+", icon: <Zap size={22} />, color: "rose" },
          ].map((stat, i) => (
             <div key={i} className="bg-white p-10 rounded-[32px] border border-border-soft flex items-center gap-6 shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
-               <div className="absolute top-0 right-0 w-20 h-20 bg-offwhite rounded-bl-full opacity-50 group-hover:bg-mylms-purple/[0.03] transition-all"></div>
+               <div className="absolute top-0 right-0 w-20 h-20 bg-offwhite rounded-bl-full opacity-50 group-hover:bg-mylms-purple/3 transition-all"></div>
                <div className={`w-14 h-14 rounded-2xl bg-offwhite text-mylms-${stat.color} flex items-center justify-center group-hover:bg-mylms-${stat.color} group-hover:text-white transition-all duration-500 shadow-inner`}>
                   {stat.icon}
                </div>
@@ -283,6 +283,14 @@ export default function CourseList() {
           </div>
       </div>
 
+    </div>
+  );
+}
+
+export default function CourseList() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <CourseCatalogWidget />
     </div>
   );
 }

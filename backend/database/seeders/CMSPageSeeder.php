@@ -207,5 +207,29 @@ class CMSPageSeeder extends Seeder
                 'root' => ['props' => ['title' => 'Tuition & Fees']]
             ]
         ]);
+
+        // 3. System Functional Pages
+        $systemPages = [
+            ['slug' => 'courses', 'title' => 'Academic Catalog', 'widget' => 'CourseCatalog'],
+            ['slug' => 'scholarships', 'title' => 'Fund Registry', 'widget' => 'ScholarshipFinder'],
+            ['slug' => 'admissions', 'title' => 'Academic Admissions', 'widget' => 'AdmissionsContent'],
+            ['slug' => 'apply', 'title' => 'Candidate Enrollment', 'widget' => 'AdmissionForm'],
+            ['slug' => 'experience', 'title' => 'Digital Experience', 'widget' => 'ExperienceContent'],
+            ['slug' => 'about', 'title' => 'Institutional Heritage', 'widget' => 'AboutContent'],
+        ];
+
+        foreach ($systemPages as $p) {
+            CMSPage::updateOrCreate(['slug' => $p['slug']], [
+                'title' => $p['title'],
+                'is_published' => true,
+                'is_core' => true,
+                'puck_json' => [
+                    'content' => [
+                        ['type' => $p['widget'], 'props' => []]
+                    ],
+                    'root' => ['props' => ['title' => $p['title']]]
+                ]
+            ]);
+        }
     }
 }

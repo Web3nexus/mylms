@@ -18,6 +18,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+// Import System Widgets
+import { CourseCatalogWidget } from "../pages/courses/CourseList";
+import { AdmissionFormWidget } from "../pages/admissions/AdmissionApplication";
+import { ScholarshipFinderWidget } from "../pages/scholarships/ScholarshipDirectory";
+import { ExperienceInner } from "../pages/ExperiencePage";
+import { AboutInner } from "../pages/AboutPage";
+import { AdmissionsInner } from "../pages/admissions/AdmissionsPage";
+
 export type Props = {
   Hero: { title: string; description: string; buttonText: string; buttonLink: string; bgImage?: string; variant: "default" | "split-gradient" };
   DualLogosStrip: { leftTitle: string; leftLogos: { src: string; alt: string }[]; rightTitle: string; rightLogos: { src: string; alt: string }[] };
@@ -40,6 +48,14 @@ export type Props = {
   FacultyGallery: { title: string; subtitle: string; staff: { name: string; role: string; image: string; highlight: boolean }[] };
   VideoParallax: { videoUrl: string; headline: string; subheadline: string; overlayOpacity: number };
   CalloutBox: { type: "info" | "warning" | "success"; title: string; description: string; actionText?: string; actionLink?: string };
+
+  // SYSTEM HYBRID WIDGETS
+  CourseCatalog: {};
+  AdmissionForm: {};
+  ScholarshipFinder: {};
+  ExperienceContent: {};
+  AboutContent: {};
+  AdmissionsContent: {};
 };
 
 export const config: Config<Props> = {
@@ -560,6 +576,27 @@ export const config: Config<Props> = {
            </div>
          )
       }
+    },
+
+    // ---------------- SYSTEM HYBRID WIDGETS ---------------- //
+     
+    CourseCatalog: {
+      render: () => <CourseCatalogWidget />
+    },
+    AdmissionForm: {
+      render: () => <AdmissionFormWidget />
+    },
+    ScholarshipFinder: {
+      render: () => <ScholarshipFinderWidget />
+    },
+    ExperienceContent: {
+      render: () => <ExperienceInner />
+    },
+    AboutContent: {
+      render: () => <AboutInner />
+    },
+    AdmissionsContent: {
+      render: () => <AdmissionsInner />
     }
   },
 };

@@ -10,11 +10,11 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function AboutPage() {
+export function AboutInner() {
   const { branding } = useBranding();
 
   return (
-    <div className="min-h-screen bg-offwhite">
+    <div className="">
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 md:px-12 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
@@ -87,13 +87,13 @@ export default function AboutPage() {
               </div>
               
               <div className="relative">
-                 <div className="aspect-[4/5] bg-offwhite rounded-[60px] overflow-hidden shadow-2xl relative hover:scale-[1.02] transition-all duration-700">
+                 <div className="aspect-4/5 bg-offwhite rounded-[60px] overflow-hidden shadow-2xl relative hover:scale-[1.02] transition-all duration-700">
                     <img 
                       src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2070" 
                       className="w-full h-full object-cover" 
                       alt="University Heritage"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-mylms-purple/40 to-transparent"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-mylms-purple/40 to-transparent"></div>
                  </div>
                  <div className="absolute -bottom-10 -right-10 bg-white p-10 rounded-[40px] shadow-2xl border border-border-soft hidden md:block">
                     <p className="text-sm font-black text-mylms-purple uppercase tracking-[0.2em] mb-2 leading-none">Accredited Member</p>
@@ -106,7 +106,7 @@ export default function AboutPage() {
 
       {/* Leadership Section */}
       <section className="py-32 px-6 md:px-12 bg-offwhite overflow-hidden relative">
-        <div className="absolute left-0 top-0 w-full h-1 bg-gradient-to-r from-transparent via-mylms-rose/20 to-transparent"></div>
+        <div className="absolute left-0 top-0 w-full h-1 bg-linear-to-r from-transparent via-mylms-rose/20 to-transparent"></div>
         <div className="max-w-7xl mx-auto text-center">
            <h2 className="text-5xl font-black text-text-main tracking-tighter mb-20 italic uppercase leading-none">
               {branding?.about_leadership_title || 'Institutional Leadership'}
@@ -143,6 +143,14 @@ export default function AboutPage() {
             </div>
          </div>
       </section>
+    </div>
+  );
+}
+
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <AboutInner />
     </div>
   );
 }

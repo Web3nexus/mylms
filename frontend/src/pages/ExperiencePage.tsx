@@ -20,11 +20,11 @@ const iconMap: Record<string, React.ReactNode> = {
   cpu: <Cpu size={24} />
 };
 
-export default function ExperiencePage() {
+export function ExperienceInner() {
   const { branding } = useBranding();
 
   return (
-    <div className="min-h-screen bg-offwhite">
+    <div className="">
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 md:px-12 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-mylms-purple/5 -z-10"></div>
@@ -141,6 +141,14 @@ export default function ExperiencePage() {
             </div>
          </div>
       </section>
+    </div>
+  );
+}
+
+export default function ExperiencePage() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <ExperienceInner />
     </div>
   );
 }
