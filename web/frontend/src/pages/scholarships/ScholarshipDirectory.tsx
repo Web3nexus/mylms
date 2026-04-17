@@ -235,6 +235,8 @@ export function ScholarshipFinderWidget() {
   
     </div>
   );
+}
+
 export default function ScholarshipDirectory() {
   return (
     <div className="min-h-screen bg-offwhite">

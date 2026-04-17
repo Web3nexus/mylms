@@ -769,6 +769,8 @@ export function AdmissionFormWidget() {
       </form>
     </div>
   );
+}
+
 export default function AdmissionApplication() {
   return (
     <div className="min-h-screen bg-offwhite">

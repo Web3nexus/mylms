@@ -294,6 +294,8 @@ export function AdmissionsInner() {
       </section>
     </div>
   );
+}
+
 export default function AdmissionsPage() {
   return (
     <div className="min-h-screen bg-offwhite">

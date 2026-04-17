@@ -145,6 +145,8 @@ export function AboutInner() {
       </section>
     </div>
   );
+}
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-offwhite">
