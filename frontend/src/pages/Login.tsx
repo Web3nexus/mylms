@@ -195,7 +195,7 @@ export default function Login() {
               <div className="premium-input-wrapper group/input">
                 <div className="flex justify-between items-center mb-4">
                   <label className="premium-label !mb-0">Security Protocol</label>
-                  <a href="#" className="text-[9px] font-black text-mylms-rose hover:-translate-x-1 transition-all uppercase tracking-widest">Forgot?</a>
+                  <Link to="/forgot-password" className="text-[9px] font-black text-mylms-rose hover:-translate-x-1 transition-all uppercase tracking-widest">Forgot?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="premium-input-icon" size={20} />

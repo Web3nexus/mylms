@@ -41,6 +41,8 @@ import NotificationDropdown from './components/NotificationDropdown'
 // Base Pages
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import CourseList from './pages/courses/CourseList'
 import PublicVerification from './pages/credentials/PublicVerification'
 import ScholarshipDirectory from './pages/scholarships/ScholarshipDirectory'
@@ -326,6 +328,8 @@ function App() {
         <Route path="/office" element={<Login />} />
         <Route path="/securegate" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify" element={<PublicVerification />} />
         
         <Route path="/dashboard" element={<Navigate to="/portal" replace />} />

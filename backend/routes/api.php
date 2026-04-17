@@ -36,7 +36,9 @@ Route::get('/pages/{slug}', [PageController::class, 'show']);
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -109,31 +111,39 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/finance/dashboard', [FinanceController::class, 'dashboardMetrics']);
         Route::post('/finance/invoices/generate', [FinanceController::class, 'generateSemesterInvoice']);
 
-        // Student Directory (Admins)
-        Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
+        // ---- ADMIN-ONLY ROUTES (role guard enforced) ----
+        Route::middleware(function ($request, $next) {
+            if ($request->user()?->role !== 'admin') {
+                return response()->json(['message' => 'Forbidden. Admin access required.'], 403);
+            }
+            return $next($request);
+        })->group(function () {
+            // Student Directory
+            Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
 
-        // Staff & Personnel Management (Admins)
-        Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);
-        Route::post('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'store']);
-        Route::delete('/admin/staff/{user}', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'destroy']);
+            // Staff & Personnel Management
+            Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);
+            Route::post('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'store']);
+            Route::delete('/admin/staff/{user}', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'destroy']);
 
-        // Trigger Global Scholarship Sync (Admins)
-        Route::post('/scholarships/sync', [ScholarshipController::class, 'triggerFetch']);
+            // Scholarship Sync
+            Route::post('/scholarships/sync', [ScholarshipController::class, 'triggerFetch']);
 
-        // Manage Branding & Global Settings (Admins)
-        Route::patch('/branding', [BrandingController::class, 'update']);
-        Route::post('/branding/upload', [BrandingController::class, 'uploadAsset']);
+            // Branding & Global Settings
+            Route::patch('/branding', [BrandingController::class, 'update']);
+            Route::post('/branding/upload', [BrandingController::class, 'uploadAsset']);
 
-        // Manage CMS Pages (Admins)
-        Route::get('/admin/pages', [PageController::class, 'index']);
-        Route::get('/admin/pages/{slug}', [PageController::class, 'showAdmin']);
-        Route::post('/admin/pages', [PageController::class, 'store']);
-        Route::patch('/admin/pages/{id}', [PageController::class, 'update']);
-        Route::delete('/admin/pages/{id}', [PageController::class, 'destroy']);
+            // CMS Pages
+            Route::get('/admin/pages', [PageController::class, 'index']);
+            Route::get('/admin/pages/{slug}', [PageController::class, 'showAdmin']);
+            Route::post('/admin/pages', [PageController::class, 'store']);
+            Route::patch('/admin/pages/{id}', [PageController::class, 'update']);
+            Route::delete('/admin/pages/{id}', [PageController::class, 'destroy']);
 
-        // Command Center — Secure Artisan Runner (Admin only, whitelist-enforced)
-        Route::get('/admin/commands', [CommandCenterController::class, 'index']);
-        Route::post('/admin/commands/run', [CommandCenterController::class, 'run']);
+            // Command Center
+            Route::get('/admin/commands', [CommandCenterController::class, 'index']);
+            Route::post('/admin/commands/run', [CommandCenterController::class, 'run']);
+        });
     });
 
     // Student Enrollments (legacy)
