@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(CMSPageSeeder::class);
+        $this->call(LandingPageSeeder::class);
 
         echo "Seeding completed successfully.\n";
     }
