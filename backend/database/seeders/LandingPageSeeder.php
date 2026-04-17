@@ -30,85 +30,55 @@ class LandingPageSeeder extends Seeder
                         "id" => "DualLogosStrip-1",
                         "leftTitle" => "Accredited By",
                         "leftLogos" => [
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png",
-                                "alt" => "DEAC Accreditation"
-                            ],
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png",
-                                "alt" => "WASC Accreditation"
-                            ]
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png", "alt" => "DEAC Accreditation"],
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png", "alt" => "WASC Accreditation"]
                         ],
                         "rightTitle" => "In Partnership With",
                         "rightLogos" => [
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/800px-IBM_logo.svg.png",
-                                "alt" => "IBM"
-                            ],
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1200px-Amazon_logo.svg.png",
-                                "alt" => "Amazon AWS"
-                            ]
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/800px-IBM_logo.svg.png", "alt" => "IBM"],
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1200px-Amazon_logo.svg.png", "alt" => "Amazon AWS"]
                         ]
                     ]
                 ],
                 [
                     "type" => "ProgramGrid",
                     "props" => [
-                         "id" => "ProgramGrid-1",
-                         "title" => "World-Class Academic Programs",
-                         "description" => "Explore our fully accredited degrees designed by elite academic leadership from top global universities.",
-                         "categories" => [
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Master's Degrees",
-                                 "programs" => [
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Business Administration (MBA)", "link" => "/programs/mba" ],
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Computer Science (MSCS)", "link" => "/programs/mscs" ]
-                                 ]
-                             ],
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Bachelor's Degrees",
-                                 "programs" => [
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Computer Science", "link" => "/programs/bsc-cs" ],
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Health Science", "link" => "/programs/bsc-health" ]
-                                 ]
-                             ],
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Associate's Degrees",
-                                 "programs" => [
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Business Administration", "link" => "/programs/as-ba" ],
-                                 ]
-                             ],
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Certificates",
-                                 "programs" => [
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Data Science", "link" => "/programs/cert-data" ],
-                                     [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"name" => "Finance", "link" => "/programs/cert-fin" ]
-                                 ]
-                             ]
-                         ]
+                        "id" => "ProgramGrid-1",
+                        "title" => "World-Class Academic Programs",
+                        "description" => "Explore our fully accredited degrees designed by elite academic leadership from top global universities.",
+                        "categories" => [
+                            [
+                                "_arrayId" => (string) Str::uuid(),
+                                "name" => "Master's Degrees",
+                                "programs" => [
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Business Administration (MBA)", "link" => "/programs/mba"],
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Computer Science (MSCS)", "link" => "/programs/mscs"]
+                                ]
+                            ],
+                            [
+                                "_arrayId" => (string) Str::uuid(),
+                                "name" => "Bachelor's Degrees",
+                                "programs" => [
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Computer Science", "link" => "/programs/bsc-cs"],
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Health Science", "link" => "/programs/bsc-health"]
+                                ]
+                            ],
+                            [
+                                "_arrayId" => (string) Str::uuid(),
+                                "name" => "Associate's Degrees",
+                                "programs" => [
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Business Administration", "link" => "/programs/as-ba"]
+                                ]
+                            ],
+                            [
+                                "_arrayId" => (string) Str::uuid(),
+                                "name" => "Certificates",
+                                "programs" => [
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Data Science", "link" => "/programs/cert-data"],
+                                    ["_arrayId" => (string) Str::uuid(), "name" => "Finance", "link" => "/programs/cert-fin"]
+                                ]
+                            ]
+                        ]
                     ]
                 ],
                 [
@@ -120,15 +90,9 @@ class LandingPageSeeder extends Seeder
                         "author" => "Sarah J.",
                         "role" => "B.Sc Computer Science Graduate",
                         "avatars" => [
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://randomuser.me/api/portraits/women/44.jpg" ],
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://randomuser.me/api/portraits/men/46.jpg" ],
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"src" => "https://randomuser.me/api/portraits/women/48.jpg" ]
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://randomuser.me/api/portraits/women/44.jpg"],
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://randomuser.me/api/portraits/men/46.jpg"],
+                            ["_arrayId" => (string) Str::uuid(), "src" => "https://randomuser.me/api/portraits/women/48.jpg"]
                         ]
                     ]
                 ],
@@ -138,20 +102,8 @@ class LandingPageSeeder extends Seeder
                         "id" => "FeaturedHighlights-1",
                         "title" => "Featured Tracks",
                         "items" => [
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"category" => "Technology",
-                                 "title" => "Software Engineering Fellowship",
-                                 "image" => "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000",
-                                 "link" => "/courses/software-engineering"
-                             ],
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"category" => "Business",
-                                 "title" => "Global Supply Chain Management",
-                                 "image" => "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000",
-                                 "link" => "/courses/supply-chain"
-                             ]
+                            ["_arrayId" => (string) Str::uuid(), "category" => "Technology", "title" => "Software Engineering Fellowship", "image" => "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000", "link" => "/courses/software-engineering"],
+                            ["_arrayId" => (string) Str::uuid(), "category" => "Business", "title" => "Global Supply Chain Management", "image" => "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000", "link" => "/courses/supply-chain"]
                         ]
                     ]
                 ],
@@ -170,20 +122,12 @@ class LandingPageSeeder extends Seeder
                 [
                     "type" => "AccordionFAQ",
                     "props" => [
-                         "id" => "AccordionFAQ-1",
-                         "title" => "Frequently Asked Questions",
-                         "items" => [
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"question" => "Is it genuinely tuition-free?",
-                                 "answer" => "Yes. You do not pay for instruction, reading materials, or campus fees. There are only nominal assessment fees per course."
-                             ],
-                             [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"question" => "Are the degrees recognized worldwide?",
-                                 "answer" => "Absolutely. We are nationally accredited in the United States, meaning degrees belong to an elite tier of universally accepted institutional standards."
-                             ]
-                         ]
+                        "id" => "AccordionFAQ-1",
+                        "title" => "Frequently Asked Questions",
+                        "items" => [
+                            ["_arrayId" => (string) Str::uuid(), "question" => "Is it genuinely tuition-free?", "answer" => "Yes. You do not pay for instruction, reading materials, or campus fees. There are only nominal assessment fees per course."],
+                            ["_arrayId" => (string) Str::uuid(), "question" => "Are the degrees recognized worldwide?", "answer" => "Absolutely. We are nationally accredited in the United States, meaning degrees belong to an elite tier of universally accepted institutional standards."]
+                        ]
                     ]
                 ],
                 [
@@ -191,24 +135,9 @@ class LandingPageSeeder extends Seeder
                     "props" => [
                         "id" => "FeatureGrid-1",
                         "items" => [
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"title" => "Tuition-Free Model",
-                                "description" => "We believe higher education is a basic human right. You only pay nominal fees for course assessments.",
-                                "icon" => "shield"
-                            ],
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"title" => "American Accredited",
-                                "description" => "Earn a globally recognized, US-certified degree built by elite academic leadership.",
-                                "icon" => "graduation"
-                            ],
-                            [
-                                "_arrayId" => (string) \Illuminate\Support\Str::uuid(),
-"title" => "Flexible Learning",
-                                "description" => "Study 100% online, on a timeframe that perfectly suits your work and life commitments.",
-                                "icon" => "clock"
-                            ]
+                            ["_arrayId" => (string) Str::uuid(), "title" => "Tuition-Free Model", "description" => "We believe higher education is a basic human right. You only pay nominal fees for course assessments.", "icon" => "shield"],
+                            ["_arrayId" => (string) Str::uuid(), "title" => "American Accredited", "description" => "Earn a globally recognized, US-certified degree built by elite academic leadership.", "icon" => "graduation"],
+                            ["_arrayId" => (string) Str::uuid(), "title" => "Flexible Learning", "description" => "Study 100% online, on a timeframe that perfectly suits your work and life commitments.", "icon" => "clock"]
                         ]
                     ]
                 ],
