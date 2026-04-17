@@ -205,6 +205,7 @@ class CMSPageSeeder extends Seeder
                     ]
                 ],
                 'root' => ['props' => ['title' => 'Tuition & Fees']]
+            ]
         ]);
 
         // 3. System Functional Pages
