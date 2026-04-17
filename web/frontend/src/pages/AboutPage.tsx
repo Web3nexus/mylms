@@ -10,11 +10,11 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function AboutPage() {
+export function AboutInner() {
   const { branding } = useBranding();
 
   return (
-    <div className="min-h-screen bg-offwhite">
+    <div className="">
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 md:px-12 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
@@ -143,6 +143,12 @@ export default function AboutPage() {
             </div>
          </div>
       </section>
+    </div>
+  );
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <AboutInner />
     </div>
   );
 }

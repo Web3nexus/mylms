@@ -34,7 +34,7 @@ interface Course {
   slug: string;
 }
 
-export default function CourseList() {
+export function CourseCatalogWidget() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -111,16 +111,16 @@ export default function CourseList() {
   });
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[60vh]">
+    <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[40vh]">
       <div className="w-16 h-16 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-8 shadow-2xl"></div>
       <p className="text-mylms-purple font-black uppercase tracking-[0.5em] text-[10px]">Accessing Undergraduate Catalog...</p>
     </div>
   );
 
-  if (error) return <RegistryError onRetry={fetchCourses} source="mylms.test" message="The Undergraduate Registry could not be synchronized." />;
+  if (error) return <RegistryError onRetry={fetchCourses} source={window.location.hostname} message="The Undergraduate Registry could not be synchronized." />;
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">
+    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite transition-all selection:bg-mylms-rose/20">
       
       {/* Catalog Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-16 border-b border-border-soft pb-16 relative overflow-hidden group">
@@ -283,6 +283,14 @@ export default function CourseList() {
           </div>
       </div>
 
+    </div>
+  );
+}
+
+export default function CourseList() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <CourseCatalogWidget />
     </div>
   );
 }

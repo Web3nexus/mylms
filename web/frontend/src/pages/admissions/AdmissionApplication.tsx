@@ -46,7 +46,7 @@ interface DynamicField {
   is_required: boolean;
 }
 
-export default function AdmissionApplication() {
+export function AdmissionFormWidget() {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [dynamicFields, setDynamicFields] = useState<DynamicField[]>([]);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -278,7 +278,7 @@ export default function AdmissionApplication() {
     </div>
   );
 
-  if (error) return <RegistryError onRetry={fetchData} source="mylms.test" message="The Admission Registry could not be synchronized." />;
+  if (error) return <RegistryError onRetry={fetchData} source={window.location.hostname} message="The Admission Registry could not be synchronized." />;
 
   // 1. Check if Admissions are globally disabled
   if (branding && !branding.admissions_enabled) {
@@ -767,6 +767,12 @@ export default function AdmissionApplication() {
            )}
         </div>
       </form>
+    </div>
+  );
+export default function AdmissionApplication() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <AdmissionFormWidget />
     </div>
   );
 }

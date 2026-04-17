@@ -10,7 +10,7 @@ interface RegistryErrorProps {
 export default function RegistryError({ 
   onRetry, 
   message = "The Academic Content Registry could not be synchronized.",
-  source = "mylms.test"
+  source = window.location.hostname
 }: RegistryErrorProps) {
   const navigate = useNavigate();
 

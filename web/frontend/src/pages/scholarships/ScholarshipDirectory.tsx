@@ -27,7 +27,7 @@ interface Scholarship {
   tags: string[];
 }
 
-export default function ScholarshipDirectory() {
+export function ScholarshipFinderWidget() {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -68,7 +68,7 @@ export default function ScholarshipDirectory() {
     );
   }
 
-  if (error) return <RegistryError onRetry={fetchOpportunities} source="mylms.test" message="The Funding Registry could not be synchronized." />;
+  if (error) return <RegistryError onRetry={fetchOpportunities} source={window.location.hostname} message="The Funding Registry could not be synchronized." />;
 
   return (
     <div className="min-h-screen bg-offwhite transition-all selection:bg-mylms-rose/20">
@@ -233,6 +233,12 @@ export default function ScholarshipDirectory() {
           )}
        </div>
   
+    </div>
+  );
+export default function ScholarshipDirectory() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <ScholarshipFinderWidget />
     </div>
   );
 }

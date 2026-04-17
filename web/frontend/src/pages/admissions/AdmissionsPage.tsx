@@ -21,7 +21,7 @@ interface Program { id: number; name: string; }
 interface Department { id: number; name: string; programs: Program[]; }
 interface Faculty { id: number; name: string; departments: Department[]; }
 
-export default function AdmissionsPage() {
+export function AdmissionsInner() {
   const { branding } = useBranding();
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [activeFaculty, setActiveFaculty] = useState<number | null>(null);
@@ -95,7 +95,7 @@ export default function AdmissionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-offwhite">
+    <div className="">
 
       {/* ─── HERO ─── */}
       <section className="relative bg-mylms-purple overflow-hidden min-h-[80vh] flex items-center">
@@ -292,6 +292,12 @@ export default function AdmissionsPage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+export default function AdmissionsPage() {
+  return (
+    <div className="min-h-screen bg-offwhite">
+      <AdmissionsInner />
     </div>
   );
 }

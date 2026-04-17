@@ -282,14 +282,7 @@ function App() {
         <Route path="/office" element={<Login />} />
         <Route path="/securegate" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/courses" element={<CourseList />} />
         <Route path="/verify" element={<PublicVerification />} />
-        <Route path="/scholarships" element={<ScholarshipDirectory />} />
-        <Route path="/admissions" element={<AdmissionsPage />} />
-        <Route path="/apply" element={<AdmissionApplication />} />
-        <Route path="/experience" element={<ExperiencePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/about/:sub" element={<AboutPage />} />
         
         <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
 

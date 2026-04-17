@@ -36,7 +36,7 @@ return new class extends Migration
         // 3. Forum Posts (Replies)
         Schema::create('forum_posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('topic_id')->constrained()->onDelete('cascade');
+            $table->foreignId('topic_id')->constrained('forum_topics')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('forum_posts')->onDelete('cascade');
             $table->longText('content');
