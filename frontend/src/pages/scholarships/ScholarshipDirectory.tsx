@@ -75,7 +75,7 @@ export function ScholarshipFinderWidget() {
       
       {/* MyLMS Funding Header */}
       <div className="bg-white border-b border-border-soft py-24 px-12 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-mylms-purple/2 transform skew-x-12 translate-x-32 transition-transform duration-1000 group-hover:translate-x-20"></div>
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-mylms-purple/[0.02] transform skew-x-12 translate-x-32 transition-transform duration-1000 group-hover:translate-x-20"></div>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-16 relative z-10">
            <div className="max-w-3xl">
               <div className="flex items-center gap-4 mb-8 text-mylms-purple font-black uppercase tracking-[0.4em] text-[10px]">
@@ -85,7 +85,7 @@ export function ScholarshipFinderWidget() {
               <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
                 {branding?.scholarships_hero_title.split(' ').map((word, i) => (
                   <span key={i}>
-                    {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
+                    {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-gradient-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
                   </span>
                 ))}
               </h1>

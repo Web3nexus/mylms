@@ -34,8 +34,8 @@ interface Course {
   slug: string;
 }
 
-export function CourseCatalogWidget() {
-  const [courses, setCourses] = useState<Course[]>([]);
+export default function CourseList() {
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,7 +99,7 @@ export function CourseCatalogWidget() {
     }
   };
 
-  const filteredCourses = courses.filter(c => {
+  const filteredCourses = courses.filter((c: any) => {
     const title = c.title || (c as any).name || '';
     const code = c.code || '';
     const facultyName = c.faculty?.name || '';
@@ -111,7 +111,7 @@ export function CourseCatalogWidget() {
   });
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[40vh]">
+    <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[60vh]">
       <div className="w-16 h-16 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-8 shadow-2xl"></div>
       <p className="text-mylms-purple font-black uppercase tracking-[0.5em] text-[10px]">Accessing Undergraduate Catalog...</p>
     </div>
@@ -120,7 +120,7 @@ export function CourseCatalogWidget() {
   if (error) return <RegistryError onRetry={fetchCourses} source={window.location.hostname} message="The Undergraduate Registry could not be synchronized." />;
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite transition-all selection:bg-mylms-rose/20">
+    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">
       
       {/* Catalog Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-16 border-b border-border-soft pb-16 relative overflow-hidden group">
@@ -131,7 +131,7 @@ export function CourseCatalogWidget() {
               <span className="text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px]">{branding?.institutional_name || 'Global Academy'} Registry</span>
            </div>
            <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
-             {branding?.courses_hero_title.split(' ').map((word, i) => (
+             {branding?.courses_hero_title.split(' ').map((word: string, i: number) => (
                <span key={i}>
                  {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
                </span>
@@ -149,7 +149,7 @@ export function CourseCatalogWidget() {
               type="text" 
               placeholder="Search Catalog..." 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
               className="w-full md:w-[380px] bg-white border-2 border-border-soft text-mylms-purple py-4 px-14 rounded-[20px] shadow-xl focus:outline-none focus:ring-2 focus:ring-mylms-rose/20 focus:border-mylms-rose transition-all font-bold text-[11px] uppercase tracking-widest"
             />
           </div>
@@ -163,7 +163,7 @@ export function CourseCatalogWidget() {
             { label: "Faculty Members", val: "420+", icon: <Users size={22} />, color: "rose" },
             { label: "Global Ranking", val: "#12", icon: <Sparkles size={22} />, color: "purple" },
             { label: "Industry Partners", val: "85+", icon: <Zap size={22} />, color: "rose" },
-         ].map((stat, i) => (
+         ].map((stat: any, i: number) => (
             <div key={i} className="bg-white p-10 rounded-[32px] border border-border-soft flex items-center gap-6 shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                <div className="absolute top-0 right-0 w-20 h-20 bg-offwhite rounded-bl-full opacity-50 group-hover:bg-mylms-purple/3 transition-all"></div>
                <div className={`w-14 h-14 rounded-2xl bg-offwhite text-mylms-${stat.color} flex items-center justify-center group-hover:bg-mylms-${stat.color} group-hover:text-white transition-all duration-500 shadow-inner`}>
@@ -185,7 +185,7 @@ export function CourseCatalogWidget() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-          {filteredCourses.map(course => (
+          {filteredCourses.map((course: any) => (
             <div key={course.id} className="flex flex-col bg-white rounded-[40px] border border-border-soft shadow-sm hover:border-mylms-purple/30 transition-all group relative overflow-hidden group-hover:-translate-y-2 duration-500">
               
               {/* MyLMS Badge */}
@@ -283,14 +283,6 @@ export function CourseCatalogWidget() {
           </div>
       </div>
 
-    </div>
-  );
-}
-
-export default function CourseList() {
-  return (
-    <div className="min-h-screen bg-offwhite">
-      <CourseCatalogWidget />
     </div>
   );
 }

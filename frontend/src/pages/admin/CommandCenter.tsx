@@ -41,12 +41,12 @@ const GROUP_COLORS: Record<string, string> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CommandCenter() {
-  const [groups, setGroups]               = useState<CommandGroups>({});
+  const [groups, setGroups]               = useState({});
   const [loading, setLoading]             = useState(true);
-  const [selected, setSelected]           = useState<CommandMeta | null>(null);
-  const [runState, setRunState]           = useState<RunState>('idle');
-  const [output, setOutput]               = useState<string>('');
-  const [history, setHistory]             = useState<HistoryEntry[]>([]);
+  const [selected, setSelected]           = useState(null);
+  const [runState, setRunState]           = useState('idle');
+  const [output, setOutput]               = useState('');
+  const [history, setHistory]             = useState([]);
   const [showConfirm, setShowConfirm]     = useState(false);
   const [error, setError]                 = useState('');
   const [activeGroup, setActiveGroup]     = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function CommandCenter() {
   // Fetch command whitelist
   useEffect(() => {
     client.get('/admin/commands')
-      .then(res => {
+      .then((res: { data: any }) => {
         setGroups(res.data.groups);
         const firstGroup = Object.keys(res.data.groups)[0];
         if (firstGroup) setActiveGroup(firstGroup);
@@ -89,7 +89,7 @@ export default function CommandCenter() {
       const data = res.data;
       setOutput(data.output);
       setRunState(data.success ? 'success' : 'error');
-      setHistory(prev => [{
+      setHistory((prev: HistoryEntry[]) => [{
         id: ++historyId.current,
         command: selected.command,
         output: data.output,
@@ -111,7 +111,7 @@ export default function CommandCenter() {
 
   // ─── Status badge ──────────────────────────────────────────────────────────
   const StatusBadge = () => {
-    const map = {
+    const map: Record<RunState, { icon: any, label: string, cls: string }> = {
       idle:    { icon: <Clock size={13} />,     label: 'Ready',   cls: 'text-slate-400' },
       running: { icon: <Loader2 size={13} className="animate-spin" />, label: 'Running…', cls: 'text-amber-400' },
       success: { icon: <CheckCircle2 size={13} />, label: 'Success', cls: 'text-emerald-400' },
@@ -196,7 +196,7 @@ export default function CommandCenter() {
 
           {/* Command list */}
           <div className="flex-1 overflow-y-auto space-y-1 pr-0.5">
-            {activeGroup && (groups[activeGroup] ?? []).map(cmd => {
+            {activeGroup && (groups[activeGroup] ?? []).map((cmd: CommandMeta) => {
               const isSelected = selected?.command === cmd.command;
               const accent = GROUP_COLORS[activeGroup] ?? '#818cf8';
               return (
@@ -271,7 +271,7 @@ export default function CommandCenter() {
             className="flex-1 bg-[#060710] border border-[#1a1b2e] rounded-xl p-5 overflow-y-auto min-h-[300px] max-h-[500px]"
           >
             {output ? (
-              <pre className={`text-[12px] leading-6 whitespace-pre-wrap break-words ${
+              <pre className={`text-[12px] leading-6 whitespace-pre-wrap wrap-break-word ${
                 runState === 'error' ? 'text-rose-400' : 'text-emerald-300'
               }`}>{output}</pre>
             ) : (
@@ -290,7 +290,7 @@ export default function CommandCenter() {
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Session History</span>
               </div>
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
-                {history.map(h => (
+                {history.map((h: HistoryEntry) => (
                   <div
                     key={h.id}
                     onClick={() => { setSelected({ command: h.command, description: '', safe: true }); setOutput(h.output); setRunState(h.success ? 'success' : 'error'); }}

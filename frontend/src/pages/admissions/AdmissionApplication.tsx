@@ -284,7 +284,7 @@ export function AdmissionFormWidget() {
   if (branding && !branding.admissions_enabled) {
     return (
       <div className="max-w-4xl mx-auto py-32 px-8 transition-all">
-        <div className="bg-white rounded-[60px] border border-border-soft shadow-2xl p-24 text-center relative overflow-hidden group border-t-16 border-t-mylms-rose">
+        <div className="bg-white rounded-[60px] border border-border-soft shadow-2xl p-24 text-center relative overflow-hidden group border-t-[16px] border-t-mylms-rose">
           <div className="absolute top-0 right-0 w-80 h-80 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-all duration-1000"></div>
           
           <div className="w-32 h-32 mx-auto mb-16 rounded-[40px] bg-mylms-rose/5 border border-mylms-rose/20 text-mylms-rose flex items-center justify-center text-5xl shadow-inner relative z-10 transition-transform group-hover:scale-110 duration-700">
@@ -326,7 +326,7 @@ export function AdmissionFormWidget() {
   if (!token) {
     return (
       <div className="max-w-4xl mx-auto py-32 px-8 transition-all">
-        <div className="bg-white rounded-[60px] border border-border-soft shadow-2xl p-24 text-center relative overflow-hidden group border-t-16 border-t-mylms-purple">
+        <div className="bg-white rounded-[60px] border border-border-soft shadow-2xl p-24 text-center relative overflow-hidden group border-t-[16px] border-t-mylms-purple">
            <div className="absolute top-0 right-0 w-80 h-80 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all duration-1000"></div>
            
            <div className="w-32 h-32 mx-auto mb-16 rounded-[40px] bg-mylms-purple/5 border border-mylms-purple/20 text-mylms-purple flex items-center justify-center text-5xl shadow-inner relative z-10">
@@ -368,7 +368,7 @@ export function AdmissionFormWidget() {
   if (application) {
     return (
       <div className="max-w-4xl mx-auto py-24 px-8 transition-all">
-        <div className="bg-white rounded-[60px] border border-border-soft shadow-2xl p-16 md:p-24 text-center relative overflow-hidden group border-t-12 border-t-mylms-purple">
+        <div className="bg-white rounded-[60px] border border-border-soft shadow-2xl p-16 md:p-24 text-center relative overflow-hidden group border-t-[12px] border-t-mylms-purple">
           <div className="absolute top-0 right-0 w-64 h-64 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
           
           <div className={`w-28 h-28 mx-auto mb-12 rounded-[32px] flex items-center justify-center text-4xl shadow-inner border transition-transform group-hover:scale-110 duration-700 ${
@@ -417,8 +417,8 @@ export function AdmissionFormWidget() {
           )}
 
           {application.status === 'approved' && application.offer?.accepted && (
-            <div className="p-16 bg-mylms-purple text-white rounded-[40px] shadow-2xl mb-16 text-left border-t-12 border-mylms-rose relative overflow-hidden group transition-all">
-               <div className="absolute top-0 right-0 w-64 h-64 bg-white/3 rounded-bl-full group-hover:bg-mylms-rose/10 transition-all duration-1000"></div>
+            <div className="p-16 bg-mylms-purple text-white rounded-[40px] shadow-2xl mb-16 text-left border-t-[12px] border-mylms-rose relative overflow-hidden group transition-all">
+               <div className="absolute top-0 right-0 w-64 h-64 bg-white/[0.03] rounded-bl-full group-hover:bg-mylms-rose/10 transition-all duration-1000"></div>
                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 relative z-10 transition-all">
                   <div>
                      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-mylms-rose mb-6 flex items-center gap-3">
@@ -451,7 +451,7 @@ export function AdmissionFormWidget() {
       
       {/* Wizard Header */}
       <div className="mb-24 flex flex-col lg:row justify-between items-center lg:items-end gap-16 border-b-2 border-border-soft pb-16 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-purple/3 rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-purple/[0.03] rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
         <div className="text-center lg:text-left">
            <div className="flex items-center justify-center lg:justify-start gap-4 mb-10 group/sub">
               <span className="w-12 h-px bg-mylms-rose group-hover/sub:w-20 transition-all duration-500"></span>
@@ -459,7 +459,7 @@ export function AdmissionFormWidget() {
            </div>
            <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.85] uppercase italic">
              Academic <br />
-             <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose text-stroke">Candidate.</span>
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-mylms-purple to-mylms-rose text-stroke">Candidate.</span>
            </h1>
            <p className="text-text-secondary font-medium text-lg max-w-xl opacity-60 font-sans italic mx-auto lg:mx-0">
              Initiate your official registration within the {branding?.institutional_name || 'Global Academy'} Registry. Complete all stages to verify your candidacy.

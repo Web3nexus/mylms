@@ -102,7 +102,7 @@ export function AdmissionsInner() {
         <div className="absolute inset-0 opacity-10"
           style={{ backgroundImage: 'radial-gradient(circle at 70% 50%, #E90171 0%, transparent 60%), radial-gradient(circle at 20% 80%, #E90171 0%, transparent 50%)' }}
         />
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-5 border-l-200 border-l-transparent border-t-200 border-t-white" />
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-5 border-l-[200px] border-l-transparent border-t-[200px] border-t-white" />
 
         <div className="max-w-7xl mx-auto px-8 md:px-16 py-28 relative z-10 grid md:grid-cols-2 gap-16 items-center w-full">
           <div>
@@ -258,7 +258,7 @@ export function AdmissionsInner() {
         <div className="max-w-4xl mx-auto">
           <div className="relative rounded-[40px] overflow-hidden border border-mylms-purple/15 shadow-2xl shadow-mylms-purple/10 bg-white/80 backdrop-blur-sm">
             {/* Subtle tinted glow */}
-            <div className="absolute inset-0 bg-linear-to-br from-mylms-purple/5 via-white/0 to-mylms-rose/5 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-mylms-purple/5 via-white/0 to-mylms-rose/5 pointer-events-none" />
             <div className="absolute top-0 right-0 w-48 h-48 bg-mylms-rose/8 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
             <div className="relative z-10 p-12 md:p-16 text-center">
