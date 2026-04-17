@@ -93,5 +93,5 @@
     # SPA fallback — everything else → React index.html
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(?!api|sanctum|backend)(.*)$ frontend/dist/index.html [L]
+    RewriteRule ^(?!api|sanctum|backend|assets)(.*)$ frontend/dist/index.html [L]
 </IfModule>
