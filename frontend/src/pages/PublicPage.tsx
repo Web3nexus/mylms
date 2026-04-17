@@ -23,6 +23,17 @@ export default function PublicPage() {
         if (typeof puckData === "string") {
             try { puckData = JSON.parse(puckData); } catch(e) {}
         }
+        // Normalize: ensure every content block has a valid `id` in props
+        // Puck calls id.toString() internally — if id is missing it crashes
+        if (puckData && Array.isArray(puckData.content)) {
+          puckData.content = puckData.content.map((item: any, i: number) => ({
+            ...item,
+            props: {
+              ...(item.props || {}),
+              id: item.props?.id || `${item.type || 'Block'}-${i}`,
+            },
+          }));
+        }
         setData(puckData && puckData.content ? puckData : null);
       } catch (err: any) {
         console.error("Error fetching CMS page:", err);
