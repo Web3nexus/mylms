@@ -113,21 +113,24 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const verifyAuth = async () => {
-      // Don't heartbeat on public auth pages or if no token exists
+      // Run only if token exists and not on auth pages
       if (!token || ['/login', '/register', '/office', '/securegate'].includes(location.pathname)) return;
       
       try {
         await client.get('/auth/me');
       } catch (err: any) {
         if (err.response?.status === 401) {
-          console.error('Session expired or invalid. Logging out.');
+          console.error('Session expired. Logging out.');
           logout();
           navigate('/login');
         }
       }
     };
+    
+    // Check auth on mount, and then every 5 minutes maximum
     verifyAuth();
-  }, [token, location.pathname, logout, navigate]);
+  }, [token, logout, navigate]); // Removed location.pathname to solve rate-limit spam业务
+
 
   useEffect(() => {
     const timer = setInterval(() => setSystemTime(new Date()), 60000)
@@ -152,7 +155,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   type NavItem = { name: string; path: string; icon: React.ReactNode };
   let sidebarLinks: NavItem[] = [];
   
-  if (user?.role === 'student') {
+  const userRole = user?.role?.toLowerCase();
+  
+  if (userRole === 'student') {
     if (isCampus) {
       sidebarLinks = [
         { name: 'Dashboard', path: '/campus', icon: <LayoutDashboard size={18} /> },
@@ -169,12 +174,12 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'Scholarships', path: '/scholarships', icon: <Award size={18} /> },
       ]
     }
-  } else if (user?.role === 'instructor') {
+  } else if (userRole === 'instructor') {
     sidebarLinks = [
       { name: 'Faculty Registry', path: '/office/portal', icon: <LayoutDashboard size={18} /> },
       { name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> },
     ]
-  } else if (user?.role === 'admin') {
+  } else if (userRole === 'admin') {
     sidebarLinks = [
       { name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> },
       { name: 'Academic Office', path: '/admin/academic', icon: <Settings size={18} /> },

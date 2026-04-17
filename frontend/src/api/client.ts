@@ -28,11 +28,9 @@ client.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Only logout and clear state; let the React ProtectedRoute handle redirection
+            // avoid window.location.href as it causes a hard reload and potential rate-limit loops
             useAuthStore.getState().logout();
-            // Redirect to login on unauthorized response
-            if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-                window.location.href = '/login';
-            }
         }
         return Promise.reject(error);
     }

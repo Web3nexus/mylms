@@ -52,7 +52,7 @@ export default function StudentDirectory() {
       if (filter === 'matriculated') params.has_matric = true;
       if (filter === 'pending') params.has_matric = false;
 
-      const res = await client.get('/admin/students', { headers, params });
+      const res = await client.get('/admin/students', { params });
       
       // Safety checks to prevent white-screen crashes
       if (res.data?.students) {
