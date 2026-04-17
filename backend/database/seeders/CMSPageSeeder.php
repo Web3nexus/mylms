@@ -205,7 +205,8 @@ class CMSPageSeeder extends Seeder
                     ]
                 ],
                 'root' => ['props' => ['title' => 'Tuition & Fees']]
-            ]
+        ]);
+
         // 3. System Functional Pages
         $systemPages = [
             ['slug' => 'courses', 'title' => 'Academic Catalog', 'widget' => 'CourseCatalog'],
