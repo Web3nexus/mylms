@@ -117,7 +117,7 @@ export default function CourseList() {
     </div>
   );
 
-  if (error) return <RegistryError onRetry={fetchCourses} source="mylms.test" message="The Undergraduate Registry could not be synchronized." />;
+  if (error) return <RegistryError onRetry={fetchCourses} source={window.location.hostname} message="The Undergraduate Registry could not be synchronized." />;
 
   return (
     <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">

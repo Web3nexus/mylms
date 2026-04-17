@@ -278,7 +278,7 @@ export default function AdmissionApplication() {
     </div>
   );
 
-  if (error) return <RegistryError onRetry={fetchData} source="mylms.test" message="The Admission Registry could not be synchronized." />;
+  if (error) return <RegistryError onRetry={fetchData} source={window.location.hostname} message="The Admission Registry could not be synchronized." />;
 
   // 1. Check if Admissions are globally disabled
   if (branding && !branding.admissions_enabled) {

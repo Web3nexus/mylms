@@ -68,7 +68,7 @@ export default function ScholarshipDirectory() {
     );
   }
 
-  if (error) return <RegistryError onRetry={fetchOpportunities} source="mylms.test" message="The Funding Registry could not be synchronized." />;
+  if (error) return <RegistryError onRetry={fetchOpportunities} source={window.location.hostname} message="The Funding Registry could not be synchronized." />;
 
   return (
     <div className="min-h-screen bg-offwhite transition-all selection:bg-mylms-rose/20">
