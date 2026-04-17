@@ -104,8 +104,8 @@ class BrandingController extends Controller
     {
         $request->validate([
             'logo_url' => 'nullable|string',
-            'primary_color' => 'nullable|string|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-            'accent_color' => 'nullable|string|regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
+            'primary_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'accent_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'institutional_name' => 'nullable|string|max:50',
             'institutional_motto' => 'nullable|string|max:100',
             'hero_image' => 'nullable|string',

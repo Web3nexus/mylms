@@ -29,6 +29,7 @@ export default function BrandingManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<'success' | 'error' | null>(null);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -50,13 +51,17 @@ export default function BrandingManager() {
     if (!branding) return;
     setSaving(true);
     setMessage('');
+    setStatus(null);
     try {
       await client.patch('/branding', branding, { headers });
       setMessage('Branding Profile Updated Successfully');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
+      setStatus('success');
+      setTimeout(() => { setMessage(''); setStatus(null); }, 3000);
+    } catch (err: any) {
       console.error('Update failed:', err);
-      setMessage('Failed to update branding settings.');
+      const errorMsg = err.response?.data?.message || 'Failed to update branding settings.';
+      setMessage(errorMsg);
+      setStatus('error');
     } finally {
       setSaving(false);
     }
