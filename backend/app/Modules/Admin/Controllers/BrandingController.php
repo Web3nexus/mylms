@@ -146,6 +146,7 @@ class BrandingController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'No file provided'], 400);
+    }
 
     /**
      * Sync branding-held page content to the CMS Registry.
