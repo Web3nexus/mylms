@@ -75,4 +75,31 @@ class AcademicController extends Controller
 
         return response()->json(['message' => 'Courses linked to program successfully']);
     }
+
+    /**
+     * Delete a Faculty.
+     */
+    public function destroyFaculty(Faculty $faculty)
+    {
+        $faculty->delete();
+        return response()->json(['message' => 'Faculty deleted successfully']);
+    }
+
+    /**
+     * Delete a Department.
+     */
+    public function destroyDepartment(Department $department)
+    {
+        $department->delete();
+        return response()->json(['message' => 'Department deleted successfully']);
+    }
+
+    /**
+     * Delete a Program.
+     */
+    public function destroyProgram(Program $program)
+    {
+        $program->delete();
+        return response()->json(['message' => 'Program deleted successfully']);
+    }
 }

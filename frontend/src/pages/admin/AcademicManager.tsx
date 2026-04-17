@@ -116,6 +116,42 @@ export default function AcademicManager() {
     }
   };
 
+  const handleDeleteFaculty = async (id: number) => {
+    if (!window.confirm('WARNING: Are you sure? This will delete the entire faculty and all its departments/programs.')) return;
+    try {
+      await client.delete(`/academic/faculties/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchStructure();
+    } catch (err) {
+       console.error('Delete faculty failed:', err);
+    }
+  };
+
+  const handleDeleteDepartment = async (id: number) => {
+    if (!window.confirm('Delete this department and all its programs?')) return;
+    try {
+      await client.delete(`/academic/departments/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchStructure();
+    } catch (err) {
+       console.error('Delete department failed:', err);
+    }
+  };
+
+  const handleDeleteProgram = async (id: number) => {
+    if (!window.confirm('Remove this academic program?')) return;
+    try {
+      await client.delete(`/academic/programs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchStructure();
+    } catch (err) {
+       console.error('Delete program failed:', err);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry'>('hierarchy');
 
   if (loading) return (
@@ -246,9 +282,12 @@ export default function AcademicManager() {
                              {showAddDeptForFaculty === faculty.id ? <XCircle size={16} /> : <PlusCircle size={16} />}
                              {showAddDeptForFaculty === faculty.id ? 'Abort Dept' : 'Add Department'}
                           </button>
-                          <button className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-lg shadow-sm">
-                             <Trash2 size={18} />
-                          </button>
+                           <button 
+                             onClick={() => handleDeleteFaculty(faculty.id)}
+                             className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-lg shadow-sm"
+                           >
+                              <Trash2 size={18} />
+                           </button>
                        </div>
                     </div>
 
@@ -297,13 +336,21 @@ export default function AcademicManager() {
                               <div key={dept.id} className="bg-white border border-border-soft rounded-xl p-8 hover:shadow-xl transition-all group relative overflow-hidden flex flex-col">
                                  <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
                                  <div className="mb-8 relative z-10">
-                                   <div className="flex items-center gap-2 mb-3">
-                                      <Hash size={12} className="text-mylms-rose opacity-50" />
-                                      <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
-                                   </div>
-                                   <h3 className="text-xl font-black text-text-main group-hover:text-mylms-purple transition-colors leading-tight uppercase tracking-tight">
-                                      {dept.name}
-                                   </h3>
+                                    <div className="flex items-center justify-between gap-2 mb-3">
+                                       <div className="flex items-center gap-2">
+                                          <Hash size={12} className="text-mylms-rose opacity-50" />
+                                          <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
+                                       </div>
+                                       <button 
+                                          onClick={() => handleDeleteDepartment(dept.id)}
+                                          className="text-gray-200 hover:text-mylms-rose transition-all p-1"
+                                       >
+                                          <Trash2 size={14} />
+                                       </button>
+                                    </div>
+                                    <h3 className="text-xl font-black text-text-main group-hover:text-mylms-purple transition-colors leading-tight uppercase tracking-tight">
+                                       {dept.name}
+                                    </h3>
                                  </div>
                                  
                                  <div className="space-y-4 grow relative z-10">
@@ -321,9 +368,17 @@ export default function AcademicManager() {
                                                 <span className="text-[11px] font-black text-text-secondary uppercase tracking-widest">{program.duration_years} Years</span>
                                               </div>
                                            </div>
-                                           <button className="text-gray-200 hover:text-mylms-purple transition-all" title="Program Settings">
-                                              <ChevronRight size={16} />
-                                           </button>
+                                            <div className="flex items-center gap-2">
+                                               <button 
+                                                  onClick={() => handleDeleteProgram(program.id)}
+                                                  className="text-gray-200 hover:text-mylms-rose transition-all"
+                                               >
+                                                  <Trash2 size={14} />
+                                               </button>
+                                               <button className="text-gray-200 hover:text-mylms-purple transition-all" title="Program Settings">
+                                                  <ChevronRight size={16} />
+                                               </button>
+                                            </div>
                                         </div>
                                       ))
                                     )}

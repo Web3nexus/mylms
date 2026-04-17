@@ -83,6 +83,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/academic/faculties/{faculty}/departments', [AcademicController::class, 'storeDepartment']);
         Route::post('/academic/departments/{department}/programs', [AcademicController::class, 'storeProgram']);
         Route::post('/academic/programs/{program}/courses', [AcademicController::class, 'linkCourses']);
+        Route::delete('/academic/faculties/{faculty}', [AcademicController::class, 'destroyFaculty']);
+        Route::delete('/academic/departments/{department}', [AcademicController::class, 'destroyDepartment']);
+        Route::delete('/academic/programs/{program}', [AcademicController::class, 'destroyProgram']);
 
         // Manage Academic Sessions & Semesters (Admins)
         Route::get('/academic/sessions', [AcademicSessionController::class, 'index']);
