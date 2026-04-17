@@ -277,7 +277,7 @@ export default function BrandingManager() {
                 </div>
 
                 <div>
-                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-3">Logo URL</label>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-3">Institutional Logo (Dark)</label>
                    <div className="flex gap-4 items-center">
                       <div className="w-12 h-12 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center overflow-hidden shrink-0">
                          {branding?.logo_url ? <img src={branding.logo_url} className="max-w-full max-h-full object-contain" /> : <ImageIcon size={20} className="text-gray-300" />}
@@ -286,6 +286,36 @@ export default function BrandingManager() {
                          type="text" 
                          value={branding?.logo_url || ''} 
                          onChange={(e) => updateField('logo_url', e.target.value)}
+                         className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
+                      />
+                   </div>
+                </div>
+
+                <div>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-3">Institutional Logo (Light/White)</label>
+                   <div className="flex gap-4 items-center">
+                      <div className="w-12 h-12 rounded-xl bg-mylms-purple border border-border-soft flex items-center justify-center overflow-hidden shrink-0">
+                         {branding?.logo_light_url ? <img src={branding.logo_light_url} className="max-w-full max-h-full object-contain" /> : <ImageIcon size={20} className="text-white/20" />}
+                      </div>
+                      <input 
+                         type="text" 
+                         value={branding?.logo_light_url || ''} 
+                         onChange={(e) => updateField('logo_light_url', e.target.value)}
+                         className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
+                      />
+                   </div>
+                </div>
+
+                <div>
+                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-3">Institutional Favicon (32x32)</label>
+                   <div className="flex gap-4 items-center">
+                      <div className="w-12 h-12 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center overflow-hidden shrink-0">
+                         {branding?.favicon_url ? <img src={branding.favicon_url} className="w-6 h-6 object-contain" /> : <Globe size={20} className="text-gray-300" />}
+                      </div>
+                      <input 
+                         type="text" 
+                         value={branding?.favicon_url || ''} 
+                         onChange={(e) => updateField('favicon_url', e.target.value)}
                          className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-xs focus:ring-2 focus:ring-mylms-purple/10 outline-none"
                       />
                    </div>

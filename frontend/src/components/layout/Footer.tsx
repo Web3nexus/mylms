@@ -53,9 +53,9 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-5 text-white mb-10 group">
-              {branding?.logo_url ? (
+              {(branding?.logo_light_url || branding?.logo_url) ? (
                 <div className="h-16 overflow-hidden shrink-0 transition-all flex items-center">
-                  <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Institutional Logo" />
+                  <img src={branding.logo_light_url || branding.logo_url} className="h-full w-auto object-contain" alt="Institutional Logo" />
                 </div>
               ) : (
                 <div className="flex items-center gap-5">

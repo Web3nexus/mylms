@@ -301,6 +301,23 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const { branding } = useBranding();
+
+  // Dynamic Favicon Synchronization
+  useEffect(() => {
+    if (branding?.favicon_url) {
+      const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+      if (link) {
+        link.href = branding.favicon_url;
+      } else {
+        const newLink = document.createElement('link');
+        newLink.rel = 'icon';
+        newLink.href = branding.favicon_url;
+        document.head.appendChild(newLink);
+      }
+    }
+  }, [branding?.favicon_url]);
+
   return (
     <MainLayout>
       <Routes>

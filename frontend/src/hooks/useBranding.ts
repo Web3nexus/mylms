@@ -3,6 +3,8 @@ import client from '../api/client';
 
 export interface Branding {
   logo_url: string | null;
+  logo_light_url: string | null;
+  favicon_url: string | null;
   primary_color: string;
   accent_color: string;
   institutional_name: string;

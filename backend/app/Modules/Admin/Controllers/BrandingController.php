@@ -16,6 +16,8 @@ class BrandingController extends Controller
     {
         $settings = [
             'logo_url' => SystemSetting::getVal('branding_logo_url', 'https://images.unsplash.com/photo-1523050853063-bd805a952113?q=80&w=200'),
+            'logo_light_url' => SystemSetting::getVal('branding_logo_light_url', 'https://images.unsplash.com/photo-1523050853063-bd805a952113?q=80&w=200'),
+            'favicon_url' => SystemSetting::getVal('branding_favicon_url', '/favicon.ico'),
             'primary_color' => SystemSetting::getVal('branding_primary_color', '#4b345d'),
             'accent_color' => SystemSetting::getVal('branding_accent_color', '#E90171'),
             'institutional_name' => SystemSetting::getVal('branding_name', 'MyLMS'),
@@ -104,6 +106,8 @@ class BrandingController extends Controller
     {
         $request->validate([
             'logo_url' => 'nullable|string',
+            'logo_light_url' => 'nullable|string',
+            'favicon_url' => 'nullable|string',
             'primary_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'accent_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'institutional_name' => 'nullable|string|max:50',
@@ -134,7 +138,7 @@ class BrandingController extends Controller
         ]);
 
         $allowed = [
-            'logo_url', 'primary_color', 'accent_color', 
+            'logo_url', 'logo_light_url', 'favicon_url', 'primary_color', 'accent_color', 
             'institutional_name', 'institutional_motto', 
             'hero_image', 'footer_text', 'admissions_enabled', 'admissions_opens_at',
             'footer_columns',
