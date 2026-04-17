@@ -34,7 +34,7 @@ interface Course {
   slug: string;
 }
 
-export default function CourseList() {
+export function CourseCatalogWidget() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -286,3 +286,5 @@ export default function CourseList() {
     </div>
   );
 }
+
+export default CourseCatalogWidget;
