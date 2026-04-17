@@ -1,0 +1,528 @@
+PROJECT NAME: Smart Online University System (UoPeople-like LMS)
+
+OBJECTIVE:
+Build a scalable, production-ready online university platform similar to University of the People. The system must support Admins, Instructors, and Students, and include course management, video learning, assessments, results, certificates, and scholarship directory with intelligent automation.
+
+TECH STACK:
+
+* Backend: Laravel 12 (PHP 8.3+)
+* Frontend: React (Vite + TypeScript)
+* Styling: TailwindCSS
+* State Management: Zustand or Redux Toolkit
+* API: RESTful (JSON)
+* Auth: Laravel Sanctum (token-based)
+* Database: PostgreSQL (preferred) or MySQL
+* Cache/Queue: Redis
+* Storage: AWS S3 or Cloudflare R2
+* Realtime (optional): Pusher / Laravel WebSockets
+
+ARCHITECTURE:
+
+* Modular Monolith (Domain-driven structure)
+* Separate Modules: Auth, Users, Courses, Lessons, Assessments, Results, Notifications, Scholarships, AI
+* API-first backend
+* Frontend consumes API only (no Blade)
+
+---
+
+AGILE DEVELOPMENT PLAN:
+
+WORK IN SPRINTS. DO NOT BUILD EVERYTHING AT ONCE.
+
+Each sprint must include:
+
+* Feature implementation
+* API endpoints
+* DB migrations
+* Validation
+* Basic UI (React)
+* Testing stubs
+
+---
+
+SPRINT 0: PROJECT SETUP
+
+BACKEND:
+
+* Install Laravel
+* Setup PostgreSQL/MySQL connection
+* Install Sanctum
+* Setup Redis (queue + cache)
+* Configure filesystem (S3/R2 ready)
+* Create base module structure
+
+FRONTEND:
+
+* Initialize React (Vite + TS)
+* Install TailwindCSS
+* Setup routing (React Router)
+* Setup API client (Axios)
+* Setup global state (Auth store)
+
+DELIVERABLE:
+Working base app with API connection
+
+---
+
+SPRINT 1: AUTH & USER SYSTEM
+
+FEATURES:
+
+* Register/Login
+* Role-based system (Admin, Instructor, Student)
+* Profile management
+
+BACKEND:
+
+* users table + roles
+* auth endpoints:
+  POST /auth/register
+  POST /auth/login
+  GET /auth/me
+
+FRONTEND:
+
+* Login/Register pages
+* Protected routes
+* Dashboard redirect by role
+
+---
+
+SPRINT 2: COURSE MANAGEMENT
+
+FEATURES:
+
+* Create/Edit/Delete courses
+* Course categories
+* Instructor ownership
+
+BACKEND:
+
+* courses table
+* CRUD APIs
+
+FRONTEND:
+
+* Course list page
+* Course creation form
+* Instructor dashboard
+
+---
+
+SPRINT 3: MODULES & LESSONS (VIDEO SYSTEM)
+
+FEATURES:
+
+* Course structure: Modules → Lessons
+* Video embedding (YouTube/Vimeo/S3)
+* Lesson content editor
+
+BACKEND:
+
+* modules table
+* lessons table
+
+FRONTEND:
+
+* Course builder UI
+* Lesson viewer page (video + content)
+
+---
+
+SPRINT 4: ENROLLMENT SYSTEM
+
+FEATURES:
+
+* Students enroll in courses
+* Track progress
+
+BACKEND:
+
+* enrollments table
+* API:
+  POST /enroll/{course_id}
+
+FRONTEND:
+
+* "Enroll" button
+* My Courses page
+
+---
+
+SPRINT 5: QUIZ & ASSESSMENT SYSTEM
+
+FEATURES:
+
+* Create quizzes
+* Multiple question types
+* Submit answers
+
+BACKEND:
+
+* quizzes, questions, answers tables
+* submission logic
+
+FRONTEND:
+
+* Quiz UI
+* Timer 
+
+---
+
+SPRINT 6: RESULTS & GRADING
+
+FEATURES:
+
+* Auto grading (MCQ)
+* Manual grading (essay)
+* GPA calculation
+
+BACKEND:
+
+* submissions table
+* grades table
+
+FRONTEND:
+
+* Results dashboard
+* Grade display
+
+---
+
+SPRINT 7: CERTIFICATES
+
+FEATURES:
+
+* Generate PDF certificates
+* Unique verification code
+
+BACKEND:
+
+* certificates table
+* certificate generator job
+
+FRONTEND:
+
+* Download certificate page
+
+---
+
+SPRINT 8: NOTIFICATIONS SYSTEM
+
+FEATURES:
+
+* In-app notifications
+* Email notifications
+
+BACKEND:
+
+* notifications table
+* queue-based email sending
+
+FRONTEND:
+
+* Notification bell UI
+
+---
+
+SPRINT 9: SCHOLARSHIP DIRECTORY (SMART FEATURE)
+
+FEATURES:
+
+* List scholarships
+* Filter by country, deadline
+* Auto-fetch new scholarships daily
+
+BACKEND:
+
+* scholarships table
+* CRON job + queue worker to fetch data
+* optional scraping/API integration
+
+FRONTEND:
+
+* Scholarship listing page
+* Filters/search
+
+---
+
+SPRINT 10: AI AUTOMATION (ADVANCED)
+
+FEATURES:
+
+* AI tutor chat per course
+* Auto quiz generation
+* Lesson summarization
+
+BACKEND:
+
+* AI service integration (OpenAI API)
+* endpoints:
+  POST /ai/chat
+  POST /ai/generate-quiz
+
+FRONTEND:
+
+* Chat UI
+* AI assistant panel
+
+---
+
+SPRINT 11: ADMIN PANEL
+
+FEATURES:
+
+* Manage users
+* Manage courses
+* Analytics dashboard
+
+FRONTEND:
+
+* Admin dashboard UI
+
+---
+
+SPRINT 12: OPTIMIZATION & SCALING
+
+* Add caching (Redis)
+* Optimize DB queries
+* Add pagination everywhere
+* Rate limiting
+* Secure APIs
+
+---
+
+SPRINT 13: DEPLOYMENT
+
+* Setup server (AWS/DigitalOcean)
+* Configure Nginx
+* Setup CI/CD pipeline
+* Setup queue worker (Supervisor)
+* Setup cron jobs
+
+---
+
+CODING STANDARDS:
+
+* Use clean architecture principles
+* Use DTOs and Services (no fat controllers)
+* Use Form Request validation in Laravel
+* Use React hooks (no class components)
+* Use reusable components
+
+---
+
+SECURITY:
+
+* Use hashed passwords (bcrypt)
+* Protect routes via middleware
+* Prevent XSS/SQL injection
+* Use HTTPS
+* Rate limit login
+
+---
+
+DELIVERABLE EXPECTATIONS:
+
+* Fully functional LMS
+* Clean UI (not perfect, but usable)
+* Modular scalable backend
+* Documented APIs
+
+---
+
+IMPORTANT INSTRUCTIONS:
+
+* Build step-by-step per sprint
+* Do NOT skip database design
+* Do NOT hardcode values
+* Ensure API consistency
+* Ensure frontend matches backend responses
+* Use realistic dummy data for testing
+
+---
+
+END GOAL:
+
+A scalable, intelligent online university platform that supports thousands of students, similar to University of the People, with modern UX and AI-powered learning features.
+
+EXPAND
+
+IMS (INSTITUTION MANAGEMENT SYSTEM) EXTENSION
+
+OBJECTIVE:
+Extend the LMS into a full Institution Management System (IMS/SIS) that handles student lifecycle, admissions, academic structure, and financial operations.
+
+---
+
+NEW CORE MODULES TO ADD:
+
+1. ADMISSIONS & REGISTRATION SYSTEM
+
+FEATURES:
+
+* Student application form
+* Admission approval workflow (Admin)
+* Assign student ID automatically
+* Upload documents (WAEC, transcripts, etc.)
+* Admission status tracking (pending, approved, rejected)
+
+DATABASE:
+
+* applications
+* admission_offers
+
+---
+
+2. ACADEMIC STRUCTURE
+
+FEATURES:
+
+* Faculties (e.g., Science, Business)
+* Departments (e.g., Computer Science)
+* Programs (BSc, MSc)
+* Course credit system
+
+DATABASE:
+
+* faculties
+* departments
+* programs
+* course_program_map
+
+---
+
+3. SEMESTER & ACADEMIC CALENDAR
+
+FEATURES:
+
+* Create academic sessions (2026/2027)
+* Define semesters (Fall, Spring)
+* Course registration periods
+* Exam periods
+
+DATABASE:
+
+* academic_sessions
+* semesters
+* academic_calendar_events
+
+---
+
+4. COURSE REGISTRATION SYSTEM
+
+FEATURES:
+
+* Students register courses per semester
+* Credit limit enforcement
+* Add/Drop courses
+* Approval (optional)
+
+DATABASE:
+
+* course_registrations
+
+---
+
+5. FINANCE & PAYMENT SYSTEM
+
+FEATURES:
+
+* Tuition fee setup
+* Invoice generation
+* Payment tracking
+* Payment gateways (Stripe, Paystack, Flutterwave)
+* Scholarship/discount application
+
+DATABASE:
+
+* invoices
+* payments
+* fee_structures
+
+---
+
+6. TRANSCRIPT & RECORD SYSTEM
+
+FEATURES:
+
+* Full academic history
+* GPA/CGPA calculation
+* Download transcript (PDF)
+* Official/unofficial transcript
+
+DATABASE:
+
+* transcripts
+
+---
+
+7. CERTIFICATE SYSTEM (ENHANCED)
+
+FEATURES:
+
+* Degree certificates
+* Program completion validation
+* QR verification
+
+---
+
+8. STUDENT DASHBOARD (ENHANCED)
+
+FEATURES:
+
+* Registered courses (per semester)
+* Financial status
+* Academic progress
+* Notifications
+
+---
+
+9. ADMIN CONTROL PANEL (EXTENDED)
+
+FEATURES:
+
+* Approve admissions
+* Manage academic calendar
+* Manage fees
+* View student lifecycle
+
+---
+
+10. AUTOMATION
+
+FEATURES:
+
+* Auto promote students to next semester
+* Auto GPA calculation
+* Payment reminders
+* Course registration deadlines
+
+---
+
+SPRINT ADDITIONS:
+
+ADD THESE NEW SPRINTS AFTER EXISTING ONES:
+
+SPRINT 14: Admissions System
+SPRINT 15: Academic Structure
+SPRINT 16: Semester & Calendar
+SPRINT 17: Course Registration System
+SPRINT 18: Payment System
+SPRINT 19: Transcript System
+SPRINT 20: Automation & Promotions
+
+---
+
+IMPORTANT:
+
+* Keep LMS and IMS in SAME codebase (modular)
+* Ensure all LMS features connect to academic structure
+* Every course must belong to a program/department
+* Every student must belong to a program
+
+---
+
+END GOAL:
+
+A fully functional digital university system combining LMS (learning) and IMS (institution management), capable of handling admissions, teaching, grading, payments, and certification at scale.
