@@ -11,126 +11,191 @@ class CMSPageSeeder extends Seeder
     {
         // 1. Home Page (Advanced Layout)
         CMSPage::updateOrCreate(['slug' => 'home'], [
-            'title' => 'Education for All',
+            'title' => 'Global Landing Page',
             'is_published' => true,
             'is_core' => true,
             'puck_json' => [
-                'content' => [
+                "content" => [
                     [
-                        'type' => 'Hero',
-                        'props' => [
-                            'variant' => 'uop',
-                            'title' => 'The Education Revolution',
-                            'description' => 'Tuition-free, accredited American online degrees for everyone, everywhere. Joining 137,000+ students globally.',
-                            'buttonText' => 'Apply Now',
-                            'buttonLink' => '/apply',
-                            'bgImage' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070'
+                        "type" => "Hero",
+                        "props" => [
+                            "id" => "Hero-1",
+                            "title" => "Unlock Your Worldwide Potential",
+                            "description" => "A tuition-free, accredited American online university dedicated to ensuring global access to higher education.",
+                            "buttonText" => "Start Your Application",
+                            "buttonLink" => "/apply",
+                            "bgImage" => "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070",
+                            "variant" => "split-gradient"
                         ]
                     ],
                     [
-                        'type' => 'LogosStrip',
-                        'props' => [
-                            'title' => 'ACCREDITED & COLLABORATING WITH THE WORLD\'S BEST',
-                            'logos' => [
-                                ['src' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/The_New_York_Times_logo.svg/1280px-The_New_York_Times_logo.svg.png', 'alt' => 'NYT'],
-                                ['src' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/PBS_logo_vertical.svg/1200px-PBS_logo_vertical.svg.png', 'alt' => 'PBS'],
-                                ['src' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Harvard_University_logo.svg/1200px-Harvard_University_logo.svg.png', 'alt' => 'Harvard'],
-                                ['src' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/University_of_Edinburgh_logo.svg/1200px-University_of_Edinburgh_logo.svg.png', 'alt' => 'Edinburgh'],
-                            ]
-                        ]
-                    ],
-                    [
-                        'type' => 'ProgramGrid',
-                        'props' => [
-                            'title' => 'Academic Degrees',
-                            'description' => 'Select from our wide range of accredited degree programs designed for the global digital economy.',
-                            'categories' => [
+                        "type" => "DualLogosStrip",
+                        "props" => [
+                            "id" => "DualLogosStrip-1",
+                            "leftTitle" => "Accredited By",
+                            "leftLogos" => [
                                 [
-                                    'name' => 'Master\'s Degrees',
-                                    'programs' => [
-                                        ['name' => 'Education (M.Ed.)', 'link' => '/programs/med'],
-                                        ['name' => 'Business (MBA)', 'link' => '/programs/mba'],
-                                        ['name' => 'Information Technology', 'link' => '/programs/mit'],
-                                    ]
+                                    "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png",
+                                    "alt" => "DEAC Accreditation"
                                 ],
                                 [
-                                    'name' => 'Bachelor\'s Degrees',
-                                    'programs' => [
-                                        ['name' => 'Computer Science', 'link' => '/programs/cs'],
-                                        ['name' => 'Health Science', 'link' => '/programs/hs'],
-                                        ['name' => 'Business Admin', 'link' => '/programs/ba'],
-                                    ]
+                                    "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png",
+                                    "alt" => "WASC Accreditation"
+                                ]
+                            ],
+                            "rightTitle" => "In Partnership With",
+                            "rightLogos" => [
+                                [
+                                    "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/800px-IBM_logo.svg.png",
+                                    "alt" => "IBM"
                                 ],
                                 [
-                                    'name' => 'Associate\'s Degrees',
-                                    'programs' => [
-                                        ['name' => 'Computer Science', 'link' => '/programs/acs'],
-                                        ['name' => 'Health Science', 'link' => '/programs/ahs'],
-                                        ['name' => 'Business Admin', 'link' => '/programs/aba'],
-                                    ]
+                                    "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1200px-Amazon_logo.svg.png",
+                                    "alt" => "Amazon AWS"
                                 ]
                             ]
                         ]
                     ],
                     [
-                        'type' => 'TestimonialMosaic',
-                        'props' => [
-                            'title' => 'Why Our Students Love Us',
-                            'quote' => 'MyLMS removed financial barriers and empowered me as a learner. The transition from my local university to this global platform was the best decision of my career.',
-                            'author' => 'Sarah Johnson',
-                            'role' => 'Computer Science Graduate',
-                            'avatars' => [
-                                ['src' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150'],
-                                ['src' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150'],
-                                ['src' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150'],
-                                ['src' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150'],
+                        "type" => "ProgramGrid",
+                        "props" => [
+                             "id" => "ProgramGrid-1",
+                             "title" => "World-Class Academic Programs",
+                             "description" => "Explore our fully accredited degrees designed by elite academic leadership from top global universities.",
+                             "categories" => [
+                                 [
+                                     "name" => "Master's Degrees",
+                                     "programs" => [
+                                         [ "name" => "Business Administration (MBA)", "link" => "/programs/mba" ],
+                                         [ "name" => "Computer Science (MSCS)", "link" => "/programs/mscs" ]
+                                     ]
+                                 ],
+                                 [
+                                     "name" => "Bachelor's Degrees",
+                                     "programs" => [
+                                         [ "name" => "Computer Science", "link" => "/programs/bsc-cs" ],
+                                         [ "name" => "Health Science", "link" => "/programs/bsc-health" ]
+                                     ]
+                                 ],
+                                 [
+                                     "name" => "Associate's Degrees",
+                                     "programs" => [
+                                         [ "name" => "Business Administration", "link" => "/programs/as-ba" ],
+                                     ]
+                                 ],
+                                 [
+                                     "name" => "Certificates",
+                                     "programs" => [
+                                         [ "name" => "Data Science", "link" => "/programs/cert-data" ],
+                                         [ "name" => "Finance", "link" => "/programs/cert-fin" ]
+                                     ]
+                                 ]
+                             ]
+                        ]
+                    ],
+                    [
+                        "type" => "TestimonialMosaic",
+                        "props" => [
+                            "id" => "TestimonialMosaic-1",
+                            "title" => "Student Success",
+                            "quote" => "MyLMS provided me the academic flexibility to earn my Computer Science degree while working full-time in my home country.",
+                            "author" => "Sarah J.",
+                            "role" => "B.Sc Computer Science Graduate",
+                            "avatars" => [
+                                [ "src" => "https://randomuser.me/api/portraits/women/44.jpg" ],
+                                [ "src" => "https://randomuser.me/api/portraits/men/46.jpg" ],
+                                [ "src" => "https://randomuser.me/api/portraits/women/48.jpg" ]
                             ]
                         ]
                     ],
                     [
-                        'type' => 'AccordionFAQ',
-                        'props' => [
-                            'title' => 'Common Questions',
-                            'items' => [
-                                ['question' => 'Is MyLMS really tuition-free?', 'answer' => 'Yes! We do not charge for instruction or courses. We only charge minimal administrative fees to keep the platform running.'],
-                                ['question' => 'Is the degree accredited?', 'answer' => 'Absolutely. We hold regional and international accreditations recognized by global employers.'],
-                                ['question' => 'Can I study from any country?', 'answer' => 'Our platform is designed for global access. As long as you have an internet connection, you can earn your degree.'],
+                        "type" => "FeaturedHighlights",
+                        "props" => [
+                            "id" => "FeaturedHighlights-1",
+                            "title" => "Featured Tracks",
+                            "items" => [
+                                 [
+                                     "category" => "Technology",
+                                     "title" => "Software Engineering Fellowship",
+                                     "image" => "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000",
+                                     "link" => "/courses/software-engineering"
+                                 ],
+                                 [
+                                     "category" => "Business",
+                                     "title" => "Global Supply Chain Management",
+                                     "image" => "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000",
+                                     "link" => "/courses/supply-chain"
+                                 ]
                             ]
                         ]
                     ],
                     [
-                        'type' => 'ResourcesGrid',
-                        'props' => [
-                            'title' => 'Featured Resources',
-                            'resources' => [
+                        "type" => "DirectorLetter",
+                        "props" => [
+                            "id" => "DirectorLetter-1",
+                            "title" => "From the Desk of the Academic Director",
+                            "message" => "Welcome to an institution built entirely for you. \n\nWe recognize that talent is equally distributed globally, but opportunity is not. We believe that a high-quality education should be a fundamental human right. \n\nI invite you to explore our rigorous, peer-supported programs, and realize the limitless future waiting for you.",
+                            "directorName" => "Shai Reshef",
+                            "directorRole" => "Academic Director & Founder",
+                            "directorImage" => "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000",
+                            "signatureImage" => "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/John_Doe_signature.svg/512px-John_Doe_signature.svg.png"
+                        ]
+                    ],
+                    [
+                        "type" => "AccordionFAQ",
+                        "props" => [
+                             "id" => "AccordionFAQ-1",
+                             "title" => "Frequently Asked Questions",
+                             "items" => [
+                                 [
+                                     "question" => "Is it genuinely tuition-free?",
+                                     "answer" => "Yes. You do not pay for instruction, reading materials, or campus fees. There are only nominal assessment fees per course."
+                                 ],
+                                 [
+                                     "question" => "Are the degrees recognized worldwide?",
+                                     "answer" => "Absolutely. We are nationally accredited in the United States, meaning degrees belong to an elite tier of universally accepted institutional standards."
+                                 ]
+                             ]
+                        ]
+                    ],
+                    [
+                        "type" => "FeatureGrid",
+                        "props" => [
+                            "id" => "FeatureGrid-1",
+                            "items" => [
                                 [
-                                    'title' => 'Transfer Guide',
-                                    'description' => 'Transfer your existing credits to MyLMS and earn your degree faster.',
-                                    'image' => 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=500'
+                                    "title" => "Tuition-Free Model",
+                                    "description" => "We believe higher education is a basic human right. You only pay nominal fees for course assessments.",
+                                    "icon" => "shield"
                                 ],
                                 [
-                                    'title' => 'AI in Education',
-                                    'description' => 'How MyLMS uses generative AI to provide 24/7 tutoring to every student.',
-                                    'image' => 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=500'
+                                    "title" => "American Accredited",
+                                    "description" => "Earn a globally recognized, US-certified degree built by elite academic leadership.",
+                                    "icon" => "graduation"
                                 ],
                                 [
-                                    'title' => 'Financial Transparency',
-                                    'description' => 'Download our white paper on how we maintain a tuition-free model.',
-                                    'image' => 'https://images.unsplash.com/photo-1454165833767-0274b0596d17?q=80&w=500'
+                                    "title" => "Flexible Learning",
+                                    "description" => "Study 100% online, on a timeframe that perfectly suits your work and life commitments.",
+                                    "icon" => "clock"
                                 ]
                             ]
                         ]
                     ],
                     [
-                        'type' => 'BottomApplyCTA',
-                        'props' => [
-                            'title' => 'Looking for a brighter future?',
-                            'studentCount' => '170,126',
-                            'buttonText' => 'Apply Now'
+                        "type" => "BottomApplyCTA",
+                        "props" => [
+                            "id" => "BottomApplyCTA-1",
+                            "title" => "Join Our Global Classroom",
+                            "studentCount" => "137,492",
+                            "buttonText" => "Start Your Application"
                         ]
                     ]
                 ],
-                'root' => ['props' => ['title' => 'Home Page']]
+                "root" => [
+                    "props" => [
+                        "title" => "Home"
+                    ]
+                ]
             ]
         ]);
 
