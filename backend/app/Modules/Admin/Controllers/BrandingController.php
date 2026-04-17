@@ -165,6 +165,9 @@ class BrandingController extends Controller
             }
         }
 
+        return response()->json(['message' => 'Branding updated successfully', 'settings' => $this->index()->original]);
+    }
+
     /**
      * Upload branding asset (logo/favicon).
      */
