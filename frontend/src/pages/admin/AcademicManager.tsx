@@ -43,6 +43,8 @@ interface Faculty {
 export default function AcademicManager() {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newFaculty, setNewFaculty] = useState({ name: '', description: '' });
+  const [newDept, setNewDept] = useState({ name: '', code: '' });
   const [newProg, setNewProg] = useState({ name: '', degree_level: 'BSc', duration_years: 4 });
   
   // Unified Modal System State
