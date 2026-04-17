@@ -43,27 +43,19 @@ interface Faculty {
 export default function AcademicManager() {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddFaculty, setShowAddFaculty] = useState(false);
-  const [newFaculty, setNewFaculty] = useState({ name: '', description: '' });
-  
-  // Department & Program Creation State
-  const [showAddDeptForFaculty, setShowAddDeptForFaculty] = useState<number | null>(null);
-  const [newDept, setNewDept] = useState({ name: '', code: '' });
-  
-  const [showAddProgForDept, setShowAddProgForDept] = useState<number | null>(null);
   const [newProg, setNewProg] = useState({ name: '', degree_level: 'BSc', duration_years: 4 });
   
-  // Custom Modal State
-  const [deleteConfirm, setDeleteConfirm] = useState<{
+  // Unified Modal System State
+  const [modal, setModal] = useState<{
     isOpen: boolean;
-    type: 'faculty' | 'department' | 'program';
-    id: number | null;
-    name: string;
+    mode: 'add_faculty' | 'add_department' | 'add_program' | 'delete' | null;
+    type?: 'faculty' | 'department' | 'program';
+    targetId?: number | null;
+    targetName?: string;
   }>({
     isOpen: false,
-    type: 'faculty',
-    id: null,
-    name: ''
+    mode: null,
+    targetId: null
   });
   
   const token = useAuthStore(state => state.token);
@@ -92,7 +84,7 @@ export default function AcademicManager() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewFaculty({ name: '', description: '' });
-      setShowAddFaculty(false);
+      setModal({ isOpen: false, mode: null });
       fetchStructure();
     } catch (err) {
       console.error('Error adding faculty:', err);
@@ -101,13 +93,13 @@ export default function AcademicManager() {
 
   const handleAddDepartment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!showAddDeptForFaculty) return;
+    if (!modal.targetId) return;
     try {
-      await client.post(`/academic/faculties/${showAddDeptForFaculty}/departments`, newDept, {
+      await client.post(`/academic/faculties/${modal.targetId}/departments`, newDept, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewDept({ name: '', code: '' });
-      setShowAddDeptForFaculty(null);
+      setModal({ isOpen: false, mode: null });
       fetchStructure();
     } catch (err) {
       console.error('Error adding department:', err);
@@ -116,13 +108,13 @@ export default function AcademicManager() {
 
   const handleAddProgram = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!showAddProgForDept) return;
+    if (!modal.targetId) return;
     try {
-      await client.post(`/academic/departments/${showAddProgForDept}/programs`, newProg, {
+      await client.post(`/academic/departments/${modal.targetId}/programs`, newProg, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewProg({ name: '', degree_level: 'BSc', duration_years: 4 });
-      setShowAddProgForDept(null);
+      setModal({ isOpen: false, mode: null });
       fetchStructure();
     } catch (err) {
       console.error('Error adding program:', err);
@@ -135,7 +127,7 @@ export default function AcademicManager() {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
-      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      setModal({ isOpen: false, mode: null });
     } catch (err) {
        console.error('Delete faculty failed:', err);
     }
@@ -147,7 +139,7 @@ export default function AcademicManager() {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
-      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      setModal({ isOpen: false, mode: null });
     } catch (err) {
        console.error('Delete department failed:', err);
     }
@@ -159,17 +151,19 @@ export default function AcademicManager() {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
-      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      setModal({ isOpen: false, mode: null });
     } catch (err) {
        console.error('Delete program failed:', err);
     }
   };
 
   const handleConfirmAction = () => {
-    if (!deleteConfirm.id) return;
-    if (deleteConfirm.type === 'faculty') handleDeleteFaculty(deleteConfirm.id);
-    else if (deleteConfirm.type === 'department') handleDeleteDepartment(deleteConfirm.id);
-    else if (deleteConfirm.type === 'program') handleDeleteProgram(deleteConfirm.id);
+    if (!modal.targetId) return;
+    if (modal.mode === 'delete') {
+      if (modal.type === 'faculty') handleDeleteFaculty(modal.targetId);
+      else if (modal.type === 'department') handleDeleteDepartment(modal.targetId);
+      else if (modal.type === 'program') handleDeleteProgram(modal.targetId);
+    }
   };
 
   const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry'>('hierarchy');
@@ -221,10 +215,13 @@ export default function AcademicManager() {
         
         {activeTab === 'hierarchy' && (
           <button 
-            onClick={() => setShowAddFaculty(!showAddFaculty)}
+            onClick={() => {
+              setNewFaculty({ name: '', description: '' });
+              setModal({ isOpen: true, mode: 'add_faculty' });
+            }}
             className="btn-purple flex items-center gap-3 px-10 py-4 text-xs"
           >
-            {showAddFaculty ? 'Abort Registry' : '+ Register New Faculty'}
+            + Register New Faculty
           </button>
         )}
       </div>
@@ -235,46 +232,6 @@ export default function AcademicManager() {
         <AdmissionRegistryManager />
       ) : (
         <>
-          {showAddFaculty && (
-            // ... existing hierarchy content ...
-            <div className="bg-white p-10 rounded-2xl border border-border-soft mb-12 shadow-sm border-t-8 border-t-mylms-purple relative group transition-all">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
-              <h3 className="text-xs font-black text-text-main uppercase tracking-[0.4em] mb-10 flex items-center gap-2">
-                 <PlusCircle size={16} className="text-mylms-rose" />
-                 Faculty Provisioning Registry
-              </h3>
-              <form onSubmit={handleAddFaculty} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end relative z-10">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase mb-4 tracking-widest pl-1">Official Designation</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newFaculty.name}
-                    onChange={e => setNewFaculty({...newFaculty, name: e.target.value})}
-                    placeholder="e.g. Faculty of Health Sciences"
-                    className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main transition-all placeholder:text-gray-200 text-sm shadow-inner"
-                  />
-                </div>
-                <div>
-                   <label className="block text-xs font-black text-gray-400 uppercase mb-4 tracking-widest pl-1">Administrative Summary</label>
-                   <input 
-                    type="text" 
-                    value={newFaculty.description}
-                    onChange={e => setNewFaculty({...newFaculty, description: e.target.value})}
-                    placeholder="Primary academic load..."
-                    className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple transition-all placeholder:text-gray-200 text-sm shadow-inner"
-                  />
-                </div>
-                <div className="md:col-span-2 flex justify-end">
-                  <button type="submit" className="btn-minimal px-12 py-3.5 shadow-md flex items-center gap-3 text-xs">
-                     Transmit Registry Entry
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
           <div className="space-y-12">
             {faculties.length === 0 ? (
                <div className="bg-white border-2 border-dashed border-border-soft rounded-2xl p-40 text-center opacity-60">
@@ -294,56 +251,22 @@ export default function AcademicManager() {
                        <div className="flex gap-4 z-10">
                           <button 
                             onClick={() => {
-                              setShowAddDeptForFaculty(showAddDeptForFaculty === faculty.id ? null : faculty.id);
                               setNewDept({ name: '', code: '' });
+                              setModal({ isOpen: true, mode: 'add_department', targetId: faculty.id, targetName: faculty.name });
                             }}
                             className="btn-minimal px-6 py-3 flex items-center gap-2 text-xs"
                           >
-                             {showAddDeptForFaculty === faculty.id ? <XCircle size={16} /> : <PlusCircle size={16} />}
-                             {showAddDeptForFaculty === faculty.id ? 'Abort Dept' : 'Add Department'}
+                             <PlusCircle size={16} />
+                             Add Department
                           </button>
                            <button 
-                             onClick={() => setDeleteConfirm({ isOpen: true, type: 'faculty', id: faculty.id, name: faculty.name })}
+                             onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'faculty', targetId: faculty.id, targetName: faculty.name })}
                              className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-lg shadow-sm"
                            >
                               <Trash2 size={18} />
                            </button>
                        </div>
                     </div>
-
-                    {showAddDeptForFaculty === faculty.id && (
-                      <div className="p-10 bg-white border-b border-border-soft animate-in fade-in slide-in-from-top-4 duration-300">
-                        <form onSubmit={handleAddDepartment} className="flex flex-col md:flex-row gap-6 items-end">
-                           <div className="grow">
-                              <label className="block text-xs font-black text-gray-400 uppercase mb-3 tracking-widest pl-1">Department Name</label>
-                              <input 
-                                type="text" 
-                                required
-                                value={newDept.name}
-                                onChange={e => setNewDept({...newDept, name: e.target.value})}
-                                placeholder="e.g. Dept. of Computer Science"
-                                className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner"
-                              />
-                           </div>
-                           <div className="w-full md:w-48">
-                              <label className="block text-xs font-black text-gray-400 uppercase mb-3 tracking-widest pl-1 text-center">Matric Code</label>
-                              <input 
-                                type="text" 
-                                required
-                                maxLength={4}
-                                value={newDept.code}
-                                onChange={e => setNewDept({...newDept, code: e.target.value.toUpperCase()})}
-                                placeholder="CS"
-                                className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner uppercase text-center"
-                              />
-                           </div>
-                           <button type="submit" className="btn-purple px-10 py-4 flex items-center gap-3 text-xs">
-                               Commit Department
-                               <ArrowRight size={16} />
-                           </button>
-                        </form>
-                      </div>
-                    )}
 
                    <div className="p-10 bg-white">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -362,7 +285,7 @@ export default function AcademicManager() {
                                           <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
                                        </div>
                                        <button 
-                                          onClick={() => setDeleteConfirm({ isOpen: true, type: 'department', id: dept.id, name: dept.name })}
+                                          onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'department', targetId: dept.id, targetName: dept.name })}
                                           className="text-gray-200 hover:text-mylms-rose transition-all p-1"
                                        >
                                           <Trash2 size={14} />
@@ -390,7 +313,7 @@ export default function AcademicManager() {
                                            </div>
                                             <div className="flex items-center gap-2">
                                                <button 
-                                                  onClick={() => setDeleteConfirm({ isOpen: true, type: 'program', id: program.id, name: program.name })}
+                                                  onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'program', targetId: program.id, targetName: program.name })}
                                                   className="text-gray-200 hover:text-mylms-rose transition-all"
                                                >
                                                   <Trash2 size={14} />
@@ -404,70 +327,16 @@ export default function AcademicManager() {
                                     )}
                                  </div>
 
-                                 {showAddProgForDept === dept.id ? (
-                                   <form onSubmit={handleAddProgram} className="mt-10 p-6 bg-offwhite rounded-xl border border-border-soft animate-in zoom-in-95 duration-300 relative z-20">
-                                      <div className="space-y-5">
-                                         <div>
-                                            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Program Title</label>
-                                            <input 
-                                              type="text" 
-                                              required
-                                              value={newProg.name}
-                                              onChange={e => setNewProg({...newProg, name: e.target.value})}
-                                              className="w-full p-3 bg-white border border-border-soft rounded-lg text-xs font-black uppercase outline-none focus:border-mylms-purple shadow-sm"
-                                            />
-                                         </div>
-                                         <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                               <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Level</label>
-                                               <select 
-                                                 value={newProg.degree_level}
-                                                 onChange={e => setNewProg({...newProg, degree_level: e.target.value})}
-                                                 className="w-full p-3 bg-white border border-border-soft rounded-lg text-xs font-black uppercase outline-none focus:border-mylms-purple shadow-sm"
-                                               >
-                                                  <option value="BSc">BSc</option>
-                                                  <option value="B.Eng">B.Eng</option>
-                                                  <option value="MSc">MSc</option>
-                                                  <option value="PhD">PhD</option>
-                                                  <option value="Diploma">Diploma</option>
-                                               </select>
-                                            </div>
-                                            <div>
-                                               <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Years</label>
-                                               <input 
-                                                 type="number" 
-                                                 required
-                                                 min={1} max={7}
-                                                 value={newProg.duration_years}
-                                                 onChange={e => setNewProg({...newProg, duration_years: parseInt(e.target.value)})}
-                                                 className="w-full p-3 bg-white border border-border-soft rounded-lg text-xs font-black uppercase outline-none focus:border-mylms-purple shadow-sm"
-                                               />
-                                            </div>
-                                         </div>
-                                         <div className="flex gap-2">
-                                            <button type="submit" className="grow btn-purple py-3 text-xs uppercase tracking-widest font-black">Commit</button>
-                                            <button 
-                                              type="button" 
-                                              onClick={() => setShowAddProgForDept(null)}
-                                              className="px-4 py-3 bg-white border border-border-soft rounded-lg text-gray-400 hover:text-mylms-rose shadow-sm"
-                                            >
-                                               <XCircle size={18} />
-                                            </button>
-                                         </div>
-                                      </div>
-                                   </form>
-                                 ) : (
-                                   <button 
+                             <button 
                                      onClick={() => {
-                                       setShowAddProgForDept(dept.id);
                                        setNewProg({ name: '', degree_level: 'BSc', duration_years: 4 });
+                                       setModal({ isOpen: true, mode: 'add_program', targetId: dept.id, targetName: dept.name });
                                      }}
                                      className="w-full py-4 mt-12 bg-offwhite border border-dashed border-border-soft text-gray-400 font-black rounded-lg hover:bg-white hover:text-mylms-purple hover:border-mylms-purple/40 transition-all text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 relative z-10"
                                    >
                                       <PlusCircle size={14} />
                                       Define Program
                                    </button>
-                                 )}
                               </div>
                             ))
                          )}
@@ -480,39 +349,105 @@ export default function AcademicManager() {
         </>
       )}
 
-      {/* Premium Deletion Guard Modal */}
-      {deleteConfirm.isOpen && (
+      {/* Unified Action Modal System */}
+      {modal.isOpen && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-mylms-purple/40 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white rounded-[32px] shadow-2xl border border-white/20 max-w-md w-full p-10 transform animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-mylms-rose/5 rounded-bl-full"></div>
+          <div className="bg-white rounded-[32px] shadow-2xl border border-white/20 max-w-xl w-full p-10 transform animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-mylms-purple/5 rounded-bl-full"></div>
             
             <div className="relative z-10">
-              <div className="w-16 h-16 bg-mylms-rose/10 rounded-2xl flex items-center justify-center text-mylms-rose mb-8">
-                 <XCircle size={32} />
-              </div>
-              
-              <h2 className="text-2xl font-black text-text-main uppercase tracking-tight leading-none mb-4">
-                 Terminate Record?
-              </h2>
-              
-              <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">
-                You are about to authorize the removal of <span className="font-black text-mylms-purple uppercase">"{deleteConfirm.name}"</span> from the institutional ledger. This action is irreversible.
-              </p>
-              
-              <div className="flex flex-col gap-3">
-                 <button 
-                    onClick={handleConfirmAction}
-                    className="w-full bg-mylms-rose text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-[#A00E26] shadow-xl hover:shadow-mylms-rose/20 transition-all active:scale-[0.98] text-[10px]"
-                 >
-                    Authorize Deletion
-                 </button>
-                 <button 
-                    onClick={() => setDeleteConfirm(prev => ({ ...prev, isOpen: false }))}
-                    className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:text-text-main transition-all text-[10px]"
-                 >
-                    Abort Registry Sync
-                 </button>
-              </div>
+              {modal.mode === 'delete' ? (
+                <>
+                  <div className="w-16 h-16 bg-mylms-rose/10 rounded-2xl flex items-center justify-center text-mylms-rose mb-8">
+                     <XCircle size={32} />
+                  </div>
+                  <h2 className="text-2xl font-black text-text-main uppercase tracking-tight leading-none mb-4">Terminate Record?</h2>
+                  <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">
+                    You are about to authorize the removal of <span className="font-black text-mylms-purple uppercase">"{modal.targetName}"</span> from the institutional ledger. This action is irreversible.
+                  </p>
+                  <div className="flex flex-col gap-3">
+                     <button onClick={handleConfirmAction} className="w-full bg-mylms-rose text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-[#A00E26] shadow-xl text-[10px]">Authorize Deletion</button>
+                     <button onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.2em] py-5 rounded-xl text-[10px]">Abort Registry Sync</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 bg-mylms-purple/10 rounded-2xl flex items-center justify-center text-mylms-purple mb-8">
+                     <PlusCircle size={32} />
+                  </div>
+                  <h2 className="text-2xl font-black text-text-main uppercase tracking-tight leading-none mb-2">
+                    {modal.mode === 'add_faculty' && 'Provision New Faculty'}
+                    {modal.mode === 'add_department' && 'Initialize Department'}
+                    {modal.mode === 'add_program' && 'Define Academic Program'}
+                  </h2>
+                  <p className="text-xs font-black text-mylms-rose uppercase tracking-[0.3em] mb-10">
+                    {modal.mode === 'add_faculty' && 'Registry: Institutional Office'}
+                    {modal.mode === 'add_department' && `Target: ${modal.targetName}`}
+                    {modal.mode === 'add_program' && `Unit: ${modal.targetName}`}
+                  </p>
+
+                  <form onSubmit={
+                    modal.mode === 'add_faculty' ? handleAddFaculty : 
+                    modal.mode === 'add_department' ? handleAddDepartment : 
+                    handleAddProgram
+                  } className="space-y-6">
+                    {modal.mode === 'add_faculty' && (
+                      <div className="space-y-6">
+                        <div className="premium-input-wrapper">
+                          <label className="premium-label">Designation</label>
+                          <input required value={newFaculty.name} onChange={e => setNewFaculty({...newFaculty, name: e.target.value})} className="premium-input" placeholder="e.g. Faculty of Health Sciences" />
+                        </div>
+                        <div className="premium-input-wrapper">
+                          <label className="premium-label">Administrative Summary</label>
+                          <input value={newFaculty.description} onChange={e => setNewFaculty({...newFaculty, description: e.target.value})} className="premium-input" placeholder="Primary academic load..." />
+                        </div>
+                      </div>
+                    )}
+
+                    {modal.mode === 'add_department' && (
+                      <div className="space-y-6">
+                        <div className="premium-input-wrapper">
+                          <label className="premium-label">Department Name</label>
+                          <input required value={newDept.name} onChange={e => setNewDept({...newDept, name: e.target.value})} className="premium-input" placeholder="e.g. Dept. of Computer Science" />
+                        </div>
+                        <div className="premium-input-wrapper">
+                          <label className="premium-label">Matric Code (4 Chars)</label>
+                          <input required maxLength={4} value={newDept.code} onChange={e => setNewDept({...newDept, code: e.target.value.toUpperCase()})} className="premium-input uppercase" placeholder="CS" />
+                        </div>
+                      </div>
+                    )}
+
+                    {modal.mode === 'add_program' && (
+                      <div className="space-y-6">
+                        <div className="premium-input-wrapper">
+                          <label className="premium-label">Program Title</label>
+                          <input required value={newProg.name} onChange={e => setNewProg({...newProg, name: e.target.value})} className="premium-input" placeholder="e.g. BSc Software Engineering" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="premium-input-wrapper">
+                            <label className="premium-label">Degree Level</label>
+                            <select value={newProg.degree_level} onChange={e => setNewProg({...newProg, degree_level: e.target.value})} className="premium-input appearance-none">
+                              <option value="BSc">BSc</option>
+                              <option value="B.Eng">B.Eng</option>
+                              <option value="MSc">MSc</option>
+                              <option value="PhD">PhD</option>
+                            </select>
+                          </div>
+                          <div className="premium-input-wrapper">
+                            <label className="premium-label">Duration (Years)</label>
+                            <input type="number" min={1} max={7} value={newProg.duration_years} onChange={e => setNewProg({...newProg, duration_years: parseInt(e.target.value)})} className="premium-input" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-3 pt-4">
+                      <button type="submit" className="w-full bg-mylms-purple text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl shadow-xl hover:opacity-90 transition-all text-[10px]">Commit Records</button>
+                      <button type="button" onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.2em] py-5 rounded-xl text-[10px]">Abort Process</button>
+                    </div>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </div>
