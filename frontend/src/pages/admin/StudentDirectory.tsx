@@ -41,6 +41,14 @@ export default function StudentDirectory() {
   const { token } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
 
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<'all' | 'matriculated' | 'pending'>('all');
+  const [stats, setStats] = useState<DirectoryStats>({ total: 0, matriculated: 0, pending: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStudents = useCallback(async (page = 1) => {

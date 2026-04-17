@@ -157,6 +157,18 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   
   const userRole = user?.role?.toLowerCase();
   
+  // SECURITY DEBUG LOGS (Delete after fixing live server)
+  useEffect(() => {
+    if (isAuthenticated) {
+       console.log('🛡️ MyLMS SECURITY DEBUG:', {
+         isAuthenticated,
+         role: user?.role,
+         normalizedRole: userRole,
+         pathname: location.pathname
+       });
+    }
+  }, [isAuthenticated, user, userRole, location.pathname]);
+
   if (userRole === 'student') {
     if (isCampus) {
       sidebarLinks = [
