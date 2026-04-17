@@ -199,7 +199,7 @@ export function CourseCatalogWidget() {
               {/* Visual Identifier - Abstract and Modern */}
               <div className="h-64 bg-offwhite relative overflow-hidden flex items-center justify-center border-b border-border-soft">
                   <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                  <div className="text-mylms-purple opacity-[0.03] text-[240px] font-black select-none pointer-events-none group-hover:scale-125 transition-transform duration-[2s]">{course.title.charAt(0)}</div>
+                  <div className="text-mylms-purple opacity-[0.03] text-[240px] font-black select-none pointer-events-none group-hover:scale-125 transition-transform duration-[2s]">{(course.title || 'C').charAt(0)}</div>
                   
                   {/* Category Pill */}
                   <div className="absolute bottom-8 right-8">
@@ -236,7 +236,7 @@ export function CourseCatalogWidget() {
                   </div>
                   <div className="text-right">
                      <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1.5 opacity-60">Department</p>
-                     <p className="text-[10px] font-black text-mylms-rose uppercase tracking-widest">{course.department.name.split(' ')[0]}</p>
+                     <p className="text-[10px] font-black text-mylms-rose uppercase tracking-widest">{(course.department?.name || '').split(' ')[0]}</p>
                   </div>
                 </div>
                 
