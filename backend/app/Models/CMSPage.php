@@ -8,7 +8,7 @@ class CMSPage extends Model
 {
     protected $table = 'cms_pages';
 
-    protected $fillable = ['slug', 'title', 'puck_json', 'is_published'];
+    protected $fillable = ['slug', 'title', 'puck_json', 'is_published', 'is_core'];
 
     protected $casts = [
         'puck_json' => 'array',

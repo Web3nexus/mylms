@@ -1,4 +1,5 @@
-import { useBranding } from '../hooks/useBranding';
+import { useState, useEffect } from 'react';
+import client from '../api/client';
 import { 
   ShieldCheck, 
   MapPin, 
@@ -11,7 +12,29 @@ import {
 import { Link } from 'react-router-dom';
 
 export function AboutInner() {
-  const { branding } = useBranding();
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const res = await client.get('/pages/about');
+        setPageData(res.data.puck_json || {});
+      } catch (err) {
+        console.error("Failed to load about page registry:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPage();
+  }, []);
+
+  const getBlockProps = (type: string) => {
+    return pageData?.content?.find((b: any) => b.type === type)?.props || {};
+  };
+
+  const hero = getBlockProps('Hero');
+  const richText = getBlockProps('RichText');
 
   return (
     <div className="">
@@ -25,16 +48,12 @@ export function AboutInner() {
             </span>
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
-            {branding?.about_hero_title.split(' ').map((word, i) => (
-              <span key={i}>
-                {i % 2 === 1 ? <span className="text-mylms-purple">{word}</span> : word}{' '}
-              </span>
-            ))}
+          <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic text-mylms-purple">
+            {hero.title || 'Innovation in Education.'}
           </h1>
           
           <p className="max-w-2xl text-text-secondary font-medium text-lg mb-12 opacity-80 leading-relaxed font-sans italic">
-            {branding?.about_hero_desc || 'Founded on the principle of universal access, we are redefining what it means to be a global university.'}
+            {hero.description || 'Founded on the principle of universal access, we are redefining what it means to be a global university.'}
           </p>
         </div>
       </section>
@@ -47,8 +66,8 @@ export function AboutInner() {
               <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
                  <ShieldCheck size={48} className="text-mylms-rose mb-10 group-hover:rotate-12 transition-transform duration-500" />
                  <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-mylms-purple mb-8">Authoritative Mission</h2>
-                 <p className="text-base md:text-lg font-medium text-text-secondary leading-relaxed italic opacity-80 max-w-2xl">
-                    {branding?.about_mission || "Our mission is to provide high-quality, internationally accredited higher education to every qualified student in the world — regardless of constraints."}
+                 <p className="text-base md:text-lg font-medium text-text-secondary leading-relaxed italic opacity-80 max-w-2xl whitespace-pre-wrap">
+                    {richText.content || "Our mission is to provide high-quality, internationally accredited higher education to every qualified student in the world — regardless of constraints."}
                  </p>
               </div>
            </div>
@@ -66,8 +85,8 @@ export function AboutInner() {
                  <h2 className="text-5xl font-black text-text-main tracking-tighter mb-8 italic uppercase leading-none">
                     Institutional <span className="text-mylms-purple">Heritage</span>
                  </h2>
-                 <p className="text-lg text-text-secondary font-medium mb-8 leading-relaxed opacity-70 font-sans italic">
-                    {branding?.about_history || "Established in the digital era, MyLMS has grown from a visionary project into a global academic authority, serving thousands of students across every continent. We are built on the foundations of innovation, accessibility, and academic excellence."}
+                 <p className="text-lg text-text-secondary font-medium mb-8 leading-relaxed opacity-70 font-sans italic whitespace-pre-wrap">
+                    {richText.content || "Established in the digital era, MyLMS has grown from a visionary project into a global academic authority, serving thousands of students across every continent. We are built on the foundations of innovation, accessibility, and academic excellence."}
                  </p>
                  
                  <div className="grid grid-cols-2 gap-8 pt-8">
@@ -109,7 +128,7 @@ export function AboutInner() {
         <div className="absolute left-0 top-0 w-full h-1 bg-gradient-to-r from-transparent via-mylms-rose/20 to-transparent"></div>
         <div className="max-w-7xl mx-auto text-center">
            <h2 className="text-5xl font-black text-text-main tracking-tighter mb-20 italic uppercase leading-none">
-              {branding?.about_leadership_title || 'Institutional Leadership'}
+              Institutional Leadership
            </h2>
            
            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

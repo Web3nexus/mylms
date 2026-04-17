@@ -1,4 +1,5 @@
-import { useBranding } from '../hooks/useBranding';
+import { useState, useEffect } from "react";
+import client from "../api/client";
 import { 
   Globe, 
   Terminal, 
@@ -21,7 +22,29 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export function ExperienceInner() {
-  const { branding } = useBranding();
+  const [pageData, setPageData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const res = await client.get("/pages/experience");
+        setPageData(res.data.puck_json || {});
+      } catch (err) {
+        console.error("Failed to load experience page registry:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPage();
+  }, []);
+
+  const getBlockProps = (type: string) => {
+    return pageData?.content?.find((b: any) => b.type === type)?.props || {};
+  };
+
+  const hero = getBlockProps("Hero");
+  const columnSection = getBlockProps("ColumnSection"); // Assuming features are here
 
   return (
     <div className="">
@@ -32,20 +55,16 @@ export function ExperienceInner() {
           <div className="flex items-center gap-4 mb-8">
             <span className="w-12 h-px bg-mylms-rose"></span>
             <span className="text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px]">
-              The {branding?.institutional_name || 'MyLMS'} Journey
+              The Institutional Journey
             </span>
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
-            {branding?.experience_hero_title.split(' ').map((word, i) => (
-              <span key={i}>
-                {i % 2 === 1 ? <span className="text-mylms-purple">{word}</span> : word}{' '}
-              </span>
-            ))}
+          <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic text-mylms-purple">
+            {hero.title || 'Student Experience.'}
           </h1>
           
           <p className="max-w-2xl text-text-secondary font-medium text-lg mb-12 opacity-80 leading-relaxed font-sans italic">
-            {branding?.experience_hero_desc || 'Experience a world-class digital education environment designed for the modern scholar.'}
+            {hero.description || 'Experience a world-class digital education environment designed for the modern scholar.'}
           </p>
 
           <div className="flex gap-6">
@@ -60,7 +79,7 @@ export function ExperienceInner() {
       <section className="py-20 px-6 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {branding?.experience_features.map((feature, idx) => (
+            {(columnSection.columns || []).map((feature: any, idx: number) => (
               <div key={idx} className="group/card p-10 rounded-[40px] bg-offwhite border border-border-soft hover:border-mylms-purple/20 hover:shadow-2xl transition-all duration-500">
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-mylms-purple mb-8 shadow-sm group-hover/card:scale-110 group-hover/card:rotate-6 transition-all">
                   {iconMap[feature.icon] || <Zap size={24} />}

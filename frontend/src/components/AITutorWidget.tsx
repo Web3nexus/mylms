@@ -63,7 +63,7 @@ export default function AITutorWidget({ courseId }: { courseId: number }) {
     <div className="fixed bottom-10 right-10 z-50">
       {/* MyLMS Chat Interface */}
       {isOpen && (
-        <div className="absolute bottom-24 right-0 w-[420px] max-w-[calc(100vw-4rem)] bg-white rounded-3xl border border-border-soft shadow-2xl overflow-hidden flex flex-col mb-4 h-[600px] transition-all animate-in slide-in-from-bottom-5 group">
+        <div className="absolute bottom-24 right-0 w-[420px] max-w-[calc(100vw-4rem)] bg-white rounded-3xl border border-border-soft shadow-2xl overflow-hidden flex flex-col mb-4 min-h-[400px] max-h-[min(650px,calc(100vh-160px))] transition-all animate-in slide-in-from-bottom-5 group">
           
           {/* Interface Header */}
           <div className="bg-white border-b border-offwhite p-8 flex justify-between items-center relative overflow-hidden group/header">

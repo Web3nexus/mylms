@@ -149,63 +149,6 @@ export default function BrandingManager() {
     updateField('footer_columns', newColumns);
   };
 
-  const updateStatField = (index: number, field: string, value: string) => {
-    if (!branding) return;
-    const newStats = [...branding.admissions_stats];
-    newStats[index] = { ...newStats[index], [field]: value };
-    updateField('admissions_stats', newStats);
-  };
-
-  const addStat = () => {
-    if (!branding) return;
-    const newStats = [...branding.admissions_stats, { label: 'New Stat', value: '0', suffix: '' }];
-    updateField('admissions_stats', newStats);
-  };
-
-  const removeStat = (index: number) => {
-    if (!branding) return;
-    const newStats = branding.admissions_stats.filter((_, i) => i !== index);
-    updateField('admissions_stats', newStats);
-  };
-
-  const updateBenefitField = (index: number, field: string, value: string) => {
-    if (!branding) return;
-    const newBenefits = [...branding.benefit_cards];
-    newBenefits[index] = { ...newBenefits[index], [field]: value };
-    updateField('benefit_cards', newBenefits);
-  };
-
-  const addBenefit = () => {
-    if (!branding) return;
-    const newBenefits = [...branding.benefit_cards, { title: 'New Benefit', desc: 'Description here...' }];
-    updateField('benefit_cards', newBenefits);
-  };
-
-  const removeBenefit = (index: number) => {
-    if (!branding) return;
-    const newBenefits = branding.benefit_cards.filter((_, i) => i !== index);
-    updateField('benefit_cards', newBenefits);
-  };
-
-  const updateExperienceFeatureField = (index: number, field: string, value: string) => {
-    if (!branding) return;
-    const newFeatures = [...branding.experience_features];
-    newFeatures[index] = { ...newFeatures[index], [field]: value };
-    updateField('experience_features', newFeatures);
-  };
-
-  const addExperienceFeature = () => {
-    if (!branding) return;
-    const newFeatures = [...branding.experience_features, { title: 'New Feature', desc: 'Description...', icon: 'globe' }];
-    updateField('experience_features', newFeatures);
-  };
-
-  const removeExperienceFeature = (index: number) => {
-    if (!branding) return;
-    const newFeatures = branding.experience_features.filter((_, i) => i !== index);
-    updateField('experience_features', newFeatures);
-  };
-
 
   if (loading) {
      return (
@@ -447,192 +390,23 @@ export default function BrandingManager() {
              />
           </div>
 
-          {/* PAGE CONTENT REGISTRY */}
-          <div className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm">
-             <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border-soft">
-                <Layout size={20} className="text-mylms-rose" />
-                <h3 className="font-black uppercase tracking-widest text-sm">Admissions Landing Page</h3>
+          <div className="bg-mylms-purple/5 p-10 rounded-3xl border border-mylms-purple/10 shadow-sm relative overflow-hidden group">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full group-hover:scale-110 transition-transform"></div>
+             <div className="flex items-center gap-4 mb-6">
+                <Layout size={24} className="text-mylms-purple" />
+                <h3 className="font-black uppercase tracking-widest text-sm">Centralized Page Registry</h3>
              </div>
-             <div className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Hero Registry Title</label>
-                  <input 
-                    type="text" 
-                    value={branding?.admissions_hero_title}
-                    onChange={(e) => updateField('admissions_hero_title', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Hero Description</label>
-                  <textarea 
-                    rows={3}
-                    value={branding?.admissions_hero_desc}
-                    onChange={(e) => updateField('admissions_hero_desc', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl p-4 font-bold text-sm outline-none"
-                  />
-                </div>
-                
-                <div className="pt-6 border-t border-offwhite">
-                  <div className="flex justify-between items-center mb-6">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Institutional Statistics</label>
-                    <button onClick={addStat} className="text-[9px] font-black uppercase text-mylms-purple flex items-center gap-2 hover:opacity-70"><Plus size={12}/> Add Stat</button>
-                  </div>
-                  <div className="grid grid-cols-1 gap-4">
-                    {branding?.admissions_stats.map((stat, idx) => (
-                      <div key={idx} className="flex gap-4 items-end bg-offwhite p-4 rounded-xl relative group/stat">
-                        <button onClick={() => removeStat(idx)} className="absolute top-2 right-2 opacity-0 group-hover/stat:opacity-100 text-gray-300 hover:text-mylms-rose transition-all"><Trash2 size={12}/></button>
-                        <div className="flex-1">
-                          <label className="text-[8px] font-black text-gray-400 uppercase mb-1 block">Label</label>
-                          <input type="text" value={stat.label} onChange={(e) => updateStatField(idx, 'label', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg px-3 py-1.5 text-xs font-bold" />
-                        </div>
-                        <div className="w-24">
-                          <label className="text-[8px] font-black text-gray-400 uppercase mb-1 block">Value</label>
-                          <input type="text" value={stat.value} onChange={(e) => updateStatField(idx, 'value', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg px-3 py-1.5 text-xs font-bold" />
-                        </div>
-                        <div className="w-16">
-                          <label className="text-[8px] font-black text-gray-400 uppercase mb-1 block">Suffix</label>
-                          <input type="text" value={stat.suffix} onChange={(e) => updateStatField(idx, 'suffix', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg px-3 py-1.5 text-xs font-bold" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-             </div>
-          </div>
-
-          <div className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm">
-             <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border-soft">
-                <Globe size={20} className="text-mylms-purple" />
-                <h3 className="font-black uppercase tracking-widest text-sm">Directory Headers</h3>
-             </div>
-             <div className="space-y-8">
-                <div className="p-6 bg-offwhite rounded-2xl space-y-4">
-                  <p className="text-[10px] font-black uppercase text-mylms-purple tracking-widest border-b border-white/50 pb-2 mb-4">Scholarships Gallery</p>
-                  <input type="text" value={branding?.scholarships_hero_title} onChange={(e) => updateField('scholarships_hero_title', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg px-4 py-2 font-bold text-sm outline-none" placeholder="Hero Title" />
-                  <textarea rows={2} value={branding?.scholarships_hero_desc} onChange={(e) => updateField('scholarships_hero_desc', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg p-4 font-bold text-xs outline-none" placeholder="Intro Description" />
-                </div>
-                <div className="p-6 bg-offwhite rounded-2xl space-y-4">
-                  <p className="text-[10px] font-black uppercase text-mylms-purple tracking-widest border-b border-white/50 pb-2 mb-4">Academic Catalog</p>
-                  <input type="text" value={branding?.courses_hero_title} onChange={(e) => updateField('courses_hero_title', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg px-4 py-2 font-bold text-sm outline-none" placeholder="Hero Title" />
-                  <textarea rows={2} value={branding?.courses_hero_desc} onChange={(e) => updateField('courses_hero_desc', e.target.value)} className="w-full bg-white border border-border-soft rounded-lg p-4 font-bold text-xs outline-none" placeholder="Intro Description" />
-                </div>
-             </div>
-          </div>
-
-          <div className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm">
-             <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border-soft">
-                <ShieldCheck size={20} className="text-mylms-rose" />
-                <h3 className="font-black uppercase tracking-widest text-sm">Auth & Onboarding</h3>
-             </div>
-             <div className="space-y-6">
-                <input type="text" value={branding?.auth_panel_title} onChange={(e) => updateField('auth_panel_title', e.target.value)} className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-sm outline-none" placeholder="Auth Panel Headline" />
-                <textarea rows={3} value={branding?.auth_panel_desc} onChange={(e) => updateField('auth_panel_desc', e.target.value)} className="w-full bg-offwhite border border-border-soft rounded-xl p-4 font-bold text-sm outline-none" placeholder="Auth Panel Subtext" />
-                
-                <div className="pt-6 border-t border-offwhite">
-                  <div className="flex justify-between items-center mb-6">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mission Benefits</label>
-                    <button onClick={addBenefit} className="text-[9px] font-black uppercase text-mylms-purple flex items-center gap-2 hover:opacity-70"><Plus size={12}/> Add Card</button>
-                  </div>
-                  <div className="space-y-4">
-                    {branding?.benefit_cards.map((card, idx) => (
-                      <div key={idx} className="bg-offwhite p-6 rounded-2xl relative group/card">
-                        <button onClick={() => removeBenefit(idx)} className="absolute top-4 right-4 opacity-0 group-hover/card:opacity-100 text-gray-300 hover:text-mylms-rose transition-all"><Trash2 size={16}/></button>
-                        <input type="text" value={card.title} onChange={(e) => updateBenefitField(idx, 'title', e.target.value)} className="w-full bg-transparent border-b border-white mb-4 font-black text-mylms-purple uppercase tracking-widest text-xs outline-none" placeholder="Card Title" />
-                        <textarea rows={2} value={card.desc} onChange={(e) => updateBenefitField(idx, 'desc', e.target.value)} className="w-full bg-transparent text-gray-500 font-medium text-xs outline-none resize-none" placeholder="Card Description" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-             </div>
-          </div>
-
-          <div className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm">
-             <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border-soft">
-                <Globe size={20} className="text-mylms-purple" />
-                <h3 className="font-black uppercase tracking-widest text-sm">Student Experience Page</h3>
-             </div>
-             <div className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Hero Registry Title</label>
-                  <input 
-                    type="text" 
-                    value={branding?.experience_hero_title}
-                    onChange={(e) => updateField('experience_hero_title', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Hero Description</label>
-                  <textarea 
-                    rows={3}
-                    value={branding?.experience_hero_desc}
-                    onChange={(e) => updateField('experience_hero_desc', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl p-4 font-bold text-sm outline-none"
-                  />
-                </div>
-                
-                <div className="pt-6 border-t border-offwhite">
-                  <div className="flex justify-between items-center mb-6">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Experience Highlights</label>
-                    <button onClick={addExperienceFeature} className="text-[9px] font-black uppercase text-mylms-purple flex items-center gap-2 hover:opacity-70"><Plus size={12}/> Add Feature</button>
-                  </div>
-                  <div className="space-y-4">
-                    {branding?.experience_features.map((feature, idx) => (
-                      <div key={idx} className="bg-offwhite p-6 rounded-2xl relative group/feat">
-                        <button onClick={() => removeExperienceFeature(idx)} className="absolute top-4 right-4 opacity-0 group-hover/feat:opacity-100 text-gray-300 hover:text-mylms-rose transition-all"><Trash2 size={16}/></button>
-                        <input type="text" value={feature.title} onChange={(e) => updateExperienceFeatureField(idx, 'title', e.target.value)} className="w-full bg-transparent border-b border-white mb-4 font-black text-mylms-purple uppercase tracking-widest text-xs outline-none" placeholder="Feature Title" />
-                        <textarea rows={2} value={feature.desc} onChange={(e) => updateExperienceFeatureField(idx, 'desc', e.target.value)} className="w-full bg-transparent text-gray-500 font-medium text-xs outline-none resize-none" placeholder="Feature Description" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-             </div>
-          </div>
-
-          <div className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm">
-             <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border-soft">
-                <ShieldCheck size={20} className="text-mylms-rose" />
-                <h3 className="font-black uppercase tracking-widest text-sm">About Institutional Profile</h3>
-             </div>
-             <div className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Hero Title</label>
-                  <input 
-                    type="text" 
-                    value={branding?.about_hero_title}
-                    onChange={(e) => updateField('about_hero_title', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl px-4 py-3 font-bold text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Hero Description</label>
-                  <textarea 
-                    rows={2}
-                    value={branding?.about_hero_desc}
-                    onChange={(e) => updateField('about_hero_desc', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl p-4 font-bold text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Mission Statement</label>
-                  <textarea 
-                    rows={4}
-                    value={branding?.about_mission}
-                    onChange={(e) => updateField('about_mission', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl p-4 font-bold text-sm outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Institutional History</label>
-                  <textarea 
-                    rows={4}
-                    value={branding?.about_history}
-                    onChange={(e) => updateField('about_history', e.target.value)}
-                    className="w-full bg-offwhite border border-border-soft rounded-xl p-4 font-bold text-sm outline-none"
-                  />
-                </div>
-             </div>
+             <p className="text-[11px] font-bold text-gray-500 mb-8 leading-relaxed uppercase tracking-wider">
+                Marketing content for Landing, About, and Experience pages has been migrated to the 
+                centralized CMS Registry for better management.
+             </p>
+             <Link 
+               to="/admin/pages" 
+               className="inline-flex items-center gap-3 bg-mylms-purple text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-lg hover:bg-mylms-purple/90 transition-all active:scale-95"
+             >
+                Access Registry Center
+                <ExternalLink size={14} />
+             </Link>
           </div>
         </div>
 

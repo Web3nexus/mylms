@@ -4,6 +4,7 @@ namespace App\Modules\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\SystemSetting;
+use App\Models\CMSPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,6 +15,8 @@ class BrandingController extends Controller
      */
     public function index()
     {
+        $this->syncCorePages();
+        
         $settings = [
             'logo_url' => SystemSetting::getVal('branding_logo_url', 'https://images.unsplash.com/photo-1523050853063-bd805a952113?q=80&w=200'),
             'logo_light_url' => SystemSetting::getVal('branding_logo_light_url', 'https://images.unsplash.com/photo-1523050853063-bd805a952113?q=80&w=200'),
@@ -26,43 +29,7 @@ class BrandingController extends Controller
             'footer_text' => SystemSetting::getVal('branding_footer', 'An accredited, American, tuition-free, online university dedicated to global access.'),
             'admissions_enabled' => SystemSetting::getVal('admissions_enabled', true),
             'admissions_opens_at' => SystemSetting::getVal('admissions_opens_at', '2026-09-01'),
-            
-            // Core Page Content (Manageable Marketing)
-            'admissions_hero_title' => SystemSetting::getVal('admissions_hero_title', 'Shape Your Future.'),
-            'admissions_hero_desc' => SystemSetting::getVal('admissions_hero_desc', 'Join thousands of scholars worldwide. Apply for fully online, internationally accredited degree programs — tuition-free.'),
-            'admissions_stats' => SystemSetting::getVal('admissions_stats', [
-                ['label' => 'Degree Programs', 'value' => '40+', 'suffix' => ''],
-                ['label' => 'Tuition-Free', 'value' => '100', 'suffix' => '%'],
-                ['label' => 'Global Students', 'value' => '12', 'suffix' => 'k+'],
-                ['label' => 'Accredited', 'value' => 'Gold', 'suffix' => ''],
-            ]),
-            'scholarships_hero_title' => SystemSetting::getVal('scholarships_hero_title', 'Funding Registry.'),
-            'scholarships_hero_desc' => SystemSetting::getVal('scholarships_hero_desc', 'Authorized MyLMS directory of academic grants, fellowships, and research bursaries curated for Institutional Scholars.'),
-            'courses_hero_title' => SystemSetting::getVal('courses_hero_title', 'Academic Catalog.'),
-            'courses_hero_desc' => SystemSetting::getVal('courses_hero_desc', 'Explore our comprehensive list of degree-granting courses and specialized certificates.'),
-            'auth_panel_title' => SystemSetting::getVal('auth_panel_title', 'Access the Nexus.'),
-            'auth_panel_desc' => SystemSetting::getVal('auth_panel_desc', 'Enter your institutional credentials to sync with the global academic registry and manage your learning journey.'),
-            'benefit_cards' => SystemSetting::getVal('benefit_cards', [
-                ['title' => '100% Online', 'desc' => 'Study from anywhere in the world, on your schedule. No campus visits required.'],
-                ['title' => 'Internationally Accredited', 'desc' => 'Our degrees are recognized by employers and institutions worldwide.'],
-                ['title' => 'Flexible Pacing', 'desc' => 'Self-paced modules designed for working professionals and busy learners.'],
-            ]),
-
-            // Student Experience Page
-            'experience_hero_title' => SystemSetting::getVal('experience_hero_title', 'Your Global Campus.'),
-            'experience_hero_desc' => SystemSetting::getVal('experience_hero_desc', 'Experience a world-class digital education environment designed for the modern scholar.'),
-            'experience_features' => SystemSetting::getVal('experience_features', [
-                ['title' => 'Digital Ecosystem', 'desc' => 'Access the full suite of Microsoft 365, high-speed virtual libraries, and peer-to-peer collaboration tools.', 'icon' => 'terminal'],
-                ['title' => 'Global Community', 'desc' => 'Connect with students from over 120 countries and build a professional network that transcends borders.', 'icon' => 'globe'],
-                ['title' => 'Research Registry', 'desc' => 'Participate in international research projects and access our exclusive academic repository.', 'icon' => 'database'],
-            ]),
-
-            // About Us Page
             'about_hero_title' => SystemSetting::getVal('about_hero_title', 'Innovation in Education.'),
-            'about_hero_desc' => SystemSetting::getVal('about_hero_desc', 'Founded on the principle of universal access, we are redefining what it means to be a global university.'),
-            'about_mission' => SystemSetting::getVal('about_mission', 'Our mission is to provide high-quality, internationally accredited higher education to every qualified student in the world, regardless of financial, geographic, or societal constraints.'),
-            'about_leadership_title' => SystemSetting::getVal('about_leadership_title', 'Academic Leadership'),
-            'about_history' => SystemSetting::getVal('about_history', 'Established in the digital era, MyLMS has grown from a visionary project into a global academic authority, serving thousands of students across every continent.'),
         ];
 
         $footerColumns = SystemSetting::getVal('branding_footer_columns');
@@ -117,24 +84,7 @@ class BrandingController extends Controller
             'admissions_enabled' => 'nullable|boolean',
             'admissions_opens_at' => 'nullable|string|date',
             'footer_columns' => 'nullable|array',
-            'admissions_hero_title' => 'nullable|string',
-            'admissions_hero_desc' => 'nullable|string',
-            'admissions_stats' => 'nullable|array',
-            'scholarships_hero_title' => 'nullable|string',
-            'scholarships_hero_desc' => 'nullable|string',
-            'courses_hero_title' => 'nullable|string',
-            'courses_hero_desc' => 'nullable|string',
-            'auth_panel_title' => 'nullable|string',
-            'auth_panel_desc' => 'nullable|string',
-            'benefit_cards' => 'nullable|array',
-            'experience_hero_title' => 'nullable|string',
-            'experience_hero_desc' => 'nullable|string',
-            'experience_features' => 'nullable|array',
             'about_hero_title' => 'nullable|string',
-            'about_hero_desc' => 'nullable|string',
-            'about_mission' => 'nullable|string',
-            'about_leadership_title' => 'nullable|string',
-            'about_history' => 'nullable|string',
         ]);
 
         $allowed = [
@@ -142,13 +92,7 @@ class BrandingController extends Controller
             'institutional_name', 'institutional_motto', 
             'hero_image', 'footer_text', 'admissions_enabled', 'admissions_opens_at',
             'footer_columns',
-            'admissions_hero_title', 'admissions_hero_desc', 'admissions_stats',
-            'scholarships_hero_title', 'scholarships_hero_desc',
-            'courses_hero_title', 'courses_hero_desc',
-            'auth_panel_title', 'auth_panel_desc',
-            'benefit_cards',
-            'experience_hero_title', 'experience_hero_desc', 'experience_features',
-            'about_hero_title', 'about_hero_desc', 'about_mission', 'about_leadership_title', 'about_history'
+            'about_hero_title'
         ];
 
         foreach ($request->only($allowed) as $key => $value) {
@@ -202,5 +146,83 @@ class BrandingController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'No file provided'], 400);
+
+    /**
+     * Sync branding-held page content to the CMS Registry.
+     */
+    private function syncCorePages()
+    {
+        $corePages = [
+            'index' => [
+                'title' => 'Landing Page Registry',
+                'puck_json' => [
+                    'content' => [
+                        ['type' => 'Hero', 'props' => [
+                            'title' => SystemSetting::getVal('admissions_hero_title', 'Shape Your Future.'),
+                            'description' => SystemSetting::getVal('admissions_hero_desc', 'Join thousands of scholars worldwide.'),
+                        ]]
+                    ]
+                ]
+            ],
+            'about' => [
+                'title' => 'Institutional About Registry',
+                'puck_json' => [
+                    'content' => [
+                        ['type' => 'Hero', 'props' => [
+                            'title' => SystemSetting::getVal('about_hero_title', 'About Our Institution'),
+                            'description' => SystemSetting::getVal('about_hero_desc', 'Founded on universal access.'),
+                        ]],
+                        ['type' => 'RichText', 'props' => [
+                            'content' => SystemSetting::getVal('about_mission', 'Mission details...') . "\n\n" . SystemSetting::getVal('about_history', 'History details...')
+                        ]]
+                    ]
+                ]
+            ],
+            'experience' => [
+                'title' => 'Student Experience Registry',
+                'puck_json' => [
+                    'content' => [
+                        ['type' => 'Hero', 'props' => [
+                            'title' => SystemSetting::getVal('experience_hero_title', 'Your Global Campus'),
+                            'description' => SystemSetting::getVal('experience_hero_desc', 'Experience world-class digital education.'),
+                        ]]
+                    ]
+                ]
+            ],
+            'scholarships' => [
+                'title' => 'Financial Aid & Scholarships Registry',
+                'puck_json' => [
+                    'content' => [
+                        ['type' => 'Hero', 'props' => [
+                            'title' => SystemSetting::getVal('scholarships_hero_title', 'Funding Your Journey'),
+                            'description' => SystemSetting::getVal('scholarships_hero_desc', 'Explore grants and bursaries.'),
+                        ]]
+                    ]
+                ]
+            ],
+            'courses' => [
+                'title' => 'Academic Catalog Registry',
+                'puck_json' => [
+                    'content' => [
+                        ['type' => 'Hero', 'props' => [
+                            'title' => SystemSetting::getVal('courses_hero_title', 'Educational Pathways'),
+                            'description' => SystemSetting::getVal('courses_hero_desc', 'Our comprehensive course catalog.'),
+                        ]]
+                    ]
+                ]
+            ],
+        ];
+
+        foreach ($corePages as $slug => $data) {
+            CMSPage::firstOrCreate(
+                ['slug' => $slug],
+                [
+                    'title' => $data['title'],
+                    'puck_json' => $data['puck_json'],
+                    'is_published' => true,
+                    'is_core' => true
+                ]
+            );
+        }
     }
 }
