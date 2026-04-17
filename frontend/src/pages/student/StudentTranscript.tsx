@@ -8,6 +8,7 @@ import {
   Calendar,
   Bell
 } from 'lucide-react';
+import { useBranding } from '../../hooks/useBranding';
 
 interface CourseRecord {
   course_id: number;
@@ -34,6 +35,7 @@ interface TranscriptData {
 }
 
 export default function StudentTranscript() {
+  const { branding } = useBranding();
   const { token, user } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -88,7 +90,16 @@ export default function StudentTranscript() {
     <div className="max-w-7xl mx-auto py-10 px-12 min-h-screen transition-all">
       {/* Header Utilities */}
       <div className="flex justify-between items-center mb-10">
-         <h1 className="text-3xl font-serif font-black text-mylms-purple uppercase tracking-tight">My Academic Progress</h1>
+         <div className="flex flex-col gap-1">
+            {branding?.logo_url ? (
+              <div className="h-10 overflow-hidden shrink-0 transition-all flex items-center mb-2">
+                <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
+              </div>
+            ) : (
+              <h1 className="text-3xl font-serif font-black text-mylms-purple uppercase tracking-tight">{branding?.institutional_name || 'MyLMS'}</h1>
+            )}
+            <h2 className="text-xl font-serif font-black text-text-secondary uppercase tracking-tight opacity-40">Academic Progress</h2>
+         </div>
          <div className="flex gap-4">
             <button className="p-3 rounded-lg bg-white border border-border-soft text-mylms-purple transition-all shadow-sm hover:shadow-md">
                <Calendar size={18} />

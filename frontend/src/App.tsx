@@ -219,11 +219,15 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           <div className="p-8 pb-8 flex items-center justify-between">
             {!isSidebarCollapsed && (
               <Link to="/" className="flex flex-col items-start gap-1 group">
-                <div className="w-10 h-10 flex items-center justify-center font-black text-xl rounded-lg shadow-sm bg-mylms-purple text-white overflow-hidden shrink-0">
-                  {branding?.logo_url ? <img src={branding.logo_url} className="w-full h-full object-cover" alt="Logo" /> : (branding?.institutional_name?.charAt(0) || 'M')}
-                </div>
-                {!branding?.logo_url && (
+                {branding?.logo_url ? (
+                  <div className="h-10 overflow-hidden shrink-0 transition-all flex items-center">
+                    <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
+                  </div>
+                ) : (
                   <>
+                    <div className="w-10 h-10 flex items-center justify-center font-black text-xl rounded-lg shadow-sm bg-mylms-purple text-white overflow-hidden shrink-0">
+                      {(branding?.institutional_name?.charAt(0) || 'M')}
+                    </div>
                     <span className="text-[11px] font-black text-text-main tracking-[0.2em] leading-none mt-3 uppercase">{branding?.institutional_name || 'MyLMS'}</span>
                     <span className="text-[7px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 opacity-50">{branding?.institutional_motto || 'University Network'}</span>
                   </>

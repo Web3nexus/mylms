@@ -453,6 +453,11 @@ export function AdmissionFormWidget() {
       <div className="mb-24 flex flex-col lg:row justify-between items-center lg:items-end gap-16 border-b-2 border-border-soft pb-16 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-purple/3 rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
         <div className="text-center lg:text-left">
+           {branding?.logo_url ? (
+             <div className="h-10 overflow-hidden shrink-0 transition-all flex items-center mb-8 justify-center lg:justify-start">
+               <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
+             </div>
+           ) : null}
            <div className="flex items-center justify-center lg:justify-start gap-4 mb-10 group/sub">
               <span className="w-12 h-px bg-mylms-rose group-hover/sub:w-20 transition-all duration-500"></span>
               <span className="text-mylms-rose font-black uppercase tracking-[0.5em] text-[10px]">Enrollment Protocol {new Date().getFullYear()}</span>

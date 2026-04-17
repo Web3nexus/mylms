@@ -15,6 +15,7 @@ import {
   Lock,
   Search
 } from 'lucide-react';
+import { useBranding } from '../../hooks/useBranding';
 
 interface CertificateData {
   course: {
@@ -31,6 +32,7 @@ interface CertificateData {
 }
 
 export default function CourseCertificate() {
+  const { branding } = useBranding();
   const { slug } = useParams();
   const { token } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
@@ -105,13 +107,25 @@ export default function CourseCertificate() {
 
          {/* Content Module */}
          <div className="relative z-10 w-full flex flex-col items-center">
-            <div className="flex items-center gap-4 mb-12">
-               <div className="w-12 h-12 bg-[#4B345E] flex items-center justify-center text-white font-black text-xl rounded-xl shadow-md font-display">M</div>
-               <div>
-                  <h4 className="text-[#1A1A1A] font-black tracking-[0.5em] uppercase text-xs md:text-sm leading-none">MyLMS Academic Network</h4>
-                  <p className="text-[8px] font-black text-gray-300 uppercase tracking-[0.4em] mt-2">MyLMS Registry of Credentials</p>
+            {branding?.logo_url ? (
+               <div className="h-16 overflow-hidden shrink-0 transition-all flex items-center mb-12">
+                  <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
                </div>
-            </div>
+            ) : (
+               <div className="flex items-center gap-4 mb-12">
+                  <div className="w-12 h-12 bg-[#4B345E] flex items-center justify-center text-white font-black text-xl rounded-xl shadow-md font-display">
+                    {(branding?.institutional_name?.charAt(0) || 'M')}
+                  </div>
+                  <div>
+                     <h4 className="text-[#1A1A1A] font-black tracking-[0.5em] uppercase text-xs md:text-sm leading-none">
+                        {branding?.institutional_name || 'MyLMS Academic Network'}
+                     </h4>
+                     <p className="text-[8px] font-black text-gray-300 uppercase tracking-[0.4em] mt-2">
+                        {branding?.institutional_motto || 'MyLMS Registry of Credentials'}
+                     </p>
+                  </div>
+               </div>
+            )}
             
             <h1 className="text-5xl md:text-7xl font-black text-[#1A1A1A] tracking-tighter mb-16 uppercase leading-none">
                Certificate of Completion

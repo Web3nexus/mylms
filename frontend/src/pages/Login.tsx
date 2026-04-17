@@ -86,13 +86,21 @@ export default function Login() {
         
         <div className="relative z-10 transition-all duration-1000 group-hover:translate-x-2">
           <Link to="/" className="flex items-center gap-5 group/logo">
-            <div className="w-16 h-16 bg-white flex items-center justify-center text-mylms-purple rounded-2xl shadow-2xl transition-all group-hover/logo:-rotate-6">
-              {branding?.logo_url ? <img src={branding.logo_url} className="w-full h-full object-contain p-2" /> : <GraduationCap size={36} />}
-            </div>
-            <div>
-              <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{branding?.institutional_name || 'MyLMS'}</h1>
-              <p className="text-[10px] font-black text-white/80 uppercase tracking-[0.4em] mt-2">{branding?.institutional_motto || 'University Network Authority'}</p>
-            </div>
+            {branding?.logo_url ? (
+              <div className="h-16 overflow-hidden shrink-0 transition-all flex items-center bg-white p-3 rounded-2xl shadow-2xl">
+                <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
+              </div>
+            ) : (
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 bg-white flex items-center justify-center text-mylms-purple rounded-2xl shadow-2xl transition-all group-hover/logo:-rotate-6">
+                  <GraduationCap size={36} />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{branding?.institutional_name || 'MyLMS'}</h1>
+                  <p className="text-[10px] font-black text-white/80 uppercase tracking-[0.4em] mt-2">{branding?.institutional_motto || 'University Network Authority'}</p>
+                </div>
+              </div>
+            )}
           </Link>
 
           <div className="mt-32 max-w-sm">

@@ -53,21 +53,25 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-5 text-white mb-10 group">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl overflow-hidden flex items-center justify-center border border-white/10 group-hover:bg-white/15 transition-all shadow-2xl">
-                {branding?.logo_url ? (
-                  <img src={branding.logo_url} className="w-full h-full object-cover" alt="Institutional Logo" />
-                ) : (
-                  <GraduationCap size={40} className="text-mylms-rose" />
-                )}
-              </div>
-              <div>
-                <span className="text-3xl font-serif font-black tracking-tight uppercase leading-none block">
-                  {branding?.institutional_name || "MyLMS"}
-                </span>
-                <span className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em] mt-2 block">
-                  {branding?.institutional_motto || "University Network Authority"}
-                </span>
-              </div>
+              {branding?.logo_url ? (
+                <div className="h-16 overflow-hidden shrink-0 transition-all flex items-center">
+                  <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Institutional Logo" />
+                </div>
+              ) : (
+                <div className="flex items-center gap-5">
+                  <div className="w-16 h-16 bg-white/10 rounded-2xl overflow-hidden flex items-center justify-center border border-white/10 group-hover:bg-white/15 transition-all shadow-2xl">
+                    <GraduationCap size={40} className="text-mylms-rose" />
+                  </div>
+                  <div>
+                    <span className="text-3xl font-serif font-black tracking-tight uppercase leading-none block">
+                      {branding?.institutional_name || "MyLMS"}
+                    </span>
+                    <span className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em] mt-2 block">
+                      {branding?.institutional_motto || "University Network Authority"}
+                    </span>
+                  </div>
+                </div>
+              )}
             </Link>
             
             <p className="text-[13px] font-bold leading-relaxed mb-10 text-white/40 uppercase tracking-[0.15em] max-w-md">
