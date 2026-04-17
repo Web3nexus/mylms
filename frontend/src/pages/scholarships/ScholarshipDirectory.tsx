@@ -83,7 +83,7 @@ export function ScholarshipFinderWidget() {
                  Office of Financial Aid • {branding?.institutional_name || 'Global Academy'}
               </div>
               <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
-                {branding?.scholarships_hero_title.split(' ').map((word, i) => (
+                {(branding?.scholarships_hero_title || 'Financial Aid & Scholarships').split(' ').map((word, i) => (
                   <span key={i}>
                     {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-gradient-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
                   </span>

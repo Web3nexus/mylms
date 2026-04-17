@@ -111,7 +111,7 @@ export function AdmissionsInner() {
               Enrollment Cycle {new Date().getFullYear()}–{new Date().getFullYear() + 1}
             </div>
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.85] uppercase mb-10 font-serif" style={{ color: '#ffffff' }}>
-              {branding?.admissions_hero_title.split(' ').map((word, i, arr) => (
+              {(branding?.admissions_hero_title || 'Enrollment & Admissions').split(' ').map((word, i, arr) => (
                 <span key={i}>
                   {i === arr.length - 1 ? <span style={{ color: 'var(--color-mylms-rose)' }}>{word}</span> : word + ' '}
                   {i % 2 === 1 && <br />}

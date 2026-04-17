@@ -131,7 +131,7 @@ export function CourseCatalogWidget() {
               <span className="text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px]">{branding?.institutional_name || 'Global Academy'} Registry</span>
            </div>
            <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
-             {branding?.courses_hero_title.split(' ').map((word: string, i: number) => (
+             {(branding?.courses_hero_title || 'Educational Pathways').split(' ').map((word: string, i: number) => (
                <span key={i}>
                  {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
                </span>
