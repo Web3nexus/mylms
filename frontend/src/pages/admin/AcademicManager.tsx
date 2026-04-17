@@ -53,6 +53,19 @@ export default function AcademicManager() {
   const [showAddProgForDept, setShowAddProgForDept] = useState<number | null>(null);
   const [newProg, setNewProg] = useState({ name: '', degree_level: 'BSc', duration_years: 4 });
   
+  // Custom Modal State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    type: 'faculty' | 'department' | 'program';
+    id: number | null;
+    name: string;
+  }>({
+    isOpen: false,
+    type: 'faculty',
+    id: null,
+    name: ''
+  });
+  
   const token = useAuthStore(state => state.token);
 
   useEffect(() => {
@@ -117,39 +130,46 @@ export default function AcademicManager() {
   };
 
   const handleDeleteFaculty = async (id: number) => {
-    if (!window.confirm('WARNING: Are you sure? This will delete the entire faculty and all its departments/programs.')) return;
     try {
       await client.delete(`/academic/faculties/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
+      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
     } catch (err) {
        console.error('Delete faculty failed:', err);
     }
   };
 
   const handleDeleteDepartment = async (id: number) => {
-    if (!window.confirm('Delete this department and all its programs?')) return;
     try {
       await client.delete(`/academic/departments/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
+      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
     } catch (err) {
        console.error('Delete department failed:', err);
     }
   };
 
   const handleDeleteProgram = async (id: number) => {
-    if (!window.confirm('Remove this academic program?')) return;
     try {
       await client.delete(`/academic/programs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
+      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
     } catch (err) {
        console.error('Delete program failed:', err);
     }
+  };
+
+  const handleConfirmAction = () => {
+    if (!deleteConfirm.id) return;
+    if (deleteConfirm.type === 'faculty') handleDeleteFaculty(deleteConfirm.id);
+    else if (deleteConfirm.type === 'department') handleDeleteDepartment(deleteConfirm.id);
+    else if (deleteConfirm.type === 'program') handleDeleteProgram(deleteConfirm.id);
   };
 
   const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry'>('hierarchy');
@@ -283,7 +303,7 @@ export default function AcademicManager() {
                              {showAddDeptForFaculty === faculty.id ? 'Abort Dept' : 'Add Department'}
                           </button>
                            <button 
-                             onClick={() => handleDeleteFaculty(faculty.id)}
+                             onClick={() => setDeleteConfirm({ isOpen: true, type: 'faculty', id: faculty.id, name: faculty.name })}
                              className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-lg shadow-sm"
                            >
                               <Trash2 size={18} />
@@ -342,7 +362,7 @@ export default function AcademicManager() {
                                           <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
                                        </div>
                                        <button 
-                                          onClick={() => handleDeleteDepartment(dept.id)}
+                                          onClick={() => setDeleteConfirm({ isOpen: true, type: 'department', id: dept.id, name: dept.name })}
                                           className="text-gray-200 hover:text-mylms-rose transition-all p-1"
                                        >
                                           <Trash2 size={14} />
@@ -370,7 +390,7 @@ export default function AcademicManager() {
                                            </div>
                                             <div className="flex items-center gap-2">
                                                <button 
-                                                  onClick={() => handleDeleteProgram(program.id)}
+                                                  onClick={() => setDeleteConfirm({ isOpen: true, type: 'program', id: program.id, name: program.name })}
                                                   className="text-gray-200 hover:text-mylms-rose transition-all"
                                                >
                                                   <Trash2 size={14} />
@@ -458,6 +478,44 @@ export default function AcademicManager() {
             )}
           </div>
         </>
+      )}
+
+      {/* Premium Deletion Guard Modal */}
+      {deleteConfirm.isOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-mylms-purple/40 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white rounded-[32px] shadow-2xl border border-white/20 max-w-md w-full p-10 transform animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-mylms-rose/5 rounded-bl-full"></div>
+            
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-mylms-rose/10 rounded-2xl flex items-center justify-center text-mylms-rose mb-8">
+                 <XCircle size={32} />
+              </div>
+              
+              <h2 className="text-2xl font-black text-text-main uppercase tracking-tight leading-none mb-4">
+                 Terminate Record?
+              </h2>
+              
+              <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">
+                You are about to authorize the removal of <span className="font-black text-mylms-purple uppercase">"{deleteConfirm.name}"</span> from the institutional ledger. This action is irreversible.
+              </p>
+              
+              <div className="flex flex-col gap-3">
+                 <button 
+                    onClick={handleConfirmAction}
+                    className="w-full bg-mylms-rose text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-[#A00E26] shadow-xl hover:shadow-mylms-rose/20 transition-all active:scale-[0.98] text-[10px]"
+                 >
+                    Authorize Deletion
+                 </button>
+                 <button 
+                    onClick={() => setDeleteConfirm(prev => ({ ...prev, isOpen: false }))}
+                    className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:text-text-main transition-all text-[10px]"
+                 >
+                    Abort Registry Sync
+                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
