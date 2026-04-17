@@ -201,7 +201,9 @@ export default function BrandingManager() {
       </div>
 
       {message && (
-        <div className="mb-8 p-4 bg-green-50 border border-green-200 text-green-700 font-bold text-center rounded-xl animate-in fade-in slide-in-from-top">
+        <div className={`mb-8 p-4 border rounded-xl animate-in fade-in slide-in-from-top font-bold text-center ${
+          status === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'
+        }`}>
           {message}
         </div>
       )}
