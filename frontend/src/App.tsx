@@ -267,12 +267,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         </aside>
       )}
 
-      {/* NAVBAR (Public & Auth Responsive) */}
-      <Navbar 
-        isMenuOpen={isMenuOpen} 
-        setIsMenuOpen={setIsMenuOpen} 
-        isDashboardRoute={isDashboardRoute} 
-      />
+      {/* NAVBAR (Public Only) */}
+      {!isDashboardRoute && (
+        <Navbar 
+          isMenuOpen={isMenuOpen} 
+          setIsMenuOpen={setIsMenuOpen} 
+          isDashboardRoute={isDashboardRoute} 
+        />
+      )}
 
       {/* MAIN BODY */}
       <div className={`flex-1 flex flex-col min-w-0 ${isDashboardRoute ? 'h-screen overflow-y-auto bg-offwhite' : ''}`}>
