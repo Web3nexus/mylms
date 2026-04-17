@@ -8,7 +8,11 @@ import {
   Menu,
   X,
   User,
-  ArrowRight
+  ArrowRight,
+  ChevronDown,
+  BookOpen,
+  Users,
+  Sparkles
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useBranding } from '../../hooks/useBranding';
@@ -101,14 +105,59 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
           </Link>
           
           <div className="relative group">
-            <span className="text-xs font-bold text-mylms-purple hover:text-mylms-rose cursor-pointer flex items-center gap-1">
-              About
+            <span className="text-xs font-bold text-mylms-purple hover:text-mylms-rose cursor-pointer flex items-center gap-1 py-4">
+              About <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
             </span>
-            <div className="absolute top-full left-0 mt-2 bg-white border border-border-soft shadow-xl rounded-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all w-48 py-2">
-              <Link to="/about" className="block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-mylms-purple hover:bg-offwhite hover:text-mylms-rose">About Us</Link>
-              <Link to="/about/leadership" className="block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-mylms-purple hover:bg-offwhite hover:text-mylms-rose">Leadership</Link>
-              <Link to="/about/partners" className="block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-mylms-purple hover:bg-offwhite hover:text-mylms-rose">Partners</Link>
-              <Link to="/about/media" className="block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-mylms-purple hover:bg-offwhite hover:text-mylms-rose">Media</Link>
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white border border-border-soft shadow-2xl rounded-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all w-[500px] pointer-events-none group-hover:pointer-events-auto">
+              {/* Decorative Header */}
+              <div className="bg-offwhite p-6 border-b border-border-soft flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-xl bg-mylms-purple/5 flex items-center justify-center">
+                    <Globe className="text-mylms-purple" size={24} />
+                 </div>
+                 <div>
+                    <h3 className="font-serif font-black text-mylms-purple text-lg">Our Institution</h3>
+                    <p className="text-text-secondary text-xs">Learn about our mission, governance, and global impact.</p>
+                 </div>
+              </div>
+              
+              {/* Mega Menu Grid */}
+              <div className="grid grid-cols-2 gap-2 p-4">
+                <Link to="/about" className="flex items-start gap-4 p-4 rounded-xl hover:bg-offwhite transition-colors group/link">
+                  <div className="text-mylms-rose mt-1 group-hover/link:scale-110 transition-transform"><BookOpen size={18} /></div>
+                  <div>
+                     <span className="block font-bold text-mylms-purple text-sm mb-1">About Us</span>
+                     <span className="text-text-secondary text-xs line-clamp-2">The history and core mission of our educational network.</span>
+                  </div>
+                </Link>
+                <Link to="/about/leadership" className="flex items-start gap-4 p-4 rounded-xl hover:bg-offwhite transition-colors group/link">
+                  <div className="text-mylms-rose mt-1 group-hover/link:scale-110 transition-transform"><Users size={18} /></div>
+                  <div>
+                     <span className="block font-bold text-mylms-purple text-sm mb-1">Leadership</span>
+                     <span className="text-text-secondary text-xs line-clamp-2">Meet our board of directors and academic executives.</span>
+                  </div>
+                </Link>
+                <Link to="/about/partners" className="flex items-start gap-4 p-4 rounded-xl hover:bg-offwhite transition-colors group/link">
+                  <div className="text-mylms-rose mt-1 group-hover/link:scale-110 transition-transform"><Globe size={18} /></div>
+                  <div>
+                     <span className="block font-bold text-mylms-purple text-sm mb-1">Global Partners</span>
+                     <span className="text-text-secondary text-xs line-clamp-2">Discover the universities and companies we collaborate with.</span>
+                  </div>
+                </Link>
+                <Link to="/about/media" className="flex items-start gap-4 p-4 rounded-xl hover:bg-offwhite transition-colors group/link">
+                  <div className="text-mylms-rose mt-1 group-hover/link:scale-110 transition-transform"><Sparkles size={18} /></div>
+                  <div>
+                     <span className="block font-bold text-mylms-purple text-sm mb-1">Media & Press</span>
+                     <span className="text-text-secondary text-xs line-clamp-2">News, press releases, and brand guidelines for journalists.</span>
+                  </div>
+                </Link>
+              </div>
+
+              {/* Mega Menu Footer */}
+              <div className="bg-mylms-purple p-4 text-center">
+                 <Link to="/contact" className="text-white text-xs font-bold hover:underline flex items-center justify-center gap-2">
+                    Contact Admissions Office <ExternalLink size={12} />
+                 </Link>
+              </div>
             </div>
           </div>
           
