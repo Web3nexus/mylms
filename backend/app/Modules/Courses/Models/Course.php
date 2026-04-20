@@ -67,6 +67,11 @@ class Course extends Model
         return $this->hasMany(Assessment::class);
     }
 
+    public function rubrics()
+    {
+        return $this->hasMany(Rubric::class);
+    }
+
     public function programs()
     {
         return $this->belongsToMany(Program::class, 'program_course');

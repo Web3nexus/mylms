@@ -24,7 +24,6 @@ export default function PublicPage() {
             try { puckData = JSON.parse(puckData); } catch(e) {}
         }
         // Normalize: ensure every content block has a valid `id` in props
-        // Puck calls id.toString() internally — if id is missing it crashes
         if (puckData && Array.isArray(puckData.content)) {
           puckData.content = puckData.content.map((item: any, i: number) => ({
             ...item,
@@ -38,7 +37,6 @@ export default function PublicPage() {
       } catch (err: any) {
         console.error("Error fetching CMS page:", err);
         
-        // Handle Network/CORS/SSL errors specifically
         if (!err.response) {
           setNetworkError(true);
         } else if (err.response.status === 404) {

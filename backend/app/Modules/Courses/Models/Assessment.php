@@ -13,8 +13,16 @@ class Assessment extends Model
         'course_id',
         'title',
         'description',
-        'time_limit_minutes'
+        'type',
+        'is_timed',
+        'duration_minutes',
+        'rubric_id'
     ];
+
+    public function rubric()
+    {
+        return $this->belongsTo(Rubric::class);
+    }
 
     public function course()
     {

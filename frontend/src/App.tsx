@@ -69,6 +69,7 @@ import CurriculumManager from './pages/courses/CurriculumManager'
 import LessonViewer from './pages/courses/LessonViewer'
 import AssessmentPlayer from './pages/courses/AssessmentPlayer'
 import AssessmentCreator from './pages/courses/AssessmentCreator'
+import RubricCreator from './pages/courses/RubricCreator'
 import StudentTranscript from './pages/student/StudentTranscript'
 import StudentBillingPortal from './pages/finance/StudentBillingPortal'
 import AdminFinanceDashboard from './pages/finance/AdminFinanceDashboard'
@@ -81,7 +82,9 @@ import PaymentFailed from './pages/finance/PaymentFailed'
 import SelfServiceForms from './pages/student/SelfServiceForms'
 import UsefulLinks from './pages/student/UsefulLinks'
 import CampusCalendar from './pages/student/CampusCalendar'
-import ForumList from './pages/student/ForumList'
+import PeerReviewList from './pages/courses/PeerReviewList';
+import PeerReviewPlayer from './pages/courses/PeerReviewPlayer';
+import ForumList from './pages/student/ForumList';
 import TopicViewer from './pages/student/TopicViewer'
 
 // Specialized Dashboards
@@ -97,6 +100,7 @@ import { useBranding } from './hooks/useBranding'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import DashboardHeader from './components/layout/DashboardHeader'
+import MobileOptimizationPrompt from './components/MobileOptimizationPrompt'
 
 function Home() {
   return <PublicPage />;
@@ -112,6 +116,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const isCampus = location.pathname.startsWith('/campus')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -214,63 +219,88 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         '--mylms-primary': branding?.primary_color || '#1A1B41',
         '--mylms-secondary': (branding as any)?.secondary_color || '#BA1200'
       }}
-    >      
+    >
+      <MobileOptimizationPrompt />
       {/* SIDEBAR (Auth Only) */}
       {isDashboardRoute && (
-        <aside className={`flex flex-col sticky top-0 h-screen shadow-sm z-20 shrink-0 border-r border-border-soft bg-white text-text-secondary transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
-          <div className="p-8 pb-8 flex items-center justify-between">
-            {!isSidebarCollapsed && (
-              <Link to="/" className="flex flex-col items-start gap-1 group">
-                {branding?.logo_url ? (
-                  <div className="h-10 overflow-hidden shrink-0 transition-all flex items-center">
-                    <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-10 h-10 flex items-center justify-center font-black text-xl rounded-lg shadow-sm bg-mylms-purple text-white overflow-hidden shrink-0">
-                      {(branding?.institutional_name?.charAt(0) || 'M')}
-                    </div>
-                    <span className="text-[11px] font-black text-text-main tracking-[0.2em] leading-none mt-3 uppercase">{branding?.institutional_name || 'MyLMS'}</span>
-                    <span className="text-[7px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 opacity-50">{branding?.institutional_motto || 'University Network'}</span>
-                  </>
-                )}
-              </Link>
-            )}
-            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="p-2 rounded-lg bg-offwhite text-text-secondary hover:text-mylms-purple">
-              {isSidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-            </button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto px-4 space-y-1">
-            {sidebarLinks.map((link) => (
-              <Link key={link.name} to={link.path} className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname.startsWith(link.path) ? 'bg-offwhite text-text-main border-l-2 border-mylms-rose' : 'hover:bg-gray-50'}`}>
-                <span className={isSidebarCollapsed ? 'mx-auto' : ''}>{link.icon}</span>
-                {!isSidebarCollapsed && <span>{link.name}</span>}
-              </Link>
-            ))}
-          </div>
+        <>
+          {/* Mobile Overlay */}
+          {isMobileSidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-mylms-primary/40 backdrop-blur-sm z-45 lg:hidden animate-in fade-in duration-300"
+              onClick={() => setIsMobileSidebarOpen(false)}
+            />
+          )}
 
-          <div className="p-4 mt-auto">
-            <div className={`bg-offwhite p-4 rounded-2xl border border-border-soft ${isSidebarCollapsed ? 'flex justify-center' : ''}`}>
-               {!isSidebarCollapsed ? (
-                 <>
-                   <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-mylms-purple flex items-center justify-center text-white font-black text-xs">{user?.name?.charAt(0) || 'U'}</div>
-                      <div className="overflow-hidden">
-                         <p className="text-[10px] font-black text-text-main truncate">{user?.name}</p>
-                         <p className="text-[8px] font-black text-mylms-rose uppercase tracking-[0.2em]">{user?.role}</p>
+          <aside className={`
+            fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 h-screen shadow-sm shrink-0 border-r border-border-soft bg-white text-text-secondary transition-all duration-300
+            ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            ${isSidebarCollapsed ? 'w-20' : 'w-64'}
+          `}>
+            <div className="p-8 pb-8 flex items-center justify-between">
+              {!isSidebarCollapsed && (
+                <Link to="/" className="flex flex-col items-start gap-1 group">
+                  {branding?.logo_url ? (
+                    <div className="h-10 overflow-hidden shrink-0 transition-all flex items-center">
+                      <img src={branding.logo_url} className="h-full w-auto object-contain" alt="Logo" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="w-10 h-10 flex items-center justify-center font-black text-xl rounded-lg shadow-sm bg-mylms-purple text-white overflow-hidden shrink-0">
+                        {(branding?.institutional_name?.charAt(0) || 'M')}
                       </div>
-                   </div>
-                   <button onClick={handleLogout} className="w-full py-2 bg-white text-[9px] font-black uppercase border border-border-soft rounded-lg hover:text-mylms-rose transition-all flex items-center justify-center gap-2">
-                     <LogOut size={12} /> Logout
-                   </button>
-                 </>
-               ) : (
-                 <button onClick={handleLogout} className="p-2 text-text-secondary hover:text-mylms-rose"><LogOut size={18} /></button>
-               )}
+                      <span className="text-[11px] font-black text-text-main tracking-[0.2em] leading-none mt-3 uppercase">{branding?.institutional_name || 'MyLMS'}</span>
+                      <span className="text-[7px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 opacity-50">{branding?.institutional_motto || 'University Network'}</span>
+                    </>
+                  )}
+                </Link>
+              )}
+              <div className="flex items-center gap-2">
+                <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="hidden lg:block p-2 rounded-lg bg-offwhite text-text-secondary hover:text-mylms-purple transition-all">
+                  {isSidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                </button>
+                <button onClick={() => setIsMobileSidebarOpen(false)} className="lg:hidden p-2 rounded-lg bg-mylms-rose/10 text-mylms-rose">
+                  <X size={18} />
+                </button>
+              </div>
             </div>
-          </div>
-        </aside>
+            
+            <div className="flex-1 overflow-y-auto px-4 space-y-1">
+              {sidebarLinks.map((link) => (
+                <Link 
+                  key={link.name} 
+                  to={link.path} 
+                  onClick={() => setIsMobileSidebarOpen(false)}
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname.startsWith(link.path) ? 'bg-offwhite text-text-main border-l-2 border-mylms-rose' : 'hover:bg-gray-50'}`}
+                >
+                  <span className={isSidebarCollapsed ? 'mx-auto' : ''}>{link.icon}</span>
+                  {!isSidebarCollapsed && <span>{link.name}</span>}
+                </Link>
+              ))}
+            </div>
+
+            <div className="p-4 mt-auto">
+              <div className={`bg-offwhite p-4 rounded-2xl border border-border-soft ${isSidebarCollapsed ? 'flex justify-center' : ''}`}>
+                {!isSidebarCollapsed ? (
+                  <>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-mylms-purple flex items-center justify-center text-white font-black text-xs">{user?.name?.charAt(0) || 'U'}</div>
+                        <div className="overflow-hidden">
+                          <p className="text-[10px] font-black text-text-main truncate">{user?.name}</p>
+                          <p className="text-[8px] font-black text-mylms-rose uppercase tracking-[0.2em]">{user?.role}</p>
+                        </div>
+                    </div>
+                    <button onClick={handleLogout} className="w-full py-2 bg-white text-[9px] font-black uppercase border border-border-soft rounded-lg hover:text-mylms-rose transition-all flex items-center justify-center gap-2">
+                      <LogOut size={12} /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={handleLogout} className="p-2 text-text-secondary hover:text-mylms-rose transition-all"><LogOut size={18} /></button>
+                )}
+              </div>
+            </div>
+          </aside>
+        </>
       )}
 
       {/* NAVBAR (Public Only) */}
@@ -287,7 +317,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         
         {/* DASHBOARD HEADER */}
         {isDashboardRoute && (
-          <DashboardHeader systemTime={systemTime} />
+          <DashboardHeader 
+            systemTime={systemTime} 
+            onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          />
         )}
 
         {/* CONTENT */}
@@ -348,6 +381,8 @@ function App() {
         <Route element={<ProtectedRoute roles={['student']} />}>
           <Route path="/campus" element={<StudentCampus />} />
           <Route path="/campus/calendar" element={<CampusCalendar />} />
+          <Route path="/campus/peer-reviews" element={<PeerReviewList />} />
+          <Route path="/peer-reviews/:reviewId" element={<PeerReviewPlayer />} />
           <Route path="/courses/:slug/lessons" element={<LessonViewer />} />
           <Route path="/courses/:slug/lessons/:lessonSlug" element={<LessonViewer />} />
           <Route path="/courses/:slug/forums" element={<ForumList />} />
@@ -361,6 +396,7 @@ function App() {
           <Route path="/courses/create" element={<CourseCreate />} />
           <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
           <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
+          <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
           <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
         </Route>
  

@@ -120,29 +120,29 @@ export function CourseCatalogWidget() {
   if (error) return <RegistryError onRetry={fetchCourses} source={window.location.hostname} message="The Undergraduate Registry could not be synchronized." />;
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">
       
       {/* Catalog Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-16 border-b border-border-soft pb-16 relative overflow-hidden group">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-24 gap-10 md:gap-16 border-b border-border-soft pb-10 md:pb-16 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/3 rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
         <div>
-           <div className="flex items-center gap-4 mb-10 group/sub">
+           <div className="flex items-center gap-4 mb-6 md:mb-10 group/sub">
               <span className="w-12 h-px bg-mylms-rose group-hover/sub:w-20 transition-all duration-500"></span>
               <span className="text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px]">{branding?.institutional_name || 'Global Academy'} Registry</span>
            </div>
-           <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic">
+           <h1 className="text-4xl md:text-8xl font-black text-text-main tracking-tighter mb-6 md:mb-10 leading-[0.9] italic">
              {(branding?.courses_hero_title || 'Educational Pathways').split(' ').map((word: string, i: number) => (
                <span key={i}>
                  {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
                </span>
              ))}
            </h1>
-           <p className="text-text-secondary font-medium text-lg max-w-xl opacity-60 font-sans italic">
+           <p className="text-text-secondary font-medium text-base md:text-lg max-w-xl opacity-60 font-sans italic">
              {branding?.courses_hero_desc || `Explore our world-class academic programs designed for global impact. All programs are verified through the ${branding?.institutional_name || 'Global Academy'} Academic Office.`}
            </p>
         </div>
         
-        <div className="w-full md:w-auto">
+        <div className="w-full md:w-auto mt-8 md:mt-0">
           <div className="relative group/search">
             <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-mylms-purple group-hover/search:text-mylms-rose transition-colors" />
             <input 
@@ -157,20 +157,20 @@ export function CourseCatalogWidget() {
       </div>
 
       {/* Stats Ribbon */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16 md:mb-24">
          {[
             { label: "Active Programs", val: courses.length, icon: <Layers size={22} />, color: "purple" },
             { label: "Faculty Members", val: "420+", icon: <Users size={22} />, color: "rose" },
             { label: "Global Ranking", val: "#12", icon: <Sparkles size={22} />, color: "purple" },
             { label: "Industry Partners", val: "85+", icon: <Zap size={22} />, color: "rose" },
          ].map((stat: any, i: number) => (
-            <div key={i} className="bg-white p-10 rounded-[32px] border border-border-soft flex items-center gap-6 shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
+            <div key={i} className="bg-white p-8 md:p-10 rounded-[32px] border border-border-soft flex items-center gap-6 shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
                <div className="absolute top-0 right-0 w-20 h-20 bg-offwhite rounded-bl-full opacity-50 group-hover:bg-mylms-purple/3 transition-all"></div>
-               <div className={`w-14 h-14 rounded-2xl bg-offwhite text-mylms-${stat.color} flex items-center justify-center group-hover:bg-mylms-${stat.color} group-hover:text-white transition-all duration-500 shadow-inner`}>
+               <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-offwhite text-mylms-${stat.color} flex items-center justify-center group-hover:bg-mylms-${stat.color} group-hover:text-white transition-all duration-500 shadow-inner`}>
                   {stat.icon}
                </div>
                <div className="relative z-10">
-                  <p className="text-3xl font-black text-text-main tracking-tighter">{stat.val}</p>
+                  <p className="text-2xl md:text-3xl font-black text-text-main tracking-tighter">{stat.val}</p>
                   <p className="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em]">{stat.label}</p>
                </div>
             </div>
@@ -179,71 +179,71 @@ export function CourseCatalogWidget() {
 
       {/* Course Grid */}
       {filteredCourses.length === 0 ? (
-        <div className="text-center py-48 bg-white rounded-[40px] border-2 border-dashed border-border-soft shadow-inner">
-           <Search size={64} className="mx-auto text-gray-100 mb-12 opacity-50" />
-           <p className="text-gray-300 font-black text-[12px] uppercase tracking-[0.5em] leading-loose italic">No academic programs match your current filter registry.</p>
+        <div className="text-center py-24 md:py-48 bg-white rounded-[40px] border-2 border-dashed border-border-soft shadow-inner">
+           <Search size={48} className="mx-auto text-gray-100 mb-8 md:mb-12 opacity-50" />
+           <p className="text-gray-300 font-black text-[10px] md:text-[12px] uppercase tracking-[0.5em] px-8 leading-loose italic">No academic programs match your current filter registry.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           {filteredCourses.map((course: any) => (
             <div key={course.id} className="flex flex-col bg-white rounded-[40px] border border-border-soft shadow-sm hover:border-mylms-purple/30 transition-all group relative overflow-hidden group-hover:-translate-y-2 duration-500">
               
               {/* MyLMS Badge */}
-              <div className="absolute top-8 left-8 z-10">
-                <span className="bg-white/95 backdrop-blur-md text-mylms-purple text-[10px] font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-2xl border border-border-soft flex items-center gap-2">
+              <div className="absolute top-6 left-6 md:top-8 md:left-8 z-10">
+                <span className="bg-white/95 backdrop-blur-md text-mylms-purple text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-5 py-2 rounded-full shadow-2xl border border-border-soft flex items-center gap-2">
                   <BookOpen size={12} className="text-mylms-rose" />
                   {course.code}
                 </span>
               </div>
 
               {/* Visual Identifier - Abstract and Modern */}
-              <div className="h-64 bg-offwhite relative overflow-hidden flex items-center justify-center border-b border-border-soft">
+              <div className="h-48 md:h-64 bg-offwhite relative overflow-hidden flex items-center justify-center border-b border-border-soft">
                   <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                  <div className="text-mylms-purple opacity-[0.03] text-[240px] font-black select-none pointer-events-none group-hover:scale-125 transition-transform duration-[2s]">{(course.title || 'C').charAt(0)}</div>
+                  <div className="text-mylms-purple opacity-[0.03] text-[180px] md:text-[240px] font-black select-none pointer-events-none group-hover:scale-125 transition-transform duration-[2s]">{(course.title || 'C').charAt(0)}</div>
                   
                   {/* Category Pill */}
-                  <div className="absolute bottom-8 right-8">
-                     <div className="bg-mylms-purple text-white px-5 py-2 rounded-xl shadow-2xl flex items-center gap-3">
-                        <span className="text-[10px] font-black uppercase tracking-widest">{course.credits} Credits</span>
+                  <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8">
+                     <div className="bg-mylms-purple text-white px-4 md:px-5 py-2 rounded-xl shadow-2xl flex items-center gap-3">
+                        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">{course.credits} Credits</span>
                      </div>
                   </div>
               </div>
               
-              <div className="p-12 flex flex-col grow group-hover:bg-offwhite/30 transition-all duration-500">
-                <div className="flex items-center gap-3 mb-6">
-                   <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest opacity-60">Faculty: {course.faculty.name}</p>
+              <div className="p-8 md:p-12 flex flex-col grow group-hover:bg-offwhite/30 transition-all duration-500">
+                <div className="flex items-center gap-3 mb-4 md:mb-6">
+                   <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest opacity-60">Faculty: {course.faculty.name}</p>
                 </div>
                 
-                <h2 className="text-2xl font-black text-text-main mb-6 leading-tight group-hover:text-mylms-purple transition-colors tracking-tighter h-16 line-clamp-2 italic">
+                <h2 className="text-xl md:text-2xl font-black text-text-main mb-4 md:mb-6 leading-tight group-hover:text-mylms-purple transition-colors tracking-tighter h-14 md:h-16 line-clamp-2 italic">
                   {course.title}
                 </h2>
                 
-                <p className="text-text-secondary text-[14px] line-clamp-3 mb-12 leading-loose grow font-sans font-medium opacity-60 italic">
+                <p className="text-text-secondary text-[13px] md:text-[14px] line-clamp-3 mb-8 md:mb-12 leading-loose grow font-sans font-medium opacity-60 italic">
                   {course.description}
                 </p>
                 
-                <div className="flex items-center justify-between mb-12 pt-10 border-t border-offwhite">
-                  <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 rounded-2xl bg-offwhite border border-border-soft flex items-center justify-center text-sm font-black text-mylms-purple shadow-inner group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500">
-                       <Clock size={20} />
+                <div className="flex items-center justify-between mb-8 md:mb-12 pt-8 md:pt-10 border-t border-offwhite">
+                  <div className="flex items-center gap-4 md:gap-5">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-offwhite border border-border-soft flex items-center justify-center text-sm font-black text-mylms-purple shadow-inner group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500">
+                       <Clock size={18} />
                     </div>
                     <div>
-                       <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1.5 opacity-60">Duration</p>
-                       <p className="text-xs font-black text-text-main tracking-tight flex items-center gap-2 uppercase">
+                       <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1 opacity-60">Duration</p>
+                       <p className="text-[10px] md:text-xs font-black text-text-main tracking-tight flex items-center gap-2 uppercase">
                          {course.duration}
                        </p>
                     </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1.5 opacity-60">Department</p>
-                     <p className="text-[10px] font-black text-mylms-rose uppercase tracking-widest">{(course.department?.name || '').split(' ')[0]}</p>
+                     <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1 opacity-60">Department</p>
+                     <p className="text-[9px] md:text-[10px] font-black text-mylms-rose uppercase tracking-widest">{(course.department?.name || '').split(' ')[0]}</p>
                   </div>
                 </div>
                 
                 <div className="flex gap-4 mt-auto">
                    <button 
                      onClick={() => handleEnroll(course.id, course.slug)}
-                     className="flex-1 py-4 bg-mylms-purple text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#001D4A] transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-4 group/btn"
+                     className="flex-1 py-4 bg-mylms-purple text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#001D4A] transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-3 md:gap-4 group/btn"
                    >
                      Enroll Now
                      <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
@@ -256,21 +256,21 @@ export function CourseCatalogWidget() {
       )}
 
       {/* Admissions CTA */}
-      <div className="mt-40 p-20 md:p-32 bg-mylms-purple rounded-[80px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden group">
+      <div className="mt-24 md:mt-40 p-12 md:p-32 bg-mylms-purple rounded-[60px] md:rounded-[80px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
           <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-mylms-rose rounded-full blur-[180px] opacity-20 group-hover:opacity-30 transition-opacity duration-1000"></div>
           
-          <div className="relative z-10 flex flex-col lg:row items-center justify-between gap-16 text-center lg:text-left">
+          <div className="relative z-10 flex flex-col lg:row items-center justify-between gap-12 md:gap-16 text-center lg:text-left">
              <div className="max-w-3xl">
-                <div className="flex items-center justify-center lg:justify-start gap-4 mb-10">
+                <div className="flex items-center justify-center lg:justify-start gap-4 mb-8 md:mb-10">
                    <span className="w-12 h-px bg-mylms-rose"></span>
                    <span className="text-mylms-rose font-black uppercase tracking-[0.5em] text-[10px]">Academic Readiness Protocol</span>
                 </div>
-                <h2 className="text-5xl md:text-8xl font-black text-white mb-10 italic uppercase tracking-tighter leading-[0.85]">
+                <h2 className="text-4xl md:text-8xl font-black text-white mb-8 md:mb-10 italic uppercase tracking-tighter leading-[0.85]">
                   Your Future <br /> 
                   <span className="text-white/40">Starts Here.</span>
                 </h2>
-                <p className="text-white/60 text-xl font-sans font-bold uppercase tracking-tight leading-relaxed max-w-2xl">
+                <p className="text-white/60 text-base md:text-xl font-sans font-bold uppercase tracking-tight leading-relaxed max-w-2xl px-4 md:px-0">
                    THE 2024 ACADEMIC CYCLE IS NOW ACTIVE. SECURE YOUR PLACEMENT WITHIN OUR GLOBAL FACULTY NETWORK TODAY.
                 </p>
              </div>

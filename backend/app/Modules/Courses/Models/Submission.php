@@ -13,7 +13,11 @@ class Submission extends Model
     protected $fillable = [
         'user_id',
         'assessment_id',
+        'file_path',
         'score',
+        'feedback',
+        'status',
+        'graded_by',
         'submitted_at'
     ];
 
@@ -26,8 +30,29 @@ class Submission extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function assessment()
+    public function peerReviews()
     {
-        return $this->belongsTo(Assessment::class);
+        return $this->hasMany(PeerReview::class);
+    }
+
+    /**
+     * Calculate final grade from completed peer reviews.
+     */
+    public function calculatePeerGrade()
+    {
+        $completedReviews = $this->peerReviews()->where('status', 'completed')->get();
+        
+        if ($completedReviews->isEmpty()) {
+            return null;
+        }
+
+        $average = $completedReviews->avg('score');
+        
+        $this->update([
+            'score' => round($average),
+            'status' => 'graded'
+        ]);
+
+        return $average;
     }
 }

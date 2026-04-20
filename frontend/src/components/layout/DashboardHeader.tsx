@@ -1,15 +1,23 @@
-import { Search, Clock } from 'lucide-react';
+import { Search, Clock, Menu } from 'lucide-react';
 import NotificationDropdown from '../NotificationDropdown';
 
 interface DashboardHeaderProps {
   systemTime: Date;
+  onToggleMobileSidebar?: () => void;
 }
 
-export default function DashboardHeader({ systemTime }: DashboardHeaderProps) {
+export default function DashboardHeader({ systemTime, onToggleMobileSidebar }: DashboardHeaderProps) {
   return (
-    <header className="bg-white border-b border-border-soft py-4 px-12 flex justify-between items-center sticky top-0 z-30 shrink-0">
-      {/* Search Bar */}
-      <div className="flex items-center gap-8 grow max-w-2xl">
+    <header className="bg-white border-b border-border-soft py-4 px-6 lg:px-12 flex justify-between items-center sticky top-0 z-30 shrink-0">
+      {/* Mobile Menu & Search Bar */}
+      <div className="flex items-center gap-4 lg:gap-8 grow max-w-2xl">
+        <button 
+          onClick={onToggleMobileSidebar}
+          className="lg:hidden p-2 rounded-lg bg-offwhite text-text-secondary hover:text-mylms-purple transition-all"
+        >
+          <Menu size={20} />
+        </button>
+
         <div className="relative grow">
           <Search size={14} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" />
           <input 

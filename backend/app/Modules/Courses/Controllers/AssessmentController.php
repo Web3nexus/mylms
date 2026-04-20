@@ -14,9 +14,15 @@ class AssessmentController extends Controller
     /**
      * List assessments for a course.
      */
-    public function index(Course $course)
+    public function index(Request $request, Course $course)
     {
-        return response()->json($course->assessments);
+        $query = $course->assessments();
+
+        if ($request->boolean('include_submissions')) {
+            $query->with(['submissions.user']);
+        }
+
+        return response()->json($query->get());
     }
 
     /**
@@ -32,22 +38,28 @@ class AssessmentController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'time_limit_minutes' => 'integer|min:0',
+            'type' => 'required|in:quiz,assignment,peer_assignment',
+            'is_timed' => 'boolean',
+            'duration_minutes' => 'nullable|integer|min:0',
+            'rubric_id' => 'nullable|exists:rubrics,id',
         ]);
 
         $assessment = $course->assessments()->create($validated);
 
         return response()->json($assessment, 201);
     }
-
     /**
-     * Add questions and options to an assessment.
+     * Add questions and options to an assessment (Quizzes only).
      */
     public function addQuestions(Request $request, Assessment $assessment)
     {
         // Enforce ownership
         if ($assessment->course->instructor_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($assessment->type !== 'quiz') {
+            return response()->json(['message' => 'Only quizzes support question banks'], 400);
         }
 
         $validated = $request->validate([
@@ -76,7 +88,7 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Get assessment details with questions (no correct answers for students).
+     * Get assessment details with questions or rubrics.
      */
     public function show(Assessment $assessment)
     {
@@ -88,56 +100,90 @@ class AssessmentController extends Controller
             return response()->json(['message' => 'Enrollment required'], 403);
         }
 
-        $assessmentData = $assessment->load(['questions.options' => function($query) use ($user, $course) {
-            // Only hide correct answers if the user is NOT the instructor
-            if ($course->instructor_id !== $user->id) {
-                $query->select('id', 'question_id', 'text');
-            }
-        }]);
+        $relations = ['rubric.criteria'];
+        
+        if ($assessment->type === 'quiz') {
+            $relations[] = 'questions.options';
+        }
+
+        $assessmentData = $assessment->load($relations);
+
+        // Security: Hide correct answers for students in quizzes
+        if ($assessment->type === 'quiz' && $course->instructor_id !== $user->id) {
+            $assessmentData->questions->each(function($question) {
+                $question->options->each(function($option) {
+                    unset($option->is_correct);
+                });
+            });
+        }
 
         return response()->json($assessmentData);
     }
-
-    /**
-     * Submit assessment answers and calculate score.
-     */
+    
     public function submit(Request $request, Assessment $assessment)
     {
         $user = Auth::user();
-        $validated = $request->validate([
-            'answers' => 'required|array', // [question_id => option_id]
-        ]);
+        
+        // Handle Based on Type
+        if ($assessment->type === 'quiz') {
+            $validated = $request->validate([
+                'answers' => 'required|array', // [question_id => option_id]
+            ]);
 
-        $score = 0;
-        $totalPoints = 0;
+            $score = 0;
+            $totalPoints = 0;
 
-        foreach ($assessment->questions as $question) {
-            $totalPoints += $question->points;
-            $submittedOptionId = $validated['answers'][$question->id] ?? null;
+            foreach ($assessment->questions as $question) {
+                $totalPoints += $question->points;
+                $submittedOptionId = $validated['answers'][$question->id] ?? null;
 
-            if ($submittedOptionId) {
-                $correctOption = $question->options()->where('is_correct', true)->first();
-                if ($correctOption && $correctOption->id == $submittedOptionId) {
-                    $score += $question->points;
+                if ($submittedOptionId) {
+                    $correctOption = $question->options()->where('is_correct', true)->first();
+                    if ($correctOption && $correctOption->id == $submittedOptionId) {
+                        $score += $question->points;
+                    }
                 }
             }
+
+            $percentage = ($totalPoints > 0) ? round(($score / $totalPoints) * 100) : 0;
+
+            $submission = Submission::create([
+                'user_id' => $user->id,
+                'assessment_id' => $assessment->id,
+                'score' => $percentage,
+                'status' => 'graded',
+                'submitted_at' => now(),
+            ]);
+
+            return response()->json([
+                'message' => 'Quiz submitted successfully',
+                'score' => $percentage,
+                'submission_id' => $submission->id
+            ]);
+        } 
+        
+        if ($assessment->type === 'assignment' || $assessment->type === 'peer_assignment') {
+            $validated = $request->validate([
+                'file_submission' => 'required|file|max:10240', // 10MB limit
+            ]);
+
+            $path = $request->file('file_submission')->store('submissions', 'public');
+
+            $submission = Submission::create([
+                'user_id' => $user->id,
+                'assessment_id' => $assessment->id,
+                'file_path' => $path,
+                'status' => 'pending',
+                'submitted_at' => now(),
+            ]);
+
+            return response()->json([
+                'message' => 'Assignment submitted successfully',
+                'submission_id' => $submission->id
+            ]);
         }
 
-        // Calculate percentage score or just raw score? Let's store percentage
-        $percentage = ($totalPoints > 0) ? round(($score / $totalPoints) * 100) : 0;
-
-        $submission = Submission::create([
-            'user_id' => $user->id,
-            'assessment_id' => $assessment->id,
-            'score' => $percentage,
-            'submitted_at' => now(),
-        ]);
-
-        return response()->json([
-            'message' => 'Assessment submitted successfully',
-            'score' => $percentage,
-            'submission_id' => $submission->id
-        ]);
+        return response()->json(['message' => 'Invalid assessment type'], 400);
     }
 
     /**

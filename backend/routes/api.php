@@ -22,6 +22,9 @@ use App\Modules\Collaboration\Controllers\ForumController;
 use App\Modules\Collaboration\Controllers\ForumPostController;
 use App\Modules\Admin\Controllers\PageController;
 use App\Modules\Admin\Controllers\BrandingController;
+use App\Modules\Courses\Controllers\PeerReviewController;
+use App\Modules\Courses\Controllers\RubricController;
+use App\Modules\Courses\Controllers\LessonNoteController;
 use App\Http\Controllers\CommandCenterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -61,89 +64,85 @@ Route::get('/verify/{code}', [CredentialController::class, 'verify']);
 Route::middleware('auth:sanctum')->group(function () {
     
     // Manage Courses (Instructors)
-    Route::middleware(['auth:sanctum'])->group(function () {
-        Route::get('/my-courses', [CourseController::class, 'myCourses']);
-        Route::post('/courses', [CourseController::class, 'store']);
-        Route::put('/courses/{course}', [CourseController::class, 'update']);
-        Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
+    Route::get('/my-courses', [CourseController::class, 'myCourses']);
+    Route::post('/courses', [CourseController::class, 'store']);
+    Route::put('/courses/{course}', [CourseController::class, 'update']);
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
 
-        // Manage Lessons (Instructors)
-        Route::apiResource('courses.lessons', LessonController::class)->shallow();
+    // Manage Lessons (Instructors)
+    Route::apiResource('courses.lessons', LessonController::class)->shallow();
 
-        // Manage Assessments (Instructors)
-        Route::apiResource('courses.assessments', AssessmentController::class)->shallow();
-        Route::post('/courses/{course}/assessments/generate', [AssessmentController::class, 'generate']);
-        Route::post('/assessments/{assessment}/questions', [AssessmentController::class, 'addQuestions']);
+    // Manage Assessments (Instructors)
+    Route::apiResource('courses.assessments', AssessmentController::class)->shallow();
 
-        // Manage Grades & Results (Instructors)
-        Route::get('/courses/{course}/gradebook', [InstructorGradeController::class, 'index']);
-        Route::post('/courses/{course}/gradebook/{registration}', [InstructorGradeController::class, 'update']);
+    // Manage Rubrics
+    Route::apiResource('courses.rubrics', RubricController::class)->shallow();
+    Route::post('/courses/{course}/assessments/generate', [AssessmentController::class, 'generate']);
+    Route::post('/assessments/{assessment}/questions', [AssessmentController::class, 'addQuestions']);
 
-        // Manage Academic Structure (Admins/Management)
-        Route::get('/academic', [AcademicController::class, 'index']);
-        Route::post('/academic/faculties', [AcademicController::class, 'storeFaculty']);
-        Route::post('/academic/faculties/{faculty}/departments', [AcademicController::class, 'storeDepartment']);
-        Route::post('/academic/departments/{department}/programs', [AcademicController::class, 'storeProgram']);
-        Route::post('/academic/programs/{program}/courses', [AcademicController::class, 'linkCourses']);
-        Route::delete('/academic/faculties/{faculty}', [AcademicController::class, 'destroyFaculty']);
-        Route::delete('/academic/departments/{department}', [AcademicController::class, 'destroyDepartment']);
-        Route::delete('/academic/programs/{program}', [AcademicController::class, 'destroyProgram']);
+    // Manage Grades & Results (Instructors)
+    Route::get('/courses/{course}/gradebook', [InstructorGradeController::class, 'index']);
+    Route::post('/courses/{course}/gradebook/{registration}', [InstructorGradeController::class, 'update']);
 
-        // Manage Academic Sessions & Semesters (Admins)
-        Route::get('/academic/sessions', [AcademicSessionController::class, 'index']);
-        Route::post('/academic/sessions', [AcademicSessionController::class, 'storeSession']);
-        Route::post('/academic/sessions/{session}/activate', [AcademicSessionController::class, 'activateSession']);
-        Route::post('/academic/sessions/{session}/semesters', [AcademicSessionController::class, 'storeSemester']);
-        Route::post('/academic/semesters/{semester}/current', [AcademicSessionController::class, 'setCurrentSemester']);
-        Route::post('/academic/events', [AcademicSessionController::class, 'storeEvent']);
+    // Manage Academic Structure (Admins/Management)
+    Route::get('/academic', [AcademicController::class, 'index']);
+    Route::post('/academic/faculties', [AcademicController::class, 'storeFaculty']);
+    Route::post('/academic/faculties/{faculty}/departments', [AcademicController::class, 'storeDepartment']);
+    Route::post('/academic/departments/{department}/programs', [AcademicController::class, 'storeProgram']);
+    Route::post('/academic/programs/{program}/courses', [AcademicController::class, 'linkCourses']);
+    Route::delete('/academic/faculties/{faculty}', [AcademicController::class, 'destroyFaculty']);
+    Route::delete('/academic/departments/{department}', [AcademicController::class, 'destroyDepartment']);
+    Route::delete('/academic/programs/{program}', [AcademicController::class, 'destroyProgram']);
 
-        // Manage Admissions (Admins)
-        Route::get('/admissions/applications', [AdmissionController::class, 'index']);
-        Route::post('/admissions/applications/{application}/review', [AdmissionController::class, 'review']);
-        
-        // Manage Admission Form Fields (Admins)
-        Route::get('/admissions/fields-admin', [AdmissionFieldController::class, 'adminIndex']);
-        Route::post('/admissions/fields', [AdmissionFieldController::class, 'store']);
-        Route::post('/admissions/fields/{field}/toggle', [AdmissionFieldController::class, 'toggle']);
-        Route::delete('/admissions/fields/{field}', [AdmissionFieldController::class, 'destroy']);
+    // Manage Academic Sessions & Semesters (Admins)
+    Route::get('/academic/sessions', [AcademicSessionController::class, 'index']);
+    Route::post('/academic/sessions', [AcademicSessionController::class, 'storeSession']);
+    Route::post('/academic/sessions/{session}/activate', [AcademicSessionController::class, 'activateSession']);
+    Route::post('/academic/sessions/{session}/semesters', [AcademicSessionController::class, 'storeSemester']);
+    Route::post('/academic/semesters/{semester}/current', [AcademicSessionController::class, 'setCurrentSemester']);
+    Route::post('/academic/events', [AcademicSessionController::class, 'storeEvent']);
 
-        // Manage Finances (Admins)
-        Route::get('/finance/dashboard', [FinanceController::class, 'dashboardMetrics']);
-        Route::post('/finance/invoices/generate', [FinanceController::class, 'generateSemesterInvoice']);
+    // Manage Admissions (Admins)
+    Route::get('/admissions/applications', [AdmissionController::class, 'index']);
+    Route::post('/admissions/applications/{application}/review', [AdmissionController::class, 'review']);
+    
+    // Manage Admission Form Fields (Admins)
+    Route::get('/admissions/fields-admin', [AdmissionFieldController::class, 'adminIndex']);
+    Route::post('/admissions/fields', [AdmissionFieldController::class, 'store']);
+    Route::post('/admissions/fields/{field}/toggle', [AdmissionFieldController::class, 'toggle']);
+    Route::delete('/admissions/fields/{field}', [AdmissionFieldController::class, 'destroy']);
 
-        // ---- ADMIN-ONLY ROUTES (role guard enforced) ----
-        Route::middleware(function ($request, $next) {
-            if ($request->user()?->role !== 'admin') {
-                return response()->json(['message' => 'Forbidden. Admin access required.'], 403);
-            }
-            return $next($request);
-        })->group(function () {
-            // Student Directory
-            Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
+    // Manage Finances (Admins)
+    Route::get('/finance/dashboard', [FinanceController::class, 'dashboardMetrics']);
+    Route::post('/finance/invoices/generate', [FinanceController::class, 'generateSemesterInvoice']);
 
-            // Staff & Personnel Management
-            Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);
-            Route::post('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'store']);
-            Route::delete('/admin/staff/{user}', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'destroy']);
+    // ---- ADMIN-ONLY ROUTES (role guard enforced) ----
+    Route::middleware('role:admin')->group(function () {
+        // Student Directory
+        Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
 
-            // Scholarship Sync
-            Route::post('/scholarships/sync', [ScholarshipController::class, 'triggerFetch']);
+        // Staff & Personnel Management
+        Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);
+        Route::post('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'store']);
+        Route::delete('/admin/staff/{user}', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'destroy']);
 
-            // Branding & Global Settings
-            Route::patch('/branding', [BrandingController::class, 'update']);
-            Route::post('/branding/upload', [BrandingController::class, 'uploadAsset']);
+        // Scholarship Sync
+        Route::post('/scholarships/sync', [ScholarshipController::class, 'triggerFetch']);
 
-            // CMS Pages
-            Route::get('/admin/pages', [PageController::class, 'index']);
-            Route::get('/admin/pages/{slug}', [PageController::class, 'showAdmin']);
-            Route::post('/admin/pages', [PageController::class, 'store']);
-            Route::patch('/admin/pages/{id}', [PageController::class, 'update']);
-            Route::delete('/admin/pages/{id}', [PageController::class, 'destroy']);
+        // Branding & Global Settings
+        Route::patch('/branding', [BrandingController::class, 'update']);
+        Route::post('/branding/upload', [BrandingController::class, 'uploadAsset']);
 
-            // Command Center
-            Route::get('/admin/commands', [CommandCenterController::class, 'index']);
-            Route::post('/admin/commands/run', [CommandCenterController::class, 'run']);
-        });
+        // CMS Pages
+        Route::get('/admin/pages', [PageController::class, 'index']);
+        Route::get('/admin/pages/{slug}', [PageController::class, 'showAdmin']);
+        Route::post('/admin/pages', [PageController::class, 'store']);
+        Route::patch('/admin/pages/{id}', [PageController::class, 'update']);
+        Route::delete('/admin/pages/{id}', [PageController::class, 'destroy']);
+
+        // Command Center
+        Route::get('/admin/commands', [CommandCenterController::class, 'index']);
+        Route::post('/admin/commands/run', [CommandCenterController::class, 'run']);
     });
 
     // Student Enrollments (legacy)
@@ -152,6 +151,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // AI Course Tutor
     Route::post('/courses/{course}/tutor', [AITutorController::class, 'ask']);
+
+    // Lesson Notes (Student specific)
+    Route::get('/lessons/{lesson}/notes', [LessonNoteController::class, 'show']);
+    Route::post('/lessons/{lesson}/notes', [LessonNoteController::class, 'store']);
 
     // Academic Course Registration (Sprint 9)
     Route::get('/registration/catalog', [RegistrationController::class, 'catalog']);
@@ -168,6 +171,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admission-offers/{offer}/accept', [AdmissionController::class, 'acceptOffer']);
 
     // Assessment Submissions
+    // Peer Assessment
+    Route::get('/peer-reviews/assigned', [PeerReviewController::class, 'assigned']);
+    Route::get('/peer-reviews/{review}', [PeerReviewController::class, 'show']);
+    Route::post('/peer-reviews/{review}/submit', [PeerReviewController::class, 'submit']);
+    Route::post('/assessments/{assessment}/allocate-peers', [PeerReviewController::class, 'allocate']);
+
     Route::get('/assessments/{assessment}', [AssessmentController::class, 'show']);
     Route::post('/assessments/{assessment}/submit', [AssessmentController::class, 'submit']);
 
@@ -203,6 +212,4 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public Payment Webhooks
 Route::post('/webhooks/payments/{gateway}', [App\Modules\Finance\Controllers\WebhookController::class, 'handle']);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::get('/user', [AuthController::class, 'me'])->middleware('auth:sanctum');

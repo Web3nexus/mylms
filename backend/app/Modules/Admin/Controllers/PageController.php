@@ -15,6 +15,7 @@ class PageController extends Controller
      */
     public function show($slug)
     {
+        \Illuminate\Support\Facades\Log::info("CMS Show Request for slug: " . $slug);
         $page = CMSPage::where('slug', $slug)
             ->where('is_published', true)
             ->firstOrFail();

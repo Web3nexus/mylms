@@ -32,12 +32,12 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'https://mylms.test',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },
       '/sanctum': {
-        target: 'https://mylms.test',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },
