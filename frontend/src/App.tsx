@@ -50,7 +50,6 @@ import AdmissionApplication from './pages/admissions/AdmissionApplication'
 import AdmissionsPage from './pages/admissions/AdmissionsPage'
 import AdmissionDashboard from './pages/admissions/AdmissionDashboard'
 import AdmissionWizard from './pages/admissions/AdmissionWizard'
-import EnrollmentManagement from './pages/admin/EnrollmentManagement'
 import ExperiencePage from './pages/ExperiencePage'
 import AboutPage from './pages/AboutPage'
 
@@ -417,7 +416,6 @@ function App() {
  
         <Route element={<ProtectedRoute roles={['admin']} />}>
           <Route path="/admin/portal" element={<AdminOperations />} />
-          <Route path="/admin/enrollment" element={<EnrollmentManagement />} />
           <Route path="/admin/academic" element={<AcademicManager />} />
           <Route path="/admin/admissions" element={<AdmissionsReview />} />
           <Route path="/admin/admissions/registry" element={<AdmissionRegistryManager />} />
