@@ -16,11 +16,7 @@ class EnrollmentController extends Controller
      */
     public function index()
     {
-        return response()->json([
-            'faculties' => Faculty::with('departments.programs')->get(),
-            'departments' => Department::with('faculty', 'programs')->get(),
-            'programs' => Program::with('department.faculty')->get(),
-        ]);
+        return response()->json(Faculty::with('departments.programs')->get());
     }
 
     /**
@@ -89,9 +85,8 @@ class EnrollmentController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
-     * Program CRUD
-     */
+    public function storeProgram(Request $request)
+    {
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|unique:programs,name',
@@ -111,6 +106,8 @@ class EnrollmentController extends Controller
         return response()->json($program, 201);
     }
 
+    public function updateProgram(Request $request, Program $program)
+    {
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|unique:programs,name,' . $program->id,

@@ -41,6 +41,18 @@ export default function AdmissionRegistryManager() {
     options: ''
   });
 
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
+
   const token = useAuthStore(state => state.token);
 
   useEffect(() => {
@@ -73,8 +85,19 @@ export default function AdmissionRegistryManager() {
       setNewField({ field_key: '', label: '', category: 'personal', type: 'text', is_required: true, options: '' });
       setShowAddField(false);
       fetchFields();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Registry Updated',
+        message: 'The new enrollment protocol field has been successfully authorized.'
+      });
     } catch (err) {
-       alert('Operation failed. Ensure field key is unique.');
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Provisioning Error',
+        message: 'The registry unique key might already be in use.'
+      });
     }
   };
 
@@ -90,14 +113,24 @@ export default function AdmissionRegistryManager() {
   };
 
   const deleteField = async (id: number) => {
-    if (!confirm('Are you sure? This will remove the field from future enrollment wizard sessions.')) return;
     try {
       await client.delete(`/admissions/fields/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchFields();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Field Purged',
+        message: 'The dynamic field has been removed from the enrollment protocol.'
+      });
     } catch (err) {
-      console.error('Delete failed:', err);
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Access Denied',
+        message: 'System protected fields cannot be removed from the registry.'
+      });
     }
   };
 
@@ -287,6 +320,24 @@ export default function AdmissionRegistryManager() {
          ))}
       </div>
 
+       {/* Notification Modal */}
+       {notification.isOpen && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-mylms-purple/40 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[40px] shadow-2xl border border-white/20 max-w-sm w-full p-12 text-center transform animate-in zoom-in-95 duration-500">
+              <div className={`w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-8 shadow-inner ${notification.type === 'success' ? 'bg-green-50 text-green-500' : 'bg-mylms-rose/10 text-mylms-rose'}`}>
+                 {notification.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
+              </div>
+              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification.title}</h3>
+              <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">{notification.message}</p>
+              <button 
+                onClick={() => setNotification({ ...notification, isOpen: false })}
+                className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all active:scale-95 ${notification.type === 'success' ? 'bg-mylms-purple text-white shadow-xl' : 'bg-mylms-rose text-white shadow-xl'}`}
+              >
+                Acknowledge
+              </button>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

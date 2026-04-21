@@ -77,12 +77,17 @@ class AuthController extends Controller
         // 2. Identify the field to check
         $field = $isEmail ? 'email' : 'student_id';
 
+        \Illuminate\Support\Facades\Log::info("Login Attempt: Protocol [$context], Identifier [$identifier], Field [$field]");
+
         // 3. Attempt Authentication
         if (!Auth::attempt([$field => $identifier, 'password' => $validated['password']])) {
+            \Illuminate\Support\Facades\Log::warning("Authentication Failed: Identifier [$identifier] - Invalid Credentials.");
             return response()->json([
                 'message' => 'Invalid credentials for the selected login protocol.',
             ], 401);
         }
+
+        \Illuminate\Support\Facades\Log::info("Authentication Successful: UserID [" . Auth::id() . "]");
 
         $user = Auth::user();
         

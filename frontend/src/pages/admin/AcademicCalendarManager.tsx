@@ -7,6 +7,7 @@ import {
   PlusCircle, 
   CalendarDays,
   CheckCircle,
+  AlertCircle,
   X
 } from 'lucide-react';
 
@@ -47,6 +48,18 @@ export default function AcademicCalendarManager() {
   const [semesterForm, setSemesterForm] = useState({ name: '', start_date: '', end_date: '', is_current: false });
   const [eventForm, setEventForm] = useState({ title: '', event_type: 'registration', start_date: '', end_date: '' });
 
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
+
   const token = useAuthStore(state => state.token);
 
   useEffect(() => {
@@ -74,8 +87,19 @@ export default function AcademicCalendarManager() {
       });
       setShowSessionModal(false);
       fetchSessions();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Session Optimized',
+        message: 'The new academic annual session has been successfully committed to the ledger.'
+      });
     } catch (err) {
-      console.error('Error creating session:', err);
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Conflict Detected',
+        message: 'Unable to provision session. Ensure date ranges do not overlap existing records.'
+      });
     }
   };
 
@@ -87,8 +111,19 @@ export default function AcademicCalendarManager() {
       });
       setShowSemesterModal(null);
       fetchSessions();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Term Initialized',
+        message: 'The academic semester window is now active and synchronized.'
+      });
     } catch (err) {
-      console.error('Error creating semester:', err);
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Registry Error',
+        message: 'Operational window could not be defined in this session.'
+      });
     }
   };
 
@@ -351,6 +386,24 @@ export default function AcademicCalendarManager() {
                    <button type="submit" className="grow py-5 bg-mylms-purple text-white font-black rounded-full hover:bg-mylms-purple/90 shadow-xl transition-all uppercase tracking-[0.3em] text-[10px] active:scale-95">Commit Event Protocol</button>
                 </div>
               </form>
+           </div>
+        </div>
+      )}
+      {/* Notification Modal */}
+      {notification.isOpen && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-mylms-purple/40 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[40px] shadow-2xl border border-white/20 max-w-sm w-full p-12 text-center transform animate-in zoom-in-95 duration-500">
+              <div className={`w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-8 shadow-inner ${notification.type === 'success' ? 'bg-green-50 text-green-500' : 'bg-mylms-rose/10 text-mylms-rose'}`}>
+                 {notification.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
+              </div>
+              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification.title}</h3>
+              <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">{notification.message}</p>
+              <button 
+                onClick={() => setNotification({ ...notification, isOpen: false })}
+                className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all active:scale-95 ${notification.type === 'success' ? 'bg-mylms-purple text-white shadow-xl' : 'bg-mylms-rose text-white shadow-xl'}`}
+              >
+                Acknowledge
+              </button>
            </div>
         </div>
       )}
