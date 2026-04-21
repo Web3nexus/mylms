@@ -10,7 +10,7 @@ class Faculty extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'description'];
+    protected $fillable = ['name', 'slug', 'description', 'code'];
 
     protected static function boot()
     {

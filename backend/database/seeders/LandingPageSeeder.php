@@ -17,6 +17,7 @@ class LandingPageSeeder extends Seeder
                     "props" => [
                         "id" => "Hero-1",
                         "title" => "Unlock Your Worldwide Potential",
+                        "titleColor" => "#edaa16",
                         "description" => "A tuition-free, accredited American online university dedicated to ensuring global access to higher education.",
                         "buttonText" => "Start Your Application",
                         "buttonLink" => "/apply",

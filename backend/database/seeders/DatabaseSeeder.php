@@ -22,13 +22,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::updateOrCreate(['email' => 'instructor@smartuni.edu'], [
-            'name' => 'Prof. Charles Xavier',
+            'name' => 'Prof. Kwame Babangida',
             'password' => Hash::make('password'),
             'role' => User::ROLE_INSTRUCTOR,
         ]);
 
         User::updateOrCreate(['email' => 'student@smartuni.edu'], [
-            'name' => 'Jean Grey',
+            'name' => 'Amara Mensah',
             'password' => Hash::make('password'),
             'role' => User::ROLE_STUDENT,
         ]);

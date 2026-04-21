@@ -22,6 +22,8 @@ use App\Modules\Collaboration\Controllers\ForumController;
 use App\Modules\Collaboration\Controllers\ForumPostController;
 use App\Modules\Admin\Controllers\PageController;
 use App\Modules\Admin\Controllers\BrandingController;
+use App\Modules\Admin\Controllers\EnrollmentController;
+use App\Modules\Admissions\Controllers\AdmissionWizardController;
 use App\Modules\Courses\Controllers\PeerReviewController;
 use App\Modules\Courses\Controllers\RubricController;
 use App\Modules\Courses\Controllers\LessonNoteController;
@@ -57,6 +59,9 @@ Route::get('/public/faculties', [AcademicController::class, 'index']);
 // Public Scholarship Directory (Sprint 14)
 Route::get('/scholarships', [ScholarshipController::class, 'index']);
 
+// Enrollment Lookup
+Route::get('/programs-by-level/{level}', [EnrollmentController::class, 'getProgramsByLevel']);
+
 // Public Certificate Verification (Sprint 12)
 Route::get('/verify/{code}', [CredentialController::class, 'verify']);
 
@@ -84,15 +89,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/{course}/gradebook', [InstructorGradeController::class, 'index']);
     Route::post('/courses/{course}/gradebook/{registration}', [InstructorGradeController::class, 'update']);
 
-    // Manage Academic Structure (Admins/Management)
-    Route::get('/academic', [AcademicController::class, 'index']);
-    Route::post('/academic/faculties', [AcademicController::class, 'storeFaculty']);
-    Route::post('/academic/faculties/{faculty}/departments', [AcademicController::class, 'storeDepartment']);
-    Route::post('/academic/departments/{department}/programs', [AcademicController::class, 'storeProgram']);
-    Route::post('/academic/programs/{program}/courses', [AcademicController::class, 'linkCourses']);
-    Route::delete('/academic/faculties/{faculty}', [AcademicController::class, 'destroyFaculty']);
-    Route::delete('/academic/departments/{department}', [AcademicController::class, 'destroyDepartment']);
-    Route::delete('/academic/programs/{program}', [AcademicController::class, 'destroyProgram']);
+    // Manage Academic Structure (Admins/Management) - Redirected to Enrollment Management
+    Route::get('/admin/enrollment', [EnrollmentController::class, 'index']);
+    Route::post('/admin/enrollment/faculties', [EnrollmentController::class, 'storeFaculty']);
+    Route::put('/admin/enrollment/faculties/{faculty}', [EnrollmentController::class, 'updateFaculty']);
+    Route::delete('/admin/enrollment/faculties/{faculty}', [EnrollmentController::class, 'deleteFaculty']);
+    
+    Route::post('/admin/enrollment/departments', [EnrollmentController::class, 'storeDepartment']);
+    Route::put('/admin/enrollment/departments/{department}', [EnrollmentController::class, 'updateDepartment']);
+    Route::delete('/admin/enrollment/departments/{department}', [EnrollmentController::class, 'deleteDepartment']);
+
+    Route::post('/admin/enrollment/programs', [EnrollmentController::class, 'storeProgram']);
+    Route::put('/admin/enrollment/programs/{program}', [EnrollmentController::class, 'updateProgram']);
+    Route::delete('/admin/enrollment/programs/{program}', [EnrollmentController::class, 'deleteProgram']);
 
     // Manage Academic Sessions & Semesters (Admins)
     Route::get('/academic/sessions', [AcademicSessionController::class, 'index']);
@@ -164,12 +173,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/registration/courses/{course}/register', [RegistrationController::class, 'register']);
     Route::post('/registration/courses/{course}/drop', [RegistrationController::class, 'drop']);
 
-    // Student Admissions
-    Route::get('/my-application', [AdmissionController::class, 'myApplication']);
     Route::get('/admissions/fields', [AdmissionFieldController::class, 'index']);
     Route::get('/faculties/{faculty}/instructors', [AdmissionController::class, 'facultyInstructors']);
-    Route::post('/apply', [AdmissionController::class, 'apply']);
     Route::post('/admission-offers/{offer}/accept', [AdmissionController::class, 'acceptOffer']);
+
+    // Application Fee, Waiver & Full Admission Flow
+    Route::get('/my-application', [AdmissionController::class, 'myApplication']);
+    Route::post('/admission/pay-fee', [AdmissionController::class, 'payFee']);
+    Route::post('/admission/request-waiver', [AdmissionController::class, 'requestWaiver']);
+    Route::post('/admission/save-step', [AdmissionController::class, 'saveStep']);
+    Route::post('/admission/save-progress', [AdmissionController::class, 'saveStep']); // legacy alias
+    Route::post('/admission/submit', [AdmissionController::class, 'submitApplication']);
+    Route::post('/admission/upload-document', [AdmissionController::class, 'uploadDocument']);
+
+    // Admin: Scholarship renewal review
+    Route::post('/admissions/applications/{application}/scholarship-renewal', [AdmissionController::class, 'reviewScholarshipRenewal']);
+
+
 
     // Assessment Submissions
     // Peer Assessment

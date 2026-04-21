@@ -48,6 +48,9 @@ import PublicVerification from './pages/credentials/PublicVerification'
 import ScholarshipDirectory from './pages/scholarships/ScholarshipDirectory'
 import AdmissionApplication from './pages/admissions/AdmissionApplication'
 import AdmissionsPage from './pages/admissions/AdmissionsPage'
+import AdmissionDashboard from './pages/admissions/AdmissionDashboard'
+import AdmissionWizard from './pages/admissions/AdmissionWizard'
+import EnrollmentManagement from './pages/admin/EnrollmentManagement'
 import ExperiencePage from './pages/ExperiencePage'
 import AboutPage from './pages/AboutPage'
 
@@ -183,13 +186,21 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'Site Home', path: '/', icon: <Library size={18} /> },
         { name: 'Calendar', path: '/campus/calendar', icon: <Calendar size={18} /> },
       ]
-    } else {
+    } else if (user?.student_id) {
+      // Approved Students in Portal
       sidebarLinks = [
         { name: 'Home', path: '/portal', icon: <LayoutDashboard size={18} /> },
         { name: 'My Payments', path: '/billing', icon: <CreditCard size={18} /> },
         { name: 'My Courses', path: '/register-courses', icon: <Library size={18} /> },
         { name: 'Transcript', path: '/transcript', icon: <TrendingUp size={18} /> },
         { name: 'Self Service', path: '/portal/forms', icon: <Layers size={18} /> },
+        { name: 'Scholarships', path: '/scholarships', icon: <Award size={18} /> },
+      ]
+    } else {
+      // Applicants/Candidates
+      sidebarLinks = [
+        { name: 'Status Dashboard', path: '/apply/dashboard', icon: <LayoutDashboard size={18} /> },
+        { name: 'Admission Wizard', path: '/apply/wizard', icon: <PlusCircle size={18} /> },
         { name: 'Scholarships', path: '/scholarships', icon: <Award size={18} /> },
       ]
     }
@@ -201,8 +212,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   } else if (userRole === 'admin') {
     sidebarLinks = [
       { name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> },
+      { name: 'Enrollment Mgr', path: '/admin/enrollment', icon: <Layers size={18} /> },
       { name: 'Academic Office', path: '/admin/academic', icon: <Settings size={18} /> },
-      { name: 'Admissions', path: '/admin/admissions', icon: <Inbox size={18} /> },
+      { name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> },
       { name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> },
       { name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> },
       { name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> },
@@ -336,6 +348,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const { user } = useAuthStore();
   const { branding } = useBranding();
 
   // Dynamic Favicon Synchronization
@@ -368,7 +381,9 @@ function App() {
         <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
 
         <Route element={<ProtectedRoute roles={['student']} />}>
-          <Route path="/portal" element={<StudentPortal />} />
+          <Route path="/portal" element={user?.student_id ? <StudentPortal /> : <Navigate to="/apply/dashboard" replace />} />
+          <Route path="/apply/dashboard" element={<AdmissionDashboard />} />
+          <Route path="/apply/wizard" element={<AdmissionWizard />} />
           <Route path="/register-courses" element={<CourseRegistrationPage />} />
           <Route path="/transcript" element={<StudentTranscript />} />
           <Route path="/billing" element={<StudentBillingPortal />} />
@@ -402,6 +417,7 @@ function App() {
  
         <Route element={<ProtectedRoute roles={['admin']} />}>
           <Route path="/admin/portal" element={<AdminOperations />} />
+          <Route path="/admin/enrollment" element={<EnrollmentManagement />} />
           <Route path="/admin/academic" element={<AcademicManager />} />
           <Route path="/admin/admissions" element={<AdmissionsReview />} />
           <Route path="/admin/admissions/registry" element={<AdmissionRegistryManager />} />

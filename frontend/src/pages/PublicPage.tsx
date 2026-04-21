@@ -1,10 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Component } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Render } from "@puckeditor/core";
 import { config } from "../cms/puck.config";
 import client from "../api/client";
-import { GraduationCap, Package } from "lucide-react";
+import { GraduationCap, Package, AlertTriangle } from "lucide-react";
 import RegistryError from "../components/layout/RegistryError";
+
+// Error Boundary to catch Puck render crashes and show the actual error
+class PuckErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-20 bg-offwhite">
+          <div className="max-w-2xl w-full bg-white border border-mylms-rose/30 rounded-[32px] p-10 shadow-2xl">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-mylms-rose/10 rounded-2xl flex items-center justify-center">
+                <AlertTriangle size={24} className="text-mylms-rose" />
+              </div>
+              <h2 className="text-lg font-black text-mylms-purple uppercase tracking-tight">Page Render Error</h2>
+            </div>
+            <p className="text-sm font-medium text-text-secondary mb-4 leading-relaxed">
+              The CMS page renderer encountered an error. This is usually caused by a malformed or missing component.
+            </p>
+            <pre className="bg-offwhite rounded-xl p-4 text-xs text-mylms-rose overflow-auto max-h-48 border border-mylms-rose/20">
+              {this.state.error?.message}
+              {"\n\n"}
+              {this.state.error?.stack?.split("\n").slice(0, 8).join("\n")}
+            </pre>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-6 bg-mylms-purple text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function PublicPage() {
   const { slug } = useParams();
@@ -74,7 +119,9 @@ export default function PublicPage() {
   return (
     <div className="grow">
       {data ? (
-        <Render config={config} data={data} />
+        <PuckErrorBoundary>
+          <Render config={config} data={data} />
+        </PuckErrorBoundary>
       ) : (
         <div className="min-h-[80vh] flex flex-col items-center justify-center px-6 py-20 bg-offwhite">
           <div className="max-w-xl w-full bg-white p-12 shadow-2xl border border-border-soft relative overflow-hidden group text-center">

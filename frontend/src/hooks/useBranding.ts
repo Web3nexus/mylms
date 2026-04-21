@@ -47,9 +47,34 @@ export interface Branding {
   partner_logos: { src: string; alt: string }[];
 }
 
+const STORAGE_KEY = 'mylms_branding_cache';
+
+const injectColors = (data: Partial<Branding>) => {
+  if (data.primary_color) {
+    document.documentElement.style.setProperty('--color-mylms-purple', data.primary_color);
+  }
+  if (data.accent_color) {
+    document.documentElement.style.setProperty('--color-mylms-rose', data.accent_color);
+  }
+};
+
 export const useBranding = () => {
-  const [branding, setBranding] = useState<Branding | null>(null);
-  const [loading, setLoading] = useState(true);
+  // 1. Initial state from localStorage to prevent flash
+  const [branding, setBranding] = useState<Branding | null>(() => {
+    const cached = localStorage.getItem(STORAGE_KEY);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        injectColors(parsed);
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(!branding);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,15 +82,12 @@ export const useBranding = () => {
       try {
         const response = await client.get('/branding');
         const data = response.data;
+        
         setBranding(data);
-
-        // Inject Dynamic Colors into CSS Variables
-        if (data.primary_color) {
-          document.documentElement.style.setProperty('--color-mylms-purple', data.primary_color);
-        }
-        if (data.accent_color) {
-          document.documentElement.style.setProperty('--color-mylms-rose', data.accent_color);
-        }
+        injectColors(data);
+        
+        // 2. Persist to localStorage for next reload
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         
       } catch (err: any) {
         console.error('Failed to load branding from registry:', err);
