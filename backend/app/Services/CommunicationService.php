@@ -91,11 +91,15 @@ class CommunicationService
      */
     private static function configureMailer(string $category)
     {
+        // Force Laravel to resolve the mailer fresh (prevents cached SMTP credential collision)
+        \Illuminate\Support\Facades\Mail::forgetMailers();
+
         $account = $category !== 'system_fallback_override' 
             ? \App\Models\MailAccount::where('category', $category)->where('is_active', true)->first() 
             : null;
 
         if ($account && !empty($account->host)) {
+            \Illuminate\Support\Facades\Log::info("Configuring institutional SMTP for category [{$category}]: {$account->host}");
             config([
                 'mail.default' => 'smtp',
                 'mail.mailers.smtp.host' => $account->host,
@@ -107,10 +111,13 @@ class CommunicationService
                 'mail.from.name' => $account->from_name,
             ]);
         } else {
+            $fallbackHost = \App\Models\SystemSetting::getVal('mail_host', env('MAIL_HOST', '127.0.0.1'));
+            \Illuminate\Support\Facades\Log::info("Using system fallback SMTP: {$fallbackHost}");
+            
             // Fallback to institutional settings or system default
             config([
                 'mail.default' => 'smtp',
-                'mail.mailers.smtp.host' => \App\Models\SystemSetting::getVal('mail_host', env('MAIL_HOST', '127.0.0.1')),
+                'mail.mailers.smtp.host' => $fallbackHost,
                 'mail.mailers.smtp.port' => \App\Models\SystemSetting::getVal('mail_port', env('MAIL_PORT', 2525)),
                 'mail.mailers.smtp.encryption' => \App\Models\SystemSetting::getVal('mail_encryption', env('MAIL_ENCRYPTION', 'tls')),
                 'mail.mailers.smtp.username' => \App\Models\SystemSetting::getVal('mail_username', env('MAIL_USERNAME')),

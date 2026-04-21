@@ -65,7 +65,11 @@ class AdmissionController extends Controller
      */
     public function payFee(Request $request)
     {
-        $application = AdmissionApplication::where('user_id', Auth::id())->firstOrFail();
+        $application = AdmissionApplication::where('user_id', Auth::id())->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Academic Protocol Error: Your admission record could not be localized. Please initiate the registry from the dashboard.'], 404);
+        }
 
         if ($application->application_fee_status === AdmissionApplication::FEE_PAID) {
             return response()->json(['message' => 'Fee already paid.']);
@@ -83,7 +87,11 @@ class AdmissionController extends Controller
      */
     public function requestWaiver(Request $request)
     {
-        $application = AdmissionApplication::where('user_id', Auth::id())->firstOrFail();
+        $application = AdmissionApplication::where('user_id', Auth::id())->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Academic Protocol Error: Your admission record could not be localized. Please initiate the registry from the dashboard.'], 404);
+        }
 
         if (in_array($application->application_fee_status, [AdmissionApplication::FEE_PAID, AdmissionApplication::FEE_WAIVED])) {
             return response()->json(['message' => 'Fee is already cleared.']);
@@ -110,7 +118,11 @@ class AdmissionController extends Controller
      */
     public function saveStep(Request $request)
     {
-        $application = AdmissionApplication::where('user_id', Auth::id())->firstOrFail();
+        $application = AdmissionApplication::where('user_id', Auth::id())->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Academic Protocol Error: Your admission record could not be localized. Please initiate the registry from the dashboard.'], 404);
+        }
 
         $validated = $request->validate([
             'step'      => 'required|string',
@@ -148,7 +160,11 @@ class AdmissionController extends Controller
      */
     public function submitApplication(Request $request)
     {
-        $application = AdmissionApplication::where('user_id', Auth::id())->firstOrFail();
+        $application = AdmissionApplication::where('user_id', Auth::id())->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Academic Protocol Error: Your admission record could not be localized. Please initiate the registry from the dashboard.'], 404);
+        }
 
         // Gate: fee must be cleared
         if (!in_array($application->application_fee_status, [AdmissionApplication::FEE_PAID, AdmissionApplication::FEE_WAIVED])) {
@@ -211,7 +227,11 @@ class AdmissionController extends Controller
         ]);
 
         $user        = Auth::user();
-        $application = AdmissionApplication::where('user_id', $user->id)->firstOrFail();
+        $application = AdmissionApplication::where('user_id', $user->id)->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Academic Protocol Error: Your admission record could not be localized. Please initiate the registry from the dashboard.'], 404);
+        }
 
         $path = $request->file('file')->store('admissions/' . $user->id, 'public');
 
