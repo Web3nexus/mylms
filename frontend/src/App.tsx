@@ -211,7 +211,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   } else if (userRole === 'admin') {
     sidebarLinks = [
       { name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> },
-      { name: 'Enrollment Mgr', path: '/admin/enrollment', icon: <Layers size={18} /> },
+
       { name: 'Academic Office', path: '/admin/academic', icon: <Settings size={18} /> },
       { name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> },
       { name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> },
