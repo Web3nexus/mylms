@@ -149,6 +149,29 @@ export default function BrandingManager() {
     updateField('footer_columns', newColumns);
   };
 
+  const addLogoItem = (type: 'accreditor' | 'partner') => {
+    if (!branding) return;
+    const field = type === 'accreditor' ? 'accreditor_logos' : 'partner_logos';
+    const current = branding[field] || [];
+    setBranding({ ...branding, [field]: [...current, { src: '', alt: '' }] });
+  };
+
+  const removeLogoItem = (type: 'accreditor' | 'partner', index: number) => {
+    if (!branding) return;
+    const field = type === 'accreditor' ? 'accreditor_logos' : 'partner_logos';
+    const current = branding[field] || [];
+    const updated = current.filter((_, i) => i !== index);
+    setBranding({ ...branding, [field]: updated });
+  };
+
+  const updateLogoItem = (type: 'accreditor' | 'partner', index: number, field: 'src' | 'alt', value: string) => {
+    if (!branding) return;
+    const key = type === 'accreditor' ? 'accreditor_logos' : 'partner_logos';
+    const current = [...(branding[key] || [])];
+    current[index] = { ...current[index], [field]: value };
+    setBranding({ ...branding, [key]: current });
+  };
+
 
   if (loading) {
      return (
@@ -388,6 +411,91 @@ export default function BrandingManager() {
                 className="w-full bg-offwhite border border-border-soft rounded-2xl p-4 font-bold text-sm focus:ring-2 focus:ring-mylms-purple/10 outline-none leading-relaxed"
                 placeholder="Institutional description for the footer..."
              />
+          </div>
+
+          <div className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm">
+             <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border-soft">
+                <ShieldCheck className="text-mylms-rose" />
+                <h3 className="font-black uppercase tracking-widest text-sm">Accreditation & Partnerships</h3>
+             </div>
+             
+             <div className="space-y-10">
+                {/* Accreditor Logos */}
+                <div>
+                   <div className="flex justify-between items-center mb-6">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Accreditor Logos</label>
+                      <button onClick={() => addLogoItem('accreditor')} className="text-[9px] font-black text-mylms-purple hover:underline uppercase tracking-widest flex items-center gap-1">
+                         <Plus size={12} /> Add Logo
+                      </button>
+                   </div>
+                   <div className="grid grid-cols-1 gap-4">
+                      {branding?.accreditor_logos?.map((logo, idx) => (
+                         <div key={idx} className="flex gap-4 items-center bg-offwhite p-4 rounded-xl border border-border-soft group">
+                            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-border-soft">
+                               {logo.src ? <img src={logo.src} className="max-w-full max-h-full object-contain" /> : <ImageIcon size={20} className="text-gray-200" />}
+                            </div>
+                            <div className="grow grid grid-cols-2 gap-4">
+                               <input 
+                                  type="text" 
+                                  value={logo.src} 
+                                  onChange={(e) => updateLogoItem('accreditor', idx, 'src', e.target.value)}
+                                  className="bg-white border border-border-soft rounded-lg px-3 py-2 text-[10px] font-bold outline-none focus:ring-1 focus:ring-mylms-purple/20"
+                                  placeholder="Logo URL"
+                               />
+                               <input 
+                                  type="text" 
+                                  value={logo.alt} 
+                                  onChange={(e) => updateLogoItem('accreditor', idx, 'alt', e.target.value)}
+                                  className="bg-white border border-border-soft rounded-lg px-3 py-2 text-[10px] font-bold outline-none focus:ring-1 focus:ring-mylms-purple/20"
+                                  placeholder="Alt Text"
+                               />
+                            </div>
+                            <button onClick={() => removeLogoItem('accreditor', idx)} className="text-gray-300 hover:text-mylms-rose transition-colors px-2">
+                               <Trash2 size={14} />
+                            </button>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+
+                {/* Partner Logos */}
+                <div>
+                   <div className="flex justify-between items-center mb-6">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Institutional Partners</label>
+                      <button onClick={() => addLogoItem('partner')} className="text-[9px] font-black text-mylms-purple hover:underline uppercase tracking-widest flex items-center gap-1">
+                         <Plus size={12} /> Add Logo
+                      </button>
+                   </div>
+                   <div className="grid grid-cols-1 gap-4">
+                      {branding?.partner_logos?.map((logo, idx) => (
+                         <div key={idx} className="flex gap-4 items-center bg-offwhite p-4 rounded-xl border border-border-soft group">
+                            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-border-soft">
+                               {logo.src ? <img src={logo.src} className="max-w-full max-h-full object-contain" /> : <ImageIcon size={20} className="text-gray-200" />}
+                            </div>
+                            <div className="grow grid grid-cols-2 gap-4">
+                               <input 
+                                  type="text" 
+                                  value={logo.src} 
+                                  onChange={(e) => updateLogoItem('partner', idx, 'src', e.target.value)}
+                                  className="bg-white border border-border-soft rounded-lg px-3 py-2 text-[10px] font-bold outline-none focus:ring-1 focus:ring-mylms-purple/20"
+                                  placeholder="Logo URL"
+                               />
+                               <input 
+                                  type="text" 
+                                  value={logo.alt} 
+                                  onChange={(e) => updateLogoItem('partner', idx, 'alt', e.target.value)}
+                                  className="bg-white border border-border-soft rounded-lg px-3 py-2 text-[10px] font-bold outline-none focus:ring-1 focus:ring-mylms-purple/20"
+                                  placeholder="Alt Text"
+                               />
+                            </div>
+                            <button onClick={() => removeLogoItem('partner', idx)} className="text-gray-300 hover:text-mylms-rose transition-colors px-2">
+                               <Trash2 size={14} />
+                            </button>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+             </div>
           </div>
 
           <div className="bg-mylms-purple/5 p-10 rounded-3xl border border-mylms-purple/10 shadow-sm relative overflow-hidden group">

@@ -58,4 +58,16 @@ class StudentDirectoryController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Get detailed info for a single student.
+     */
+    public function show($id)
+    {
+        $student = User::where('role', 'student')
+            ->with(['program.department', 'admissionApplications.program', 'admissionApplications.faculty'])
+            ->findOrFail($id);
+
+        return response()->json($student);
+    }
 }

@@ -41,6 +41,10 @@ export interface Branding {
   about_mission: string;
   about_leadership_title: string;
   about_history: string;
+
+  // Partner & Accreditor Logos
+  accreditor_logos: { src: string; alt: string }[];
+  partner_logos: { src: string; alt: string }[];
 }
 
 export const useBranding = () => {

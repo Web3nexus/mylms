@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import client from '../../api/client';
+import { Link } from 'react-router-dom';
 
 interface Student {
   id: number;
@@ -23,6 +24,7 @@ interface Student {
   student_id: string | null;
   program_id: number | null;
   admission_applications_count: number;
+  admission_applications?: any[]; // For detailed view
   program?: { 
     name: string; 
     degree_level: string;
@@ -50,6 +52,11 @@ export default function StudentDirectory() {
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Detailed View State
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+  const [detailedStudent, setDetailedStudent] = useState<Student | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   const fetchStudents = useCallback(async (page = 1) => {
     setLoading(true);
@@ -90,6 +97,19 @@ export default function StudentDirectory() {
     const timer = setTimeout(() => fetchStudents(1), 300);
     return () => clearTimeout(timer);
   }, [search, filter]);
+
+  const fetchStudentDetails = async (id: number) => {
+    setDetailsLoading(true);
+    setSelectedStudentId(id);
+    try {
+      const res = await client.get(`/admin/students/${id}`, { headers });
+      setDetailedStudent(res.data);
+    } catch (err) {
+      console.error('Failed to fetch student details:', err);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
 
   const clearSearch = () => setSearch('');
 
@@ -205,7 +225,8 @@ export default function StudentDirectory() {
             {students.map(student => (
               <div
                 key={student.id}
-                className="grid grid-cols-12 px-8 py-6 items-center group hover:bg-offwhite/60 transition-all"
+                onClick={() => fetchStudentDetails(student.id)}
+                className={`grid grid-cols-12 px-8 py-6 items-center group hover:bg-offwhite/60 transition-all cursor-pointer ${selectedStudentId === student.id ? 'bg-offwhite/80 ring-1 ring-inset ring-mylms-purple/10' : ''}`}
               >
                 {/* Student Info */}
                 <div className="col-span-4 flex items-center gap-4">
@@ -306,6 +327,129 @@ export default function StudentDirectory() {
           </div>
         )}
       </div>
+
+      {/* Student Details Sidebar */}
+      {selectedStudentId && (
+        <div className="fixed inset-0 z-50 overflow-hidden pointer-events-none">
+           <div className="absolute inset-0 bg-black/5 backdrop-blur-xs pointer-events-auto" onClick={() => setSelectedStudentId(null)}></div>
+           <div className={`absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl transition-transform duration-500 pointer-events-auto flex flex-col ${selectedStudentId ? 'translate-x-0' : 'translate-x-full'}`}>
+              
+              {/* Sidebar Header */}
+              <div className="p-8 border-b border-border-soft flex justify-between items-center bg-offwhite">
+                 <div>
+                    <h3 className="text-xl font-black text-text-main tracking-tighter uppercase mb-1">Institutional Profile</h3>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Candidate Registry Status</p>
+                 </div>
+                 <button 
+                   onClick={() => setSelectedStudentId(null)}
+                   className="p-2 hover:bg-white rounded-full transition-colors"
+                 >
+                    <X size={20} className="text-gray-400" />
+                 </button>
+              </div>
+
+              {/* Sidebar Content */}
+              <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
+                 {detailsLoading ? (
+                   <div className="h-full flex flex-col items-center justify-center gap-4">
+                      <Loader2 size={32} className="animate-spin text-mylms-purple" />
+                      <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Accessing Secure Records...</p>
+                   </div>
+                 ) : detailedStudent ? (
+                    <div className="space-y-12">
+                       {/* Identity */}
+                       <div className="flex items-center gap-6">
+                          <div className="w-20 h-20 bg-mylms-purple rounded-[2rem] flex items-center justify-center text-white font-black text-4xl shadow-xl">
+                             {detailedStudent.name.charAt(0)}
+                          </div>
+                          <div>
+                             <h4 className="text-3xl font-black text-text-main tracking-tighter uppercase mb-2">{detailedStudent.name}</h4>
+                             <p className="text-sm font-bold text-gray-300 uppercase tracking-widest">{detailedStudent.email}</p>
+                          </div>
+                       </div>
+
+                       {/* Status Grid */}
+                       <div className="grid grid-cols-2 gap-4">
+                          <div className="p-6 bg-offwhite rounded-2xl border border-border-soft">
+                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3">Matriculation</p>
+                             <div className="flex items-center gap-2">
+                                {detailedStudent.student_id ? (
+                                   <>
+                                      <Hash size={14} className="text-green-500" />
+                                      <span className="text-sm font-black text-green-700 font-mono italic">{detailedStudent.student_id}</span>
+                                   </>
+                                ) : (
+                                   <>
+                                      <Clock size={14} className="text-amber-500" />
+                                      <span className="text-sm font-black text-amber-600 uppercase tracking-tighter">Unassigned</span>
+                                   </>
+                                )}
+                             </div>
+                          </div>
+                          <div className="p-6 bg-offwhite rounded-2xl border border-border-soft">
+                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3">Programs Joined</p>
+                             <div className="flex items-center gap-2">
+                                <GraduationCap size={14} className="text-mylms-rose" />
+                                <span className="text-sm font-black text-text-main uppercase tracking-tighter">{detailedStudent.program?.degree_level || 'N/A'}</span>
+                             </div>
+                          </div>
+                       </div>
+
+                       {/* Applications Section */}
+                       <div>
+                          <label className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 block mb-6 px-1">Admission Protocol History</label>
+                          <div className="space-y-4">
+                             {detailedStudent.admission_applications?.map(app => (
+                                <div key={app.id} className="p-6 bg-white border border-border-soft rounded-2xl shadow-sm hover:shadow-md transition-all group">
+                                   <div className="flex justify-between items-start mb-6">
+                                      <div>
+                                         <p className="text-xs font-black text-text-main uppercase tracking-tight mb-2">{app.program?.name}</p>
+                                         <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">Submitted: {new Date(app.created_at).toLocaleDateString()}</p>
+                                      </div>
+                                      <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg border ${
+                                         app.status === 'approved' ? 'bg-green-50 text-green-600 border-green-100' :
+                                         app.status === 'rejected' ? 'bg-mylms-rose/5 text-mylms-rose border-mylms-rose/20' :
+                                         'bg-amber-50 text-amber-500 border-amber-100'
+                                      }`}>
+                                         {app.status}
+                                      </span>
+                                   </div>
+                                   <Link 
+                                     to="/admin/admissions/review" 
+                                     className="w-full py-3 bg-offwhite group-hover:bg-mylms-purple group-hover:text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2"
+                                   >
+                                      Open in Admissions Review
+                                      <ChevronRight size={12} />
+                                   </Link>
+                                </div>
+                             ))}
+                             {detailedStudent.admission_applications?.length === 0 && (
+                                <div className="text-center py-10 bg-offwhite/50 rounded-2xl border-2 border-dashed border-border-soft opacity-60">
+                                   <AlertCircle size={24} className="mx-auto text-gray-200 mb-4" />
+                                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No admission applications found.</p>
+                                </div>
+                             )}
+                          </div>
+                       </div>
+
+                       {/* Danger Zone / Admin Actions */}
+                       <div className="pt-10 border-t border-border-soft">
+                          <label className="text-[10px] font-black uppercase tracking-[0.4em] text-mylms-rose block mb-6 px-1">Registry Actions</label>
+                          <div className="grid grid-cols-2 gap-4">
+                             <button className="flex items-center justify-center gap-2 py-4 bg-offwhite border border-border-soft rounded-xl text-[9px] font-black uppercase tracking-widest text-text-main hover:bg-white hover:border-mylms-purple/30 transition-all">
+                                <Search size={12} /> View Logs
+                             </button>
+                             <button className="flex items-center justify-center gap-2 py-4 bg-offwhite border border-border-soft rounded-xl text-[9px] font-black uppercase tracking-widest text-mylms-rose hover:bg-mylms-rose hover:text-white transition-all">
+                                <X size={12} /> Revoke Access
+                             </button>
+                          </div>
+                       </div>
+                    </div>
+                 ) : null}
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

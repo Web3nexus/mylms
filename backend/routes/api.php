@@ -120,6 +120,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         // Student Directory
         Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
+        Route::get('/admin/students/{id}', [StudentDirectoryController::class, 'show']);
 
         // Staff & Personnel Management
         Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);

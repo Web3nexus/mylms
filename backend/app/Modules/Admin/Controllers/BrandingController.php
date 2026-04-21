@@ -30,6 +30,8 @@ class BrandingController extends Controller
             'admissions_enabled' => SystemSetting::getVal('admissions_enabled', true),
             'admissions_opens_at' => SystemSetting::getVal('admissions_opens_at', '2026-09-01'),
             'about_hero_title' => SystemSetting::getVal('about_hero_title', 'Innovation in Education.'),
+            'accreditor_logos' => SystemSetting::getVal('branding_accreditor_logos', []),
+            'partner_logos' => SystemSetting::getVal('branding_partner_logos', []),
         ];
 
         $footerColumns = SystemSetting::getVal('branding_footer_columns');
@@ -85,6 +87,8 @@ class BrandingController extends Controller
             'admissions_opens_at' => 'nullable|string|date',
             'footer_columns' => 'nullable|array',
             'about_hero_title' => 'nullable|string',
+            'accreditor_logos' => 'nullable|array',
+            'partner_logos' => 'nullable|array',
         ]);
 
         $allowed = [
@@ -92,7 +96,9 @@ class BrandingController extends Controller
             'institutional_name', 'institutional_motto', 
             'hero_image', 'footer_text', 'admissions_enabled', 'admissions_opens_at',
             'footer_columns',
-            'about_hero_title'
+            'about_hero_title',
+            'accreditor_logos',
+            'partner_logos'
         ];
 
         foreach ($request->only($allowed) as $key => $value) {

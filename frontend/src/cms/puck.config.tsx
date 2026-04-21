@@ -25,6 +25,7 @@ import { ScholarshipFinderWidget } from "../pages/scholarships/ScholarshipDirect
 import { ExperienceInner } from "../pages/ExperiencePage";
 import { AboutInner } from "../pages/AboutPage";
 import { AdmissionsInner } from "../pages/admissions/AdmissionsPage";
+import { useBranding } from "../hooks/useBranding";
 
 export type Props = {
   Hero: { title: string; description: string; buttonText: string; buttonLink: string; bgImage?: string; variant: "default" | "split-gradient" };
@@ -125,22 +126,29 @@ export const config: Config<Props> = {
            arrayFields: { src: { type: "text" }, alt: { type: "text" } }
          }
        },
-       render: ({ leftTitle, leftLogos, rightTitle, rightLogos }) => (
-         <div className="bg-white border-b border-border-soft flex flex-col md:flex-row">
-            <div className="flex-1 py-16 px-10 md:border-r border-border-soft flex flex-col items-center">
-               <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">{leftTitle}</p>
-               <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 opacity-60 hover:opacity-100 transition-duration-700">
-                  {leftLogos?.map((logo, i) => <img key={i} src={logo.src} alt={logo.alt} className="h-10 md:h-12 w-auto object-contain" />)}
-               </div>
-            </div>
-            <div className="flex-1 py-16 px-10 flex flex-col items-center bg-gray-50/50">
-               <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">{rightTitle}</p>
-               <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 opacity-40 hover:opacity-100 transition-duration-700 grayscale hover:grayscale-0">
-                  {rightLogos?.map((logo, i) => <img key={i} src={logo.src} alt={logo.alt} className="h-8 md:h-10 w-auto object-contain" />)}
-               </div>
-            </div>
-         </div>
-       )
+       render: ({ leftTitle, leftLogos, rightTitle, rightLogos }) => {
+         const { branding } = useBranding();
+         
+         const accreditorLogos = (leftLogos && leftLogos.length > 0) ? leftLogos : (branding?.accreditor_logos || []);
+         const partnerLogos = (rightLogos && rightLogos.length > 0) ? rightLogos : (branding?.partner_logos || []);
+
+         return (
+           <div className="bg-white border-b border-border-soft flex flex-col md:flex-row">
+              <div className="flex-1 py-16 px-10 md:border-r border-border-soft flex flex-col items-center">
+                 <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">{leftTitle || "Accredited By"}</p>
+                 <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 opacity-60 hover:opacity-100 transition-duration-700">
+                    {accreditorLogos.map((logo, i) => <img key={i} src={logo.src} alt={logo.alt} className="h-10 md:h-12 w-auto object-contain" />)}
+                 </div>
+              </div>
+              <div className="flex-1 py-16 px-10 flex flex-col items-center bg-gray-50/50">
+                 <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">{rightTitle || "In Partnership With"}</p>
+                 <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 opacity-40 hover:opacity-100 transition-duration-700 grayscale hover:grayscale-0">
+                    {partnerLogos.map((logo, i) => <img key={i} src={logo.src} alt={logo.alt} className="h-8 md:h-10 w-auto object-contain" />)}
+                 </div>
+              </div>
+           </div>
+         );
+       }
     },
     ProgramGrid: {
        fields: {
