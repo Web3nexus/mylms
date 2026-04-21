@@ -51,21 +51,30 @@ class CommunicationController extends Controller
         return response()->json(['message' => 'Institutional communication settings updated.']);
     }
 
-    /**
-     * Send a test email to verify settings.
-     */
     public function sendTestEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
 
-        // Dynamically apply settings for the test if desired, 
-        // or rely on the global configuration loaded in AppServiceProvider
+        // ─────────────────────────────────────────────────────────────
+        //  DYNAMIC TEST CONFIGURATION (BYPASSES CACHE/SCHEME ERRORS)
+        // ─────────────────────────────────────────────────────────────
         try {
+            config([
+                'mail.default' => 'smtp',
+                'mail.mailers.smtp.host' => SystemSetting::getVal('mail_host'),
+                'mail.mailers.smtp.port' => SystemSetting::getVal('mail_port'),
+                'mail.mailers.smtp.encryption' => SystemSetting::getVal('mail_encryption'),
+                'mail.mailers.smtp.username' => SystemSetting::getVal('mail_username'),
+                'mail.mailers.smtp.password' => SystemSetting::getVal('mail_password'),
+                'mail.mailers.smtp.scheme' => null,
+                'mail.mailers.smtp.url' => null,
+            ]);
+
             Mail::to($request->email)->send(new SystemTestMail());
             return response()->json(['message' => 'Test protocol initiated. Check your inbox.']);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to transmit test protocol.',
+                'message' => 'Failed to transmit test protocol. Verify your SMTP credentials.',
                 'error' => $e->getMessage()
             ], 500);
         }
