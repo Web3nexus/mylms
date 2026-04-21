@@ -45,11 +45,23 @@ class AppServiceProvider extends ServiceProvider
                     'mail.mailers.smtp.username'   => SystemSetting::getVal('mail_username'),
                     'mail.mailers.smtp.password'   => SystemSetting::getVal('mail_password'),
                     'mail.from.address'            => SystemSetting::getVal('mail_from_address'),
-                    'mail.from.name'                 => SystemSetting::getVal('mail_from_name'),
+                    'mail.from.name'               => SystemSetting::getVal('mail_from_name'),
+                    'mail.mailers.smtp.scheme'     => null,
+                    'mail.mailers.smtp.url'        => null,
                 ];
 
+                $hasConfig = false;
                 foreach ($settings as $key => $value) {
-                    if ($value) Config::set($key, $value);
+                    if ($value !== null) {
+                        $processedValue = ($value === 'null' || $value === 'none') ? null : $value;
+                        Config::set($key, $processedValue);
+                        if ($key === 'mail.mailers.smtp.host' && $processedValue) $hasConfig = true;
+                    }
+                }
+
+                if ($hasConfig) {
+                    Config::set('mail.default', 'smtp');
+                    Config::set('mail.mailers.smtp.transport', 'smtp');
                 }
             }
         } catch (\Exception $e) {
