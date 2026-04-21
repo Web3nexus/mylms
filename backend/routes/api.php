@@ -170,6 +170,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/communications/settings', [\App\Http\Controllers\CommunicationController::class, 'updateSettings']);
         Route::post('/communications/test-email', [\App\Http\Controllers\CommunicationController::class, 'sendTestEmail']);
 
+        // Multi-SMTP Account Management
+        Route::apiResource('admin/mail-accounts', \App\Http\Controllers\MailAccountController::class);
+
         // Email Templates
         Route::get('/admin/email-templates', [\App\Http\Controllers\EmailTemplateController::class, 'index']);
         Route::get('/admin/email-templates/{id}', [\App\Http\Controllers\EmailTemplateController::class, 'show']);

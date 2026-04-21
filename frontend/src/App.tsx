@@ -99,6 +99,7 @@ import AdminOperations from './pages/dashboards/AdminOperations'
 import BrandingManager from './pages/admin/BrandingManager'
 import CommunicationManager from './pages/admin/CommunicationManager'
 import EmailTemplateManager from './pages/admin/EmailTemplateManager'
+import EmailAccountManager from './pages/admin/EmailAccountManager'
 import CommandCenter from './pages/admin/CommandCenter'
 
 // Hooks
@@ -435,6 +436,7 @@ function App() {
           <Route path="/branding" element={<BrandingManager />} />
           <Route path="/admin/communications" element={<CommunicationManager />} />
           <Route path="/admin/communications/templates" element={<EmailTemplateManager />} />
+          <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
           <Route path="/admin/command-center" element={<CommandCenter />} />
         </Route>
         

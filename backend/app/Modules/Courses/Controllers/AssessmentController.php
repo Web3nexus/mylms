@@ -108,9 +108,16 @@ class AssessmentController extends Controller
 
         $assessmentData = $assessment->load($relations);
 
-        // Security: Hide correct answers for students in quizzes
+        // Security: Hide correct answers for students and Scramble Options
         if ($assessment->type === 'quiz' && $course->instructor_id !== $user->id) {
-            $assessmentData->questions->each(function($question) {
+            $assessmentData->questions->each(function($question) use ($user) {
+                // Scramble options using user ID as seed to ensure consistency per attempt but unique per user
+                $options = $question->options->toArray();
+                srand($user->id + $question->id);
+                shuffle($options);
+                srand(); // Reset seed
+                $question->setRelation('options', collect($options));
+
                 $question->options->each(function($option) {
                     unset($option->is_correct);
                 });
@@ -127,19 +134,23 @@ class AssessmentController extends Controller
         // Handle Based on Type
         if ($assessment->type === 'quiz') {
             $validated = $request->validate([
-                'answers' => 'required|array', // [question_id => option_id]
+                'answers' => 'required|array', // [question_id => option_id or theory_text]
             ]);
 
             $score = 0;
             $totalPoints = 0;
+            $hasTheory = false;
 
             foreach ($assessment->questions as $question) {
                 $totalPoints += $question->points;
-                $submittedOptionId = $validated['answers'][$question->id] ?? null;
+                $submittedAnswer = $validated['answers'][$question->id] ?? null;
 
-                if ($submittedOptionId) {
+                if ($question->type === 'theory') {
+                    $hasTheory = true;
+                    // Theory questions aren't auto-graded
+                } elseif ($submittedAnswer) {
                     $correctOption = $question->options()->where('is_correct', true)->first();
-                    if ($correctOption && $correctOption->id == $submittedOptionId) {
+                    if ($correctOption && $correctOption->id == $submittedAnswer) {
                         $score += $question->points;
                     }
                 }
@@ -150,15 +161,17 @@ class AssessmentController extends Controller
             $submission = Submission::create([
                 'user_id' => $user->id,
                 'assessment_id' => $assessment->id,
+                'answers' => $validated['answers'],
                 'score' => $percentage,
-                'status' => 'graded',
+                'status' => $hasTheory ? 'pending' : 'graded',
                 'submitted_at' => now(),
             ]);
 
             return response()->json([
-                'message' => 'Quiz submitted successfully',
+                'message' => $hasTheory ? 'Quiz submitted. Theory portion requires instructor review.' : 'Quiz submitted and graded.',
                 'score' => $percentage,
-                'submission_id' => $submission->id
+                'submission_id' => $submission->id,
+                'status' => $submission->status
             ]);
         } 
         

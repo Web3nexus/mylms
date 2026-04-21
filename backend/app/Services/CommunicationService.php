@@ -11,7 +11,7 @@ class CommunicationService
     /**
      * Send an email based on a database template.
      */
-    public static function send(string $recipientEmail, string $templateSlug, array $data = [])
+    public static function send(string $recipientEmail, string $templateSlug, array $data = [], string $category = 'general')
     {
         $template = EmailTemplate::where('slug', $templateSlug)->first();
 
@@ -19,6 +19,9 @@ class CommunicationService
             \Illuminate\Support\Facades\Log::error("Email template not found: {$templateSlug}");
             return false;
         }
+
+        // Configure Mailer Category
+        self::configureMailer($category);
 
         $subject = $template->subject;
         $content = $template->content_html;
@@ -43,6 +46,39 @@ class CommunicationService
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("Failed to send email [{$templateSlug}] to {$recipientEmail}: " . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Dynamically reconfigure the mailer based on category.
+     */
+    private static function configureMailer(string $category)
+    {
+        $account = \App\Models\MailAccount::where('category', $category)->where('is_active', true)->first();
+
+        if ($account) {
+            config([
+                'mail.default' => 'smtp',
+                'mail.mailers.smtp.host' => $account->host,
+                'mail.mailers.smtp.port' => $account->port,
+                'mail.mailers.smtp.encryption' => $account->encryption,
+                'mail.mailers.smtp.username' => $account->username,
+                'mail.mailers.smtp.password' => $account->password,
+                'mail.from.address' => $account->from_address,
+                'mail.from.name' => $account->from_name,
+            ]);
+        } else {
+            // Fallback to institutional settings or system default
+            config([
+                'mail.default' => 'smtp',
+                'mail.mailers.smtp.host' => \App\Models\SystemSetting::getVal('mail_host'),
+                'mail.mailers.smtp.port' => \App\Models\SystemSetting::getVal('mail_port'),
+                'mail.mailers.smtp.encryption' => \App\Models\SystemSetting::getVal('mail_encryption'),
+                'mail.mailers.smtp.username' => \App\Models\SystemSetting::getVal('mail_username'),
+                'mail.mailers.smtp.password' => \App\Models\SystemSetting::getVal('mail_password'),
+                'mail.from.address' => \App\Models\SystemSetting::getVal('mail_from_address'),
+                'mail.from.name' => \App\Models\SystemSetting::getVal('mail_from_name'),
+            ]);
         }
     }
 }

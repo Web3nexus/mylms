@@ -98,4 +98,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(AdmissionApplication::class);
     }
+
+    public function courseRegistrations()
+    {
+        return $this->hasMany(\App\Modules\Courses\Models\CourseRegistration::class);
+    }
 }

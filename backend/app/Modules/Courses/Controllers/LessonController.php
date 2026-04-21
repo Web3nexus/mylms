@@ -54,12 +54,37 @@ class LessonController extends Controller
     public function show(Course $course, Lesson $lesson)
     {
         // Check if user is enrolled or is the instructor or admin
-        $isInstructor = $course->instructor_id === Auth::id();
-        $isAdmin = Auth::user() && Auth::user()->role === 'admin';
-        $isEnrolled = Auth::check() && $course->enrollments()->where('user_id', Auth::id())->exists();
+        $user = Auth::user();
+        $isInstructor = $user && $course->instructor_id === $user->id;
+        $isAdmin = $user && $user->role === 'admin';
+        $isEnrolled = $user && $course->registrations()->where('user_id', $user->id)->exists();
+
+        // Legacy Enrollment compatibility
+        if (!$isEnrolled && $user) {
+            $isEnrolled = $course->enrollments()->where('user_id', $user->id)->exists();
+        }
 
         if (!$lesson->is_free && !$isInstructor && !$isAdmin && !$isEnrolled) {
             return response()->json(['message' => 'Enrollment required to view this lesson.'], 403);
+        }
+
+        // Pacing Enforcement Logic
+        if ($isEnrolled && !$isAdmin && !$isInstructor && $user->program) {
+            $program = $user->program;
+            if ($program->pacing_type === 'scheduled') {
+                $registration = $course->registrations()->where('user_id', $user->id)->first();
+                if ($registration) {
+                    $daysSinceEnrollment = now()->diffInDays($registration->created_at);
+                    $weeksSinceEnrollment = max(1, ceil($daysSinceEnrollment / 7));
+                    $allowedLessons = $weeksSinceEnrollment * $program->schedule_days_per_week;
+
+                    if ($lesson->order > $allowedLessons) {
+                        return response()->json([
+                            'message' => 'Lesson locked based on the scheduled academic pacing. Allowed lessons for your current week: ' . $allowedLessons
+                        ], 403);
+                    }
+                }
+            }
         }
 
         return response()->json($lesson);

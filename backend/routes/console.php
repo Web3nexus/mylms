@@ -24,3 +24,6 @@ Schedule::command('academic:promote-students')->monthly()->withoutOverlapping();
 
 // 5. Institutional Academic Term Rotation Protocol
 Schedule::command('academic:rotate-semester')->monthly()->withoutOverlapping();
+
+// 6. Inactivity Re-engagement Protocol
+Schedule::job(new \App\Jobs\CheckStudentActivityJob)->dailyAt('08:00');

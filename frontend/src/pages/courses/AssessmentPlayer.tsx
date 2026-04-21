@@ -35,7 +35,7 @@ interface Option {
 interface Question {
   id: number;
   text: string;
-  type: 'mcq' | 'true_false';
+  type: 'mcq' | 'true_false' | 'theory';
   options: Option[];
 }
 
@@ -58,7 +58,7 @@ export default function AssessmentPlayer() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [answers, setAnswers] = useState<Record<number, number | string>>({});
   const [file, setFile] = useState<File | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -108,9 +108,9 @@ export default function AssessmentPlayer() {
     }, 1000);
   };
 
-  const handleOptionSelect = (questionId: number, optionId: number) => {
+  const handleAnswer = (questionId: number, answer: number | string) => {
     if (submitted) return;
-    setAnswers({ ...answers, [questionId]: optionId });
+    setAnswers({ ...answers, [questionId]: answer });
   };
 
   const handleSubmit = async () => {
@@ -273,18 +273,27 @@ export default function AssessmentPlayer() {
                 </div>
                 
                 <div className="p-8 md:p-12 space-y-4 bg-white">
-                   {assessment.questions[currentQuestionIdx].options.map((option) => (
-                     <button
-                       key={option.id}
-                       onClick={() => handleOptionSelect(assessment.questions[currentQuestionIdx].id, option.id)}
-                       className={`w-full p-5 md:p-6 text-left rounded-xl border-2 transition-all flex items-center justify-between group/opt relative overflow-hidden ${answers[assessment.questions[currentQuestionIdx].id] === option.id ? 'bg-offwhite border-mylms-purple text-text-main shadow-md' : 'bg-white border-border-soft text-mylms-purple hover:border-mylms-purple/30 hover:bg-offwhite/50 shadow-sm'}`}
-                     >
-                        <span className="font-black text-[11px] md:text-[12px] uppercase tracking-tight group-hover/opt:translate-x-1 transition-transform relative z-10">{option.text}</span>
-                        <div className={`w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center shrink-0 relative z-10 ${answers[assessment.questions[currentQuestionIdx].id] === option.id ? 'bg-mylms-purple border-mylms-purple shadow-sm' : 'border-border-soft group-hover/opt:border-mylms-purple/40'}`}>
-                           {answers[assessment.questions[currentQuestionIdx].id] === option.id && <CheckCircle size={14} className="text-white" />}
-                        </div>
-                     </button>
-                   ))}
+                   {assessment.questions[currentQuestionIdx].type === 'theory' ? (
+                      <textarea
+                        value={(answers[assessment.questions[currentQuestionIdx].id] as string) || ''}
+                        onChange={(e) => handleAnswer(assessment.questions[currentQuestionIdx].id, e.target.value)}
+                        placeholder="Write your comprehensive response here..."
+                        className="w-full h-64 p-6 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-medium text-text-main text-sm resize-none shadow-inner"
+                      />
+                   ) : (
+                     assessment.questions[currentQuestionIdx].options.map((option) => (
+                       <button
+                         key={option.id}
+                         onClick={() => handleAnswer(assessment.questions[currentQuestionIdx].id, option.id)}
+                         className={`w-full p-5 md:p-6 text-left rounded-xl border-2 transition-all flex items-center justify-between group/opt relative overflow-hidden ${answers[assessment.questions[currentQuestionIdx].id] === option.id ? 'bg-offwhite border-mylms-purple text-text-main shadow-md' : 'bg-white border-border-soft text-mylms-purple hover:border-mylms-purple/30 hover:bg-offwhite/50 shadow-sm'}`}
+                       >
+                          <span className="font-black text-[11px] md:text-[12px] uppercase tracking-tight group-hover/opt:translate-x-1 transition-transform relative z-10">{option.text}</span>
+                          <div className={`w-6 h-6 rounded-lg border-2 transition-all flex items-center justify-center shrink-0 relative z-10 ${answers[assessment.questions[currentQuestionIdx].id] === option.id ? 'bg-mylms-purple border-mylms-purple shadow-sm' : 'border-border-soft group-hover/opt:border-mylms-purple/40'}`}>
+                             {answers[assessment.questions[currentQuestionIdx].id] === option.id && <CheckCircle size={14} className="text-white" />}
+                          </div>
+                       </button>
+                     ))
+                   )}
                 </div>
 
                 <div className="p-6 md:p-10 bg-offwhite border-t border-border-soft flex flex-col sm:flex-row justify-between items-center gap-6">

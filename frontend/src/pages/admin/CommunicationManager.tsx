@@ -109,7 +109,7 @@ export default function CommunicationManager() {
            </h1>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center gap-4">
+         <div className="flex flex-col md:flex-row items-center gap-4">
             <button 
               onClick={() => navigate('/admin/communications/templates')}
               className="flex items-center gap-4 bg-mylms-purple p-4 px-8 rounded-3xl border border-mylms-purple shadow-lg text-white hover:opacity-90 transition-all active:scale-95"
@@ -120,7 +120,17 @@ export default function CommunicationManager() {
                   <p className="text-[9px] font-black opacity-60 uppercase tracking-widest mt-1">Manage institutional Emails</p>
                </div>
             </button>
-            <div className="flex items-center gap-4 bg-white p-4 rounded-3xl border border-border-soft shadow-sm">
+            <button 
+              onClick={() => navigate('/admin/communications/gateways')}
+              className="flex items-center gap-4 bg-white p-4 px-8 rounded-3xl border border-border-soft shadow-sm hover:border-mylms-purple transition-all active:scale-95 group"
+            >
+               <Server size={20} className="text-text-secondary group-hover:text-mylms-purple transition-colors" />
+               <div className="text-left">
+                  <p className="text-[10px] font-black uppercase tracking-tight text-text-main group-hover:text-mylms-purple transition-colors">Gateway Routing</p>
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1 group-hover:text-mylms-purple/60 transition-colors">Multiple SMTP Config</p>
+               </div>
+            </button>
+            <div className="flex items-center gap-4 bg-white p-4 rounded-3xl border border-border-soft shadow-sm hidden lg:flex">
                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center shadow-inner">
                   <Shield size={24} />
                </div>
