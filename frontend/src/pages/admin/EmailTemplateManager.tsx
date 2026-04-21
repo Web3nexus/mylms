@@ -205,7 +205,7 @@ export default function EmailTemplateManager() {
                       <h5 className="text-[10px] font-black text-mylms-purple uppercase tracking-widest">Available Placeholders</h5>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      {selectedTemplate.placeholders.map(p => (
+                      {(Array.isArray(selectedTemplate.placeholders) ? selectedTemplate.placeholders : (typeof selectedTemplate.placeholders === 'string' ? JSON.parse(selectedTemplate.placeholders || '[]') : [])).map((p: string) => (
                         <span key={p} className="px-3 py-2 bg-white border border-mylms-purple/20 text-mylms-purple text-[9px] font-black rounded-lg uppercase tracking-tight">
                           {`{{${p}}}`}
                         </span>
