@@ -16,8 +16,30 @@ class CommunicationService
         $template = EmailTemplate::where('slug', $templateSlug)->first();
 
         if (!$template) {
-            \Illuminate\Support\Facades\Log::error("Email template not found: {$templateSlug}");
-            return false;
+            // Auto-heal missing critical templates
+            if ($templateSlug === 'otp_verification') {
+                $template = EmailTemplate::create([
+                    'slug' => 'otp_verification',
+                    'subject' => '🔐 Institutional Identity Verification',
+                    'category' => 'system',
+                    'placeholders' => '["student_name", "otp_code", "campus_name"]',
+                    'content_html' => '
+                        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 40px; background: #fff;">
+                            <div style="text-align: center; margin-bottom: 40px;">
+                                <h1 style="color: #4c1d95; font-size: 24px; font-weight: 900; text-transform: uppercase;">Institutional Gate</h1>
+                                <p style="color: #707070; font-size: 10px; font-weight: 900; text-transform: uppercase;">Security Protocol Active</p>
+                            </div>
+                            <p style="color: #333; font-size: 16px;">Greetings, <strong>{{student_name}}</strong>.</p>
+                            <p style="color: #333; font-size: 16px;">To finalize your registry at <strong>{{campus_name}}</strong>, please use this One-Time Security Code:</p>
+                            <div style="background: #f8fafc; padding: 40px; border-radius: 24px; text-align: center; margin: 40px 0; border: 1px solid #e2e8f0;">
+                                <h2 style="font-family: monospace; font-size: 48px; color: #4c1d95; margin: 0; letter-spacing: 8px;">{{otp_code}}</h2>
+                            </div>
+                        </div>'
+                ]);
+            } else {
+                \Illuminate\Support\Facades\Log::error("Email template not found: {$templateSlug}");
+                return false;
+            }
         }
 
         // Determine Category (favor provided category, fallback to template's category)
@@ -93,6 +115,8 @@ class CommunicationService
                 'mail.mailers.smtp.encryption' => \App\Models\SystemSetting::getVal('mail_encryption', env('MAIL_ENCRYPTION', 'tls')),
                 'mail.mailers.smtp.username' => \App\Models\SystemSetting::getVal('mail_username', env('MAIL_USERNAME')),
                 'mail.mailers.smtp.password' => \App\Models\SystemSetting::getVal('mail_password', env('MAIL_PASSWORD')),
+                'mail.mailers.smtp.scheme' => null,
+                'mail.mailers.smtp.url' => null,
                 'mail.from.address' => \App\Models\SystemSetting::getVal('mail_from_address', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
                 'mail.from.name' => \App\Models\SystemSetting::getVal('mail_from_name', env('MAIL_FROM_NAME', 'MyLMS')),
             ]);
