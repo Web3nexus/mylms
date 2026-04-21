@@ -18,16 +18,21 @@ class Program extends Model
         'degree_level', 
         'duration_years',
         // Additions for Admissions & Pricing (Phase 1)
+        'pricing_type',
         'tuition_fee',
         'application_fee',
+        'certificate_fee',
         'is_scholarship_eligible',
-        'external_provider_id'
+        'is_external',
+        'external_provider'
     ];
 
     protected $casts = [
         'is_scholarship_eligible' => 'boolean',
+        'is_external' => 'boolean',
         'tuition_fee' => 'decimal:2',
-        'application_fee' => 'decimal:2'
+        'application_fee' => 'decimal:2',
+        'certificate_fee' => 'decimal:2'
     ];
 
     protected static function boot()
