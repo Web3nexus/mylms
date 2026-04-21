@@ -20,8 +20,11 @@ class CommunicationService
             return false;
         }
 
+        // Determine Category (favor provided category, fallback to template's category)
+        $actualCategory = $category !== 'general' ? $category : ($template->category ?? 'general');
+
         // Configure Mailer Category
-        self::configureMailer($category);
+        self::configureMailer($actualCategory);
 
         $subject = $template->subject;
         $content = $template->content_html;
@@ -44,8 +47,20 @@ class CommunicationService
             });
             return true;
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("Failed to send email [{$templateSlug}] to {$recipientEmail}: " . $e->getMessage());
-            return false;
+            \Illuminate\Support\Facades\Log::warning("Failed to send email [{$templateSlug}] via primary SMTP ({$actualCategory}): " . $e->getMessage() . ". Reverting to default platform SMTP.");
+            
+            // Revert to system default and try again
+            self::configureMailer('system_fallback_override');
+            
+            try {
+                Mail::html($content, function ($message) use ($recipientEmail, $subject) {
+                    $message->to($recipientEmail)->subject($subject);
+                });
+                return true;
+            } catch (\Exception $fallbackException) {
+                \Illuminate\Support\Facades\Log::error("Failed to send email [{$templateSlug}] via fallback SMTP: " . $fallbackException->getMessage());
+                return false;
+            }
         }
     }
 
@@ -54,9 +69,11 @@ class CommunicationService
      */
     private static function configureMailer(string $category)
     {
-        $account = \App\Models\MailAccount::where('category', $category)->where('is_active', true)->first();
+        $account = $category !== 'system_fallback_override' 
+            ? \App\Models\MailAccount::where('category', $category)->where('is_active', true)->first() 
+            : null;
 
-        if ($account) {
+        if ($account && !empty($account->host)) {
             config([
                 'mail.default' => 'smtp',
                 'mail.mailers.smtp.host' => $account->host,
