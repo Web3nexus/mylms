@@ -25,11 +25,21 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
+        $otp = (string) rand(100000, 999999);
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => User::ROLE_STUDENT,
+            'otp_code' => $otp,
+            'otp_expires_at' => now()->addMinutes(15),
+        ]);
+
+        // Send OTP via CommunicationService
+        \App\Services\CommunicationService::send($user->email, 'otp_verification', [
+            'student_name' => $user->name,
+            'otp_code' => $otp
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

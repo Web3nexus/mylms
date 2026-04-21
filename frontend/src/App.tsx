@@ -46,6 +46,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import CourseList from './pages/courses/CourseList'
 import PublicVerification from './pages/credentials/PublicVerification'
+import VerifyEmail from './pages/VerifyEmail'
 import ScholarshipDirectory from './pages/scholarships/ScholarshipDirectory'
 import AdmissionApplication from './pages/admissions/AdmissionApplication'
 import AdmissionsPage from './pages/admissions/AdmissionsPage'
@@ -97,6 +98,7 @@ import InstructorRegistry from './pages/dashboards/InstructorRegistry'
 import AdminOperations from './pages/dashboards/AdminOperations'
 import BrandingManager from './pages/admin/BrandingManager'
 import CommunicationManager from './pages/admin/CommunicationManager'
+import EmailTemplateManager from './pages/admin/EmailTemplateManager'
 import CommandCenter from './pages/admin/CommandCenter'
 
 // Hooks
@@ -378,6 +380,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/verify" element={<PublicVerification />} />
         
         <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
@@ -431,6 +434,7 @@ function App() {
           <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />
           <Route path="/branding" element={<BrandingManager />} />
           <Route path="/admin/communications" element={<CommunicationManager />} />
+          <Route path="/admin/communications/templates" element={<EmailTemplateManager />} />
           <Route path="/admin/command-center" element={<CommandCenter />} />
         </Route>
         

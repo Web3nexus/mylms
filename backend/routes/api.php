@@ -47,6 +47,10 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        
+        // OTP Verification
+        Route::post('/verify-otp', [\App\Modules\Auth\Controllers\VerifyController::class, 'verifyOtp']);
+        Route::post('/resend-otp', [\App\Modules\Auth\Controllers\VerifyController::class, 'resendOtp']);
     });
 });
 
@@ -165,6 +169,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/communications/settings', [\App\Http\Controllers\CommunicationController::class, 'getSettings']);
         Route::post('/communications/settings', [\App\Http\Controllers\CommunicationController::class, 'updateSettings']);
         Route::post('/communications/test-email', [\App\Http\Controllers\CommunicationController::class, 'sendTestEmail']);
+
+        // Email Templates
+        Route::get('/admin/email-templates', [\App\Http\Controllers\EmailTemplateController::class, 'index']);
+        Route::get('/admin/email-templates/{id}', [\App\Http\Controllers\EmailTemplateController::class, 'show']);
+        Route::put('/admin/email-templates/{id}', [\App\Http\Controllers\EmailTemplateController::class, 'update']);
     });
 
     // Student Enrollments (legacy)

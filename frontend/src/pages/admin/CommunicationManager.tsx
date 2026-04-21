@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 import { 
   Mail, 
@@ -13,7 +14,8 @@ import {
   Lock,
   User,
   ExternalLink,
-  Loader2
+  Loader2,
+  Layout
 } from 'lucide-react';
 
 interface CommunicationSettings {
@@ -27,6 +29,7 @@ interface CommunicationSettings {
 }
 
 export default function CommunicationManager() {
+  const navigate = useNavigate();
   const [settings, setSettings] = useState<CommunicationSettings>({
     mail_host: '',
     mail_port: 587,
@@ -106,15 +109,27 @@ export default function CommunicationManager() {
            </h1>
         </div>
 
-        <div className="flex items-center gap-4 bg-white p-4 rounded-3xl border border-border-soft shadow-sm">
-           <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center shadow-inner">
-              <Shield size={24} />
-           </div>
-           <div>
-              <p className="text-[10px] font-black text-text-main uppercase tracking-tight">Security Status</p>
-              <p className="text-[9px] font-black text-green-500 uppercase tracking-widest mt-1">TLS Protocol Active</p>
-           </div>
-        </div>
+        <div className="flex flex-col md:flex-row items-center gap-4">
+            <button 
+              onClick={() => navigate('/admin/communications/templates')}
+              className="flex items-center gap-4 bg-mylms-purple p-4 px-8 rounded-3xl border border-mylms-purple shadow-lg text-white hover:opacity-90 transition-all active:scale-95"
+            >
+               <Layout size={20} />
+               <div className="text-left">
+                  <p className="text-[10px] font-black uppercase tracking-tight">Template Architecture</p>
+                  <p className="text-[9px] font-black opacity-60 uppercase tracking-widest mt-1">Manage institutional Emails</p>
+               </div>
+            </button>
+            <div className="flex items-center gap-4 bg-white p-4 rounded-3xl border border-border-soft shadow-sm">
+               <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center shadow-inner">
+                  <Shield size={24} />
+               </div>
+               <div>
+                  <p className="text-[10px] font-black text-text-main uppercase tracking-tight">Security Status</p>
+                  <p className="text-[9px] font-black text-green-500 uppercase tracking-widest mt-1">TLS Protocol Active</p>
+               </div>
+            </div>
+         </div>
       </div>
 
       {notif && (

@@ -49,8 +49,8 @@ export default function Register() {
       const { user, access_token } = response.data;
 
       setAuth(user, access_token);
-      // If student registrant, redirect to admissions wizard immediately
-      if (user.role === 'student') navigate('/apply');
+      // If student registrant, redirect to institutional verification protocol
+      if (user.role === 'student') navigate('/verify-email');
       else navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please verify your information.');

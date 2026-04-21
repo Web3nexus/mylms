@@ -22,10 +22,37 @@ class ProcessFeeWaiverJob implements ShouldQueue
 
     public function handle()
     {
-        $app = AdmissionApplication::find($this->applicationId);
-        if ($app && $app->fee_status === 'waiver_pending') {
-            // Auto approve the waiver after the delay
-            $app->update(['fee_status' => 'waiver_approved']);
+        $app = AdmissionApplication::with(['user', 'program'])->find($this->applicationId);
+        
+        if ($app && ($app->application_fee_status === 'pending' || $app->application_fee_status === 'waiver_pending')) {
+            $app->update([
+                'application_fee_status' => 'waived',
+                'application_fee_waived_at' => now()
+            ]);
+            
+            $user = $app->user;
+            if (!$user) return;
+
+            // 1. Admission Waiver Congratulations
+            \App\Services\CommunicationService::send($user->email, 'waiver_congratulations', [
+                'student_name' => $user->name,
+            ]);
+
+            // 2. Rector's Welcome Letter
+            \App\Services\CommunicationService::send($user->email, 'rector_welcome', [
+                'student_name' => $user->name,
+            ]);
+
+            // 3. Tuition Fee Statement (Scholarship Worth)
+            $tuitionValue = (float) ($app->program?->tuition_fee ?? 0);
+            \App\Services\CommunicationService::send($user->email, 'tuition_statement', [
+                'student_name'  => $user->name,
+                'tuition_worth' => number_format($tuitionValue, 2),
+                'academic_year' => '2026/2027', // Dynamic resolution could be added later
+            ]);
+
+            // 4. Delayed Job: Follow the Mission (2 days)
+            \App\Jobs\DelayedMissionEmailJob::dispatch($user->id)->delay(now()->addDays(2));
         }
     }
 }
