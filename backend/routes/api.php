@@ -258,4 +258,16 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public Payment Webhooks
 Route::post('/webhooks/payments/{gateway}', [App\Modules\Finance\Controllers\WebhookController::class, 'handle']);
 
-Route::get('/user', [AuthController::class, 'me'])->middleware('auth:sanctum');
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+// Temporary route to allow database migrations on shared hosting without SSH
+Route::get('/force-migrate', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response()->json(['message' => 'Migration complete', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
