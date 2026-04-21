@@ -79,8 +79,10 @@ export default function AcademicManager() {
     admission_email_delay_hours: 24,
     scholarship_renewal_min_gpa: 2.0
   });
+
+  const [lastSync, setLastSync] = useState<string>(new Date().toLocaleTimeString());
+  const [syncing, setSyncing] = useState(false);
   
-  // Unified Modal System State
   const [modal, setModal] = useState<{
     isOpen: boolean;
     mode: 'add_faculty' | 'add_department' | 'add_program' | 'delete' | null;
@@ -92,12 +94,28 @@ export default function AcademicManager() {
     mode: null,
     targetId: null
   });
+
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
   
   const token = useAuthStore(state => state.token);
 
   useEffect(() => {
-    fetchStructure();
-    fetchSettings();
+    const initData = async () => {
+      setLoading(true);
+      await Promise.all([fetchStructure(), fetchSettings()]);
+      setLoading(false);
+    };
+    initData();
   }, []);
 
   const fetchStructure = async () => {
@@ -108,8 +126,6 @@ export default function AcademicManager() {
       setFaculties(res.data);
     } catch (err) {
       console.error('Error fetching academic structure:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -126,13 +142,27 @@ export default function AcademicManager() {
 
   const handleUpdateSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSyncing(true);
     try {
       await client.patch('/admin/admissions/settings', settings, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert('Institutional settings updated successfully.');
+      setLastSync(new Date().toLocaleTimeString());
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Registry Updated',
+        message: 'The institutional admission protocols have been successfully synchronized.'
+      });
     } catch (err) {
-       alert('Failed to update settings.');
+       setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Sync Failure',
+        message: 'Unable to commit institutional settings to the central ledger.'
+      });
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -145,8 +175,19 @@ export default function AcademicManager() {
       setNewFaculty({ name: '', description: '' });
       setModal({ isOpen: false, mode: null });
       fetchStructure();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Faculty Registered',
+        message: 'A new academic faculty has been successfully added to the registry.'
+      });
     } catch (err) {
-      console.error('Error adding faculty:', err);
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Registration Error',
+        message: 'Could not Provision the new faculty at this time.'
+      });
     }
   };
 
@@ -163,8 +204,19 @@ export default function AcademicManager() {
       setNewDept({ name: '', code: '' });
       setModal({ isOpen: false, mode: null });
       fetchStructure();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Unit Initialized',
+        message: 'The new department has been successfully registered in the faculty hierarchy.'
+      });
     } catch (err) {
-      console.error('Error adding department:', err);
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Sync Failed',
+        message: 'The departmental record could not be committed to the registry.'
+      });
     }
   };
 
@@ -192,8 +244,19 @@ export default function AcademicManager() {
       });
       setModal({ isOpen: false, mode: null });
       fetchStructure();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Program Provisioned',
+        message: 'The academic program is now active and available for enrollment.'
+      });
     } catch (err) {
-      console.error('Error adding program:', err);
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Protocol Error',
+        message: 'Could not define the new program record in this session.'
+      });
     }
   };
 
@@ -204,8 +267,19 @@ export default function AcademicManager() {
       });
       fetchStructure();
       setModal({ isOpen: false, mode: null });
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Faculty Wiped',
+        message: 'The faculty and all its nested units have been removed from the registry.'
+      });
     } catch (err) {
-       console.error('Delete faculty failed:', err);
+       setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Delete Failed',
+        message: 'Institutional guardrails prevented the removal of this record.'
+      });
     }
   };
 
@@ -216,8 +290,19 @@ export default function AcademicManager() {
       });
       fetchStructure();
       setModal({ isOpen: false, mode: null });
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Unit Terminated',
+        message: 'The departmental record has been successfully purged.'
+      });
     } catch (err) {
-       console.error('Delete department failed:', err);
+       setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Lock Error',
+        message: 'Unable to authorized termination. The record might be protected.'
+      });
     }
   };
 
@@ -228,8 +313,19 @@ export default function AcademicManager() {
       });
       fetchStructure();
       setModal({ isOpen: false, mode: null });
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Program Terminated',
+        message: 'The academic program has been permanently removed from the ledger.'
+      });
     } catch (err) {
-       console.error('Delete program failed:', err);
+       setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Termination Failed',
+        message: 'Record sync failed. Program could not be deleted.'
+      });
     }
   };
 
@@ -324,7 +420,10 @@ export default function AcademicManager() {
                  </div>
                  <div>
                     <h3 className="text-2xl font-black text-text-main uppercase tracking-tight">Global Admission Logic</h3>
-                    <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em] mt-1">Configuring System Behavior</p>
+                    <div className="flex items-center gap-2 mt-1">
+                       <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em]">Configuring System Behavior</p>
+                       <span className="text-[8px] font-bold text-gray-300 uppercase tracking-widest ml-4 italic">Last Sync: {lastSync}</span>
+                    </div>
                  </div>
               </div>
 
@@ -336,7 +435,7 @@ export default function AcademicManager() {
                           <Clock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                           <input 
                             type="number" 
-                            value={settings.admission_fee_waiver_delay_minutes} 
+                            value={settings.admission_fee_waiver_delay_minutes || 0} 
                             onChange={e => setSettings({...settings, admission_fee_waiver_delay_minutes: parseInt(e.target.value)})}
                             className="w-full pl-16 pr-8 py-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
                           />
@@ -358,7 +457,7 @@ export default function AcademicManager() {
                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Admission Email Delay (Hours)</label>
                        <input 
                           type="number" 
-                          value={settings.admission_email_delay_hours} 
+                          value={settings.admission_email_delay_hours || 0} 
                           onChange={e => setSettings({...settings, admission_email_delay_hours: parseInt(e.target.value)})}
                           className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
                        />
@@ -368,7 +467,7 @@ export default function AcademicManager() {
                        <input 
                           type="number" 
                           step="0.1" 
-                          value={settings.scholarship_renewal_min_gpa} 
+                          value={settings.scholarship_renewal_min_gpa || 0} 
                           onChange={e => setSettings({...settings, scholarship_renewal_min_gpa: parseFloat(e.target.value)})}
                           className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
                        />
@@ -376,8 +475,13 @@ export default function AcademicManager() {
                  </div>
 
                  <div className="pt-6 border-t border-offwhite">
-                    <button type="submit" className="w-full py-6 bg-mylms-purple text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all active:scale-[0.98]">
-                       Commit Global Config
+                    <button 
+                      type="submit" 
+                      disabled={syncing}
+                      className="w-full py-6 bg-mylms-purple text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+                    >
+                       {syncing && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                       {syncing ? 'Synchronizing Protocols...' : 'Commit Global Config'}
                     </button>
                  </div>
               </form>
@@ -680,6 +784,24 @@ export default function AcademicManager() {
               )}
             </div>
           </div>
+        </div>
+      )}
+      {/* Notification Modal */}
+      {notification.isOpen && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-mylms-purple/40 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="bg-white rounded-[40px] shadow-2xl border border-white/20 max-w-sm w-full p-12 text-center transform animate-in zoom-in-95 duration-500">
+              <div className={`w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-8 shadow-inner ${notification.type === 'success' ? 'bg-green-50 text-green-500' : 'bg-mylms-rose/10 text-mylms-rose'}`}>
+                 {notification.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
+              </div>
+              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification.title}</h3>
+              <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">{notification.message}</p>
+              <button 
+                onClick={() => setNotification({ ...notification, isOpen: false })}
+                className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] transition-all active:scale-95 ${notification.type === 'success' ? 'bg-mylms-purple text-white shadow-xl' : 'bg-mylms-rose text-white shadow-xl'}`}
+              >
+                Acknowledge
+              </button>
+           </div>
         </div>
       )}
     </div>
