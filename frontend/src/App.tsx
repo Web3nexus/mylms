@@ -150,6 +150,21 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     const timer = setInterval(() => setSystemTime(new Date()), 60000)
     return () => clearInterval(timer)
   }, [])
+
+  // Dynamic Document Title
+  useEffect(() => {
+    const appName = branding?.institutional_name || import.meta.env.VITE_APP_NAME || 'MyLMS';
+    // Attempt to extract page name from path, fallback to something generic if not in sidebar
+    const cleanPath = location.pathname.split('/').pop() || 'Portal';
+    const pageName = cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
+    
+    // Fallback if we are on root
+    if (location.pathname === '/') {
+       document.title = `${appName} | Unified Campus`;
+    } else {
+       document.title = `${pageName} - ${appName}`;
+    }
+  }, [location.pathname, branding?.institutional_name]);
   
   const handleLogout = async () => {
     try {

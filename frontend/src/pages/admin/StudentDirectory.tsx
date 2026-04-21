@@ -111,6 +111,39 @@ export default function StudentDirectory() {
     }
   };
 
+  // Bulk Actions
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [deleting, setDeleting] = useState(false);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === students.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(students.map(s => s.id));
+    }
+  };
+
+  const toggleSelect = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkDelete = async () => {
+    if (!selectedIds.length) return;
+    if (!confirm(`Are you sure you want to permanently delete ${selectedIds.length} student(s)? This action cannot be undone.`)) return;
+
+    setDeleting(true);
+    try {
+      await client.post('/admin/students/bulk-delete', { student_ids: selectedIds }, { headers });
+      setSelectedIds([]);
+      fetchStudents(currentPage);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete selected students.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const clearSearch = () => setSearch('');
 
   return (
@@ -146,30 +179,48 @@ export default function StudentDirectory() {
         </div>
       </div>
 
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-10">
-        <div className="relative grow group">
-          <Search size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-mylms-rose transition-colors" />
-          <input
-            type="text"
-            placeholder="Search by name, email, or matric number..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full bg-white border border-border-soft rounded-xl py-3.5 pl-12 pr-10 text-[11px] font-bold focus:ring-1 focus:ring-mylms-rose/20 focus:border-mylms-rose/30 outline-none transition-all placeholder:text-gray-300 shadow-sm"
-          />
-          {search && (
-            <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-mylms-rose transition-colors">
-              <X size={14} />
+      {/* Search, Filter & Bulk Actions Bar */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-10 items-center">
+        {selectedIds.length > 0 ? (
+          <div className="flex-1 flex gap-4 w-full h-12">
+            <div className="flex-grow flex items-center justify-between px-6 bg-mylms-purple text-white rounded-xl shadow-sm">
+               <span className="text-[10px] font-black uppercase tracking-widest">{selectedIds.length} Student(s) Selected</span>
+               <button onClick={() => setSelectedIds([])} className="hover:text-mylms-rose transition-colors">
+                  <X size={16} />
+               </button>
+            </div>
+            <button 
+              onClick={handleBulkDelete}
+              disabled={deleting}
+              className="px-8 bg-mylms-rose text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-600 transition-colors shrink-0 disabled:opacity-50 flex items-center gap-2"
+            >
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />} Delete Selected
             </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="relative grow group w-full h-12">
+            <Search size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-mylms-rose transition-colors" />
+            <input
+              type="text"
+              placeholder="Search by name, email, or matric number..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full h-full bg-white border border-border-soft rounded-xl pl-12 pr-10 text-[11px] font-bold focus:ring-1 focus:ring-mylms-rose/20 focus:border-mylms-rose/30 outline-none transition-all placeholder:text-gray-300 shadow-sm"
+            />
+            {search && (
+              <button onClick={clearSearch} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-mylms-rose transition-colors">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        )}
 
-        <div className="flex gap-2 shrink-0">
+        <div className="flex gap-2 shrink-0 h-12">
           {(['all', 'matriculated', 'pending'] as const).map(f => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
-              className={`flex items-center gap-2 px-5 py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border ${
+              onClick={() => { setFilter(f); setSelectedIds([]); }}
+              className={`flex items-center gap-2 px-5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border ${
                 filter === f 
                   ? 'bg-mylms-purple text-white border-mylms-purple shadow-md' 
                   : 'bg-white text-gray-400 border-border-soft hover:border-mylms-purple/30 shadow-sm'
@@ -185,8 +236,16 @@ export default function StudentDirectory() {
       {/* Student Table */}
       <div className="bg-white rounded-2xl border border-border-soft shadow-sm overflow-hidden">
         {/* Table Header */}
-        <div className="grid grid-cols-12 px-8 py-5 bg-offwhite border-b border-border-soft">
-          <div className="col-span-4 text-[8px] font-black text-gray-400 uppercase tracking-[0.4em]">Student</div>
+        <div className="grid grid-cols-12 px-8 py-5 bg-offwhite border-b border-border-soft items-center">
+          <div className="col-span-4 flex items-center gap-4">
+             <input 
+               type="checkbox" 
+               checked={students.length > 0 && selectedIds.length === students.length}
+               onChange={toggleSelectAll}
+               className="w-4 h-4 rounded text-mylms-purple focus:ring-mylms-purple border-border-soft"
+             />
+             <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.4em]">Student</span>
+          </div>
           <div className="col-span-3 text-[8px] font-black text-gray-400 uppercase tracking-[0.4em]">Programme</div>
           <div className="col-span-3 text-[8px] font-black text-gray-400 uppercase tracking-[0.4em]">Matric Number</div>
           <div className="col-span-2 text-[8px] font-black text-gray-400 uppercase tracking-[0.4em] text-right">Status</div>
@@ -226,10 +285,18 @@ export default function StudentDirectory() {
               <div
                 key={student.id}
                 onClick={() => fetchStudentDetails(student.id)}
-                className={`grid grid-cols-12 px-8 py-6 items-center group hover:bg-offwhite/60 transition-all cursor-pointer ${selectedStudentId === student.id ? 'bg-offwhite/80 ring-1 ring-inset ring-mylms-purple/10' : ''}`}
+                className={`grid grid-cols-12 px-8 py-6 items-center group hover:bg-offwhite/60 transition-all cursor-pointer ${selectedIds.includes(student.id) ? 'bg-mylms-purple/5' : selectedStudentId === student.id ? 'bg-offwhite/80 ring-1 ring-inset ring-mylms-purple/10' : ''}`}
               >
                 {/* Student Info */}
                 <div className="col-span-4 flex items-center gap-4">
+                  <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                     <input 
+                       type="checkbox" 
+                       checked={selectedIds.includes(student.id)}
+                       onChange={(e) => toggleSelect(student.id, e as any)}
+                       className="w-4 h-4 rounded text-mylms-purple focus:ring-mylms-purple border-border-soft"
+                     />
+                  </div>
                   <div className="w-10 h-10 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center text-mylms-purple font-black text-sm shrink-0 group-hover:bg-mylms-purple group-hover:text-white transition-all shadow-sm">
                     {student.name.charAt(0)}
                   </div>
