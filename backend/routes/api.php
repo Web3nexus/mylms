@@ -89,19 +89,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/{course}/gradebook', [InstructorGradeController::class, 'index']);
     Route::post('/courses/{course}/gradebook/{registration}', [InstructorGradeController::class, 'update']);
 
-    // Manage Academic Structure (Admins/Management) - Redirected to Enrollment Management
-    Route::get('/admin/enrollment', [EnrollmentController::class, 'index']);
-    Route::post('/admin/enrollment/faculties', [EnrollmentController::class, 'storeFaculty']);
-    Route::put('/admin/enrollment/faculties/{faculty}', [EnrollmentController::class, 'updateFaculty']);
-    Route::delete('/admin/enrollment/faculties/{faculty}', [EnrollmentController::class, 'deleteFaculty']);
-    
-    Route::post('/admin/enrollment/departments', [EnrollmentController::class, 'storeDepartment']);
-    Route::put('/admin/enrollment/departments/{department}', [EnrollmentController::class, 'updateDepartment']);
-    Route::delete('/admin/enrollment/departments/{department}', [EnrollmentController::class, 'deleteDepartment']);
+    // Unified Academic & Enrollment Management (Admins/Management)
+    Route::prefix('admin/academic')->group(function () {
+        Route::get('/structure', [EnrollmentController::class, 'index']); // faculties/depts/progs list
+        
+        Route::post('/faculties', [EnrollmentController::class, 'storeFaculty']);
+        Route::put('/faculties/{faculty}', [EnrollmentController::class, 'updateFaculty']);
+        Route::delete('/faculties/{faculty}', [EnrollmentController::class, 'deleteFaculty']);
+        
+        Route::post('/departments', [EnrollmentController::class, 'storeDepartment']);
+        Route::put('/departments/{department}', [EnrollmentController::class, 'updateDepartment']);
+        Route::delete('/departments/{department}', [EnrollmentController::class, 'deleteDepartment']);
 
-    Route::post('/admin/enrollment/programs', [EnrollmentController::class, 'storeProgram']);
-    Route::put('/admin/enrollment/programs/{program}', [EnrollmentController::class, 'updateProgram']);
-    Route::delete('/admin/enrollment/programs/{program}', [EnrollmentController::class, 'deleteProgram']);
+        Route::post('/programs', [EnrollmentController::class, 'storeProgram']);
+        Route::put('/programs/{program}', [EnrollmentController::class, 'updateProgram']);
+        Route::delete('/programs/{program}', [EnrollmentController::class, 'deleteProgram']);
+    });
 
     // Manage Academic Sessions & Semesters (Admins)
     Route::get('/academic/sessions', [AcademicSessionController::class, 'index']);
@@ -149,6 +152,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/admin/pages', [PageController::class, 'store']);
         Route::patch('/admin/pages/{id}', [PageController::class, 'update']);
         Route::delete('/admin/pages/{id}', [PageController::class, 'destroy']);
+
+        // Admission Institutional Settings
+        Route::get('/admin/admissions/settings', [\App\Modules\Admissions\Controllers\AdmissionSettingsController::class, 'index']);
+        Route::patch('/admin/admissions/settings', [\App\Modules\Admissions\Controllers\AdmissionSettingsController::class, 'update']);
 
         // Command Center
         Route::get('/admin/commands', [CommandCenterController::class, 'index']);

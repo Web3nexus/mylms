@@ -92,28 +92,38 @@ class EnrollmentController extends Controller
     /**
      * Program CRUD
      */
-    public function storeProgram(Request $request)
-    {
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|unique:programs,name',
             'degree_level' => 'required|string', // Associate, Bachelor, Master, PhD
             'duration_years' => 'required|integer|min:1',
             'is_active' => 'boolean',
+            'pricing_type' => 'nullable|string',
+            'tuition_fee' => 'nullable|numeric',
+            'application_fee' => 'nullable|numeric',
+            'certificate_fee' => 'nullable|numeric',
+            'is_scholarship_eligible' => 'boolean',
+            'is_external' => 'boolean',
+            'external_provider' => 'nullable|string',
         ]);
 
         $program = Program::create($validated);
         return response()->json($program, 201);
     }
 
-    public function updateProgram(Request $request, Program $program)
-    {
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|unique:programs,name,' . $program->id,
             'degree_level' => 'required|string',
             'duration_years' => 'required|integer|min:1',
             'is_active' => 'boolean',
+            'pricing_type' => 'nullable|string',
+            'tuition_fee' => 'nullable|numeric',
+            'application_fee' => 'nullable|numeric',
+            'certificate_fee' => 'nullable|numeric',
+            'is_scholarship_eligible' => 'boolean',
+            'is_external' => 'boolean',
+            'external_provider' => 'nullable|string',
         ]);
 
         $program->update($validated);

@@ -16,7 +16,15 @@ import {
   Hash,
   XCircle,
   GraduationCap,
-  ShieldCheck
+  ShieldCheck,
+  CreditCard,
+  Target,
+  Sparkles,
+  Heart,
+  Globe,
+  Clock,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 
 interface Program {
@@ -24,6 +32,13 @@ interface Program {
   name: string;
   degree_level: string;
   duration_years: number;
+  pricing_type: string;
+  tuition_fee: string;
+  application_fee: string;
+  certificate_fee: string;
+  is_scholarship_eligible: boolean;
+  is_external: boolean;
+  external_provider: string | null;
 }
 
 interface Department {
@@ -45,7 +60,25 @@ export default function AcademicManager() {
   const [loading, setLoading] = useState(true);
   const [newFaculty, setNewFaculty] = useState({ name: '', description: '' });
   const [newDept, setNewDept] = useState({ name: '', code: '' });
-  const [newProg, setNewProg] = useState({ name: '', degree_level: 'BSc', duration_years: 4 });
+  const [newProg, setNewProg] = useState({ 
+    name: '', 
+    degree_level: 'BSc', 
+    duration_years: 4,
+    pricing_type: 'hybrid',
+    tuition_fee: '0',
+    application_fee: '0',
+    certificate_fee: '0',
+    is_scholarship_eligible: true,
+    is_external: false,
+    external_provider: ''
+  });
+
+  const [settings, setSettings] = useState({
+    admission_fee_waiver_delay_minutes: 5,
+    scholarship_auto_approval: true,
+    admission_email_delay_hours: 24,
+    scholarship_renewal_min_gpa: 2.0
+  });
   
   // Unified Modal System State
   const [modal, setModal] = useState<{
@@ -64,6 +97,7 @@ export default function AcademicManager() {
 
   useEffect(() => {
     fetchStructure();
+    fetchSettings();
   }, []);
 
   const fetchStructure = async () => {
@@ -79,10 +113,33 @@ export default function AcademicManager() {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const res = await client.get('/admin/admissions/settings', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSettings(res.data);
+    } catch (err) {
+      console.error('Error fetching settings:', err);
+    }
+  };
+
+  const handleUpdateSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await client.patch('/admin/admissions/settings', settings, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert('Institutional settings updated successfully.');
+    } catch (err) {
+       alert('Failed to update settings.');
+    }
+  };
+
   const handleAddFaculty = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await client.post('/academic/faculties', newFaculty, {
+      await client.post('/admin/academic/faculties', newFaculty, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewFaculty({ name: '', description: '' });
@@ -97,7 +154,10 @@ export default function AcademicManager() {
     e.preventDefault();
     if (!modal.targetId) return;
     try {
-      await client.post(`/academic/faculties/${modal.targetId}/departments`, newDept, {
+      await client.post(`/admin/academic/departments`, {
+        ...newDept,
+        faculty_id: modal.targetId
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewDept({ name: '', code: '' });
@@ -112,10 +172,24 @@ export default function AcademicManager() {
     e.preventDefault();
     if (!modal.targetId) return;
     try {
-      await client.post(`/academic/departments/${modal.targetId}/programs`, newProg, {
+      await client.post(`/admin/academic/programs`, {
+        ...newProg,
+        department_id: modal.targetId
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNewProg({ name: '', degree_level: 'BSc', duration_years: 4 });
+      setNewProg({ 
+        name: '', 
+        degree_level: 'BSc', 
+        duration_years: 4,
+        pricing_type: 'hybrid',
+        tuition_fee: '0',
+        application_fee: '0',
+        certificate_fee: '0',
+        is_scholarship_eligible: true,
+        is_external: false,
+        external_provider: ''
+      });
       setModal({ isOpen: false, mode: null });
       fetchStructure();
     } catch (err) {
@@ -125,7 +199,7 @@ export default function AcademicManager() {
 
   const handleDeleteFaculty = async (id: number) => {
     try {
-      await client.delete(`/academic/faculties/${id}`, {
+      await client.delete(`/admin/academic/faculties/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
@@ -137,7 +211,7 @@ export default function AcademicManager() {
 
   const handleDeleteDepartment = async (id: number) => {
     try {
-      await client.delete(`/academic/departments/${id}`, {
+      await client.delete(`/admin/academic/departments/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
@@ -149,7 +223,7 @@ export default function AcademicManager() {
 
   const handleDeleteProgram = async (id: number) => {
     try {
-      await client.delete(`/academic/programs/${id}`, {
+      await client.delete(`/admin/academic/programs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchStructure();
@@ -168,7 +242,7 @@ export default function AcademicManager() {
     }
   };
 
-  const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry'>('hierarchy');
+  const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry' | 'settings'>('hierarchy');
 
   if (loading) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center bg-offwhite">
@@ -187,30 +261,37 @@ export default function AcademicManager() {
               <Database className="opacity-50" size={16} />
               Academic Management Operations
            </div>
-           <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none">Academic Office</h1>
+           <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none font-display">Enrollment Management</h1>
            
            {/* Tab Navigation */}
            <div className="flex gap-10 mt-10">
              <button 
                 onClick={() => setActiveTab('hierarchy')}
-                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-3 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'hierarchy' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
+                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-4 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'hierarchy' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
              >
                 <Layers size={16} />
                 MyLMS Hierarchy
              </button>
              <button 
+                onClick={() => setActiveTab('registry')}
+                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-4 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'registry' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
+             >
+                <ShieldCheck size={16} />
+                Enrollment Protocol
+             </button>
+             <button 
                 onClick={() => setActiveTab('calendar')}
-                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-3 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'calendar' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
+                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-4 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'calendar' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
              >
                 <Calendar size={16} />
                 University Calendar
              </button>
              <button 
-                onClick={() => setActiveTab('registry')}
-                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-3 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'registry' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
+                onClick={() => setActiveTab('settings')}
+                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-4 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'settings' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
              >
-                <ShieldCheck size={16} />
-                Enrollment Protocol
+                <Settings size={16} />
+                Institutional Settings
              </button>
            </div>
         </div>
@@ -232,6 +313,76 @@ export default function AcademicManager() {
         <AcademicCalendarManager />
       ) : activeTab === 'registry' ? (
         <AdmissionRegistryManager />
+      ) : activeTab === 'settings' ? (
+        <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+           <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-12 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-offwhite rounded-bl-full"></div>
+              
+              <div className="flex items-center gap-6 mb-12">
+                 <div className="w-16 h-16 bg-mylms-purple/5 text-mylms-purple rounded-2xl flex items-center justify-center border border-mylms-purple/10">
+                    <Settings size={32} />
+                 </div>
+                 <div>
+                    <h3 className="text-2xl font-black text-text-main uppercase tracking-tight">Global Admission Logic</h3>
+                    <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em] mt-1">Configuring System Behavior</p>
+                 </div>
+              </div>
+
+              <form onSubmit={handleUpdateSettings} className="space-y-10">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Fee Waiver Delay (Minutes)</label>
+                       <div className="relative">
+                          <Clock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                          <input 
+                            type="number" 
+                            value={settings.admission_fee_waiver_delay_minutes} 
+                            onChange={e => setSettings({...settings, admission_fee_waiver_delay_minutes: parseInt(e.target.value)})}
+                            className="w-full pl-16 pr-8 py-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
+                          />
+                       </div>
+                       <p className="text-[9px] text-gray-400 mt-3 font-bold uppercase italic pl-1">Time students must wait for waiver approval.</p>
+                    </div>
+                    <div>
+                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Auto-Approval Protocol</label>
+                       <select 
+                         value={settings.scholarship_auto_approval ? '1' : '0'} 
+                         onChange={e => setSettings({...settings, scholarship_auto_approval: e.target.value === '1'})}
+                         className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-xs uppercase appearance-none"
+                       >
+                          <option value="1">Enabled (System Evaluate)</option>
+                          <option value="0">Disabled (Review Only)</option>
+                       </select>
+                    </div>
+                    <div>
+                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Admission Email Delay (Hours)</label>
+                       <input 
+                          type="number" 
+                          value={settings.admission_email_delay_hours} 
+                          onChange={e => setSettings({...settings, admission_email_delay_hours: parseInt(e.target.value)})}
+                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
+                       />
+                    </div>
+                    <div>
+                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Scholarship Renewal Min GPA</label>
+                       <input 
+                          type="number" 
+                          step="0.1" 
+                          value={settings.scholarship_renewal_min_gpa} 
+                          onChange={e => setSettings({...settings, scholarship_renewal_min_gpa: parseFloat(e.target.value)})}
+                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
+                       />
+                    </div>
+                 </div>
+
+                 <div className="pt-6 border-t border-offwhite">
+                    <button type="submit" className="w-full py-6 bg-mylms-purple text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all active:scale-[0.98]">
+                       Commit Global Config
+                    </button>
+                 </div>
+              </form>
+           </div>
+        </div>
       ) : (
         <>
           <div className="space-y-12">
@@ -271,58 +422,76 @@ export default function AcademicManager() {
                     </div>
 
                    <div className="p-10 bg-white">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-12">
                          {faculty.departments.length === 0 ? (
                            <div className="col-span-full py-24 text-center bg-offwhite border border-dashed border-border-soft rounded-2xl opacity-60">
                               <p className="text-gray-300 font-black text-[11px] uppercase tracking-[0.3em] leading-none">No departmental units authorized for this faculty.</p>
                            </div>
                          ) : (
                             faculty.departments.map((dept) => (
-                              <div key={dept.id} className="bg-white border border-border-soft rounded-xl p-8 hover:shadow-xl transition-all group relative overflow-hidden flex flex-col">
-                                 <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
-                                 <div className="mb-8 relative z-10">
-                                    <div className="flex items-center justify-between gap-2 mb-3">
-                                       <div className="flex items-center gap-2">
-                                          <Hash size={12} className="text-mylms-rose opacity-50" />
+                              <div key={dept.id} className="bg-white border border-border-soft rounded-3xl p-10 hover:shadow-2xl transition-all group relative overflow-hidden flex flex-col">
+                                 <div className="absolute top-0 right-0 w-24 h-24 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
+                                 <div className="mb-10 relative z-10">
+                                    <div className="flex items-center justify-between gap-2 mb-4">
+                                       <div className="flex items-center gap-3">
+                                          <Target size={14} className="text-mylms-rose" />
                                           <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
                                        </div>
                                        <button 
                                           onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'department', targetId: dept.id, targetName: dept.name })}
-                                          className="text-gray-200 hover:text-mylms-rose transition-all p-1"
+                                          className="text-gray-200 hover:text-mylms-rose transition-all p-2"
                                        >
-                                          <Trash2 size={14} />
+                                          <Trash2 size={16} />
                                        </button>
                                     </div>
-                                    <h3 className="text-xl font-black text-text-main group-hover:text-mylms-purple transition-colors leading-tight uppercase tracking-tight">
+                                    <h3 className="text-2xl font-black text-text-main group-hover:text-mylms-purple transition-colors leading-tight uppercase tracking-tighter">
                                        {dept.name}
                                     </h3>
                                  </div>
                                  
-                                 <div className="space-y-4 grow relative z-10">
-                                    <p className="text-[11px] font-black uppercase text-gray-300 tracking-[0.4em] mb-6 border-b border-offwhite pb-4">Academic Programs</p>
+                                 <div className="space-y-6 grow relative z-10">
+                                    <p className="text-[10px] font-black uppercase text-gray-300 tracking-[0.5em] mb-10 border-b border-offwhite pb-6">Academic Program Roster</p>
                                     {dept.programs.length === 0 ? (
-                                      <p className="text-xs text-gray-300 font-black uppercase tracking-widest opacity-60 py-10 text-center">No Programs Registered</p>
+                                      <p className="text-xs text-gray-300 font-black uppercase tracking-widest opacity-60 py-16 text-center italic">No Programs Registered in Unit</p>
                                     ) : (
                                       dept.programs.map((program) => (
-                                        <div key={program.id} className="bg-offwhite px-5 py-4 border border-border-soft rounded-lg flex justify-between items-center group/program hover:bg-white transition-all shadow-sm">
-                                           <div>
-                                              <p className="font-black text-text-main text-xs uppercase leading-tight tracking-tight">{program.name}</p>
-                                              <div className="flex items-center gap-3 mt-2 opacity-60">
-                                                <span className="text-[11px] font-black text-mylms-rose uppercase tracking-[0.2em]">{program.degree_level}</span>
-                                                <span className="text-[14px] text-gray-200">&bull;</span>
-                                                <span className="text-[11px] font-black text-text-secondary uppercase tracking-widest">{program.duration_years} Years</span>
+                                        <div key={program.id} className="bg-offwhite/50 px-8 py-8 border border-border-soft rounded-2xl flex justify-between items-center group/program hover:bg-white transition-all shadow-sm hover:shadow-md border-l-4 border-l-mylms-purple">
+                                           <div className="flex-1">
+                                              <p className="font-black text-text-main text-sm uppercase leading-tight tracking-tight mb-3">{program.name}</p>
+                                              <div className="flex items-center gap-4 flex-wrap">
+                                                <span className="text-[10px] font-black text-mylms-rose uppercase tracking-widest bg-mylms-rose/5 px-3 py-1 rounded-md border border-mylms-rose/10">{program.degree_level}</span>
+                                                <span className="text-[10px] font-black text-text-secondary uppercase tracking-widest">{program.duration_years} Years</span>
+                                                 {/* Fee Badges */}
+                                                 <div className="flex items-center gap-3 ml-4 bg-white/60 px-4 py-1.5 rounded-full shadow-inner border border-border-soft">
+                                                    <CreditCard size={12} className="text-mylms-purple" />
+                                                    <span className="text-[10px] font-black text-mylms-purple uppercase tracking-tight">${Number(program.application_fee).toFixed(0)} APP FEE</span>
+                                                 </div>
+                                              </div>
+                                              
+                                              {/* Logic Attributes */}
+                                              <div className="flex items-center gap-6 mt-6 border-t border-offwhite pt-4">
+                                                 <div className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest ${program.is_scholarship_eligible ? 'text-green-600' : 'text-gray-300'}`}>
+                                                    <Sparkles size={11} className={program.is_scholarship_eligible ? 'text-amber-500' : 'text-gray-200'} />
+                                                    {program.is_scholarship_eligible ? 'Scholarship Qualified' : 'No Scholarship'}
+                                                 </div>
+                                                 {program.is_external && (
+                                                   <div className="flex items-center gap-2 text-[9px] font-black text-mylms-purple uppercase tracking-widest">
+                                                      <Globe size={11} />
+                                                      {program.external_provider}
+                                                   </div>
+                                                 )}
                                               </div>
                                            </div>
-                                            <div className="flex items-center gap-2">
-                                               <button 
-                                                  onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'program', targetId: program.id, targetName: program.name })}
-                                                  className="text-gray-200 hover:text-mylms-rose transition-all"
-                                               >
-                                                  <Trash2 size={14} />
-                                               </button>
-                                               <button className="text-gray-200 hover:text-mylms-purple transition-all" title="Program Settings">
-                                                  <ChevronRight size={16} />
-                                               </button>
+                                            <div className="flex flex-col gap-4 ml-8">
+                                                <button 
+                                                   onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'program', targetId: program.id, targetName: program.name })}
+                                                   className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-xl shadow-sm"
+                                                >
+                                                   <Trash2 size={16} />
+                                                </button>
+                                                <button className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-purple transition-all rounded-xl shadow-sm" title="Program Settings">
+                                                   <ChevronRight size={18} />
+                                                </button>
                                             </div>
                                         </div>
                                       ))
@@ -330,15 +499,26 @@ export default function AcademicManager() {
                                  </div>
 
                              <button 
-                                     onClick={() => {
-                                       setNewProg({ name: '', degree_level: 'BSc', duration_years: 4 });
-                                       setModal({ isOpen: true, mode: 'add_program', targetId: dept.id, targetName: dept.name });
-                                     }}
-                                     className="w-full py-4 mt-12 bg-offwhite border border-dashed border-border-soft text-gray-400 font-black rounded-lg hover:bg-white hover:text-mylms-purple hover:border-mylms-purple/40 transition-all text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 relative z-10"
-                                   >
-                                      <PlusCircle size={14} />
-                                      Define Program
-                                   </button>
+                                      onClick={() => {
+                                        setNewProg({ 
+                                          name: '', 
+                                          degree_level: 'BSc', 
+                                          duration_years: 4,
+                                          pricing_type: 'hybrid',
+                                          tuition_fee: '0',
+                                          application_fee: '25',
+                                          certificate_fee: '0',
+                                          is_scholarship_eligible: true,
+                                          is_external: false,
+                                          external_provider: ''
+                                        });
+                                        setModal({ isOpen: true, mode: 'add_program', targetId: dept.id, targetName: dept.name });
+                                      }}
+                                      className="w-full py-5 mt-12 bg-mylms-purple/5 border border-dashed border-mylms-purple/20 text-mylms-purple font-black rounded-xl hover:bg-mylms-purple hover:text-white transition-all text-[11px] uppercase tracking-[0.4em] flex items-center justify-center gap-3 relative z-10"
+                                    >
+                                       <PlusCircle size={16} />
+                                       Provision Program
+                                    </button>
                               </div>
                             ))
                          )}
@@ -354,98 +534,146 @@ export default function AcademicManager() {
       {/* Unified Action Modal System */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-mylms-purple/40 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white rounded-[32px] shadow-2xl border border-white/20 max-w-xl w-full p-10 transform animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 overflow-hidden relative">
+          <div className="bg-white rounded-[40px] shadow-2xl border border-white/20 max-w-xl w-full p-12 transform animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-[90vh] relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-mylms-purple/5 rounded-bl-full"></div>
             
             <div className="relative z-10">
               {modal.mode === 'delete' ? (
                 <>
-                  <div className="w-16 h-16 bg-mylms-rose/10 rounded-2xl flex items-center justify-center text-mylms-rose mb-8">
+                  <div className="w-20 h-20 bg-mylms-rose/10 rounded-[28px] flex items-center justify-center text-mylms-rose mb-10 shadow-inner">
                      <XCircle size={32} />
                   </div>
-                  <h2 className="text-2xl font-black text-text-main uppercase tracking-tight leading-none mb-4">Terminate Record?</h2>
-                  <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">
+                  <h2 className="text-3xl font-black text-text-main uppercase tracking-tighter leading-tight mb-4">Terminate Record?</h2>
+                  <p className="text-sm font-medium text-gray-500 leading-relaxed mb-12">
                     You are about to authorize the removal of <span className="font-black text-mylms-purple uppercase">"{modal.targetName}"</span> from the institutional ledger. This action is irreversible.
                   </p>
-                  <div className="flex flex-col gap-3">
-                     <button onClick={handleConfirmAction} className="w-full bg-mylms-rose text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl hover:bg-[#A00E26] shadow-xl text-[10px]">Authorize Deletion</button>
-                     <button onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.2em] py-5 rounded-xl text-[10px]">Abort Registry Sync</button>
+                  <div className="flex flex-col gap-4">
+                     <button onClick={handleConfirmAction} className="w-full bg-mylms-rose text-white font-black uppercase tracking-[0.3em] py-6 rounded-2xl hover:bg-[#A00E26] shadow-xl text-[11px] active:scale-[0.98] transition-all">Authorize Deletion</button>
+                     <button onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.3em] py-6 rounded-2xl text-[11px] active:scale-[0.98] transition-all">Abort Registry Sync</button>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="w-16 h-16 bg-mylms-purple/10 rounded-2xl flex items-center justify-center text-mylms-purple mb-8">
+                  <div className="w-20 h-20 bg-mylms-purple/10 rounded-[28px] flex items-center justify-center text-mylms-purple mb-10 shadow-inner">
                      <PlusCircle size={32} />
                   </div>
-                  <h2 className="text-2xl font-black text-text-main uppercase tracking-tight leading-none mb-2">
+                  <h2 className="text-3xl font-black text-text-main uppercase tracking-tighter leading-tight mb-2">
                     {modal.mode === 'add_faculty' && 'Provision New Faculty'}
                     {modal.mode === 'add_department' && 'Initialize Department'}
-                    {modal.mode === 'add_program' && 'Define Academic Program'}
+                    {modal.mode === 'add_program' && 'Define Program'}
                   </h2>
-                  <p className="text-xs font-black text-mylms-rose uppercase tracking-[0.3em] mb-10">
-                    {modal.mode === 'add_faculty' && 'Registry: Institutional Office'}
-                    {modal.mode === 'add_department' && `Target: ${modal.targetName}`}
-                    {modal.mode === 'add_program' && `Unit: ${modal.targetName}`}
+                  <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.5em] mb-12">
+                    {modal.mode === 'add_faculty' && 'System Registry: Institutional Branch'}
+                    {modal.mode === 'add_department' && `Target Parent: ${modal.targetName}`}
+                    {modal.mode === 'add_program' && `Host Unit: ${modal.targetName}`}
                   </p>
 
                   <form onSubmit={
                     modal.mode === 'add_faculty' ? handleAddFaculty : 
                     modal.mode === 'add_department' ? handleAddDepartment : 
                     handleAddProgram
-                  } className="space-y-6">
+                  } className="space-y-8">
                     {modal.mode === 'add_faculty' && (
-                      <div className="space-y-6">
-                        <div className="premium-input-wrapper">
-                          <label className="premium-label">Designation</label>
-                          <input required value={newFaculty.name} onChange={e => setNewFaculty({...newFaculty, name: e.target.value})} className="premium-input" placeholder="e.g. Faculty of Health Sciences" />
+                      <div className="space-y-8">
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Official Designation</label>
+                          <input required value={newFaculty.name} onChange={e => setNewFaculty({...newFaculty, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Faculty of Humanities..." />
                         </div>
-                        <div className="premium-input-wrapper">
-                          <label className="premium-label">Administrative Summary</label>
-                          <input value={newFaculty.description} onChange={e => setNewFaculty({...newFaculty, description: e.target.value})} className="premium-input" placeholder="Primary academic load..." />
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Administrative Summary</label>
+                          <textarea value={newFaculty.description} onChange={e => setNewFaculty({...newFaculty, description: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight min-h-[120px]" placeholder="Brief mission statement..." />
                         </div>
                       </div>
                     )}
 
                     {modal.mode === 'add_department' && (
-                      <div className="space-y-6">
-                        <div className="premium-input-wrapper">
-                          <label className="premium-label">Department Name</label>
-                          <input required value={newDept.name} onChange={e => setNewDept({...newDept, name: e.target.value})} className="premium-input" placeholder="e.g. Dept. of Computer Science" />
+                      <div className="space-y-8">
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Department Identifier</label>
+                          <input required value={newDept.name} onChange={e => setNewDept({...newDept, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Dept. of Theoretical Physics..." />
                         </div>
-                        <div className="premium-input-wrapper">
-                          <label className="premium-label">Matric Code (4 Chars)</label>
-                          <input required maxLength={4} value={newDept.code} onChange={e => setNewDept({...newDept, code: e.target.value.toUpperCase()})} className="premium-input uppercase" placeholder="CS" />
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Registry Code (4 Chars)</label>
+                          <input required maxLength={4} value={newDept.code} onChange={e => setNewDept({...newDept, code: e.target.value.toUpperCase()})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-rose shadow-inner font-black text-sm uppercase tracking-[0.2em]" placeholder="PHYS" />
                         </div>
                       </div>
                     )}
 
                     {modal.mode === 'add_program' && (
-                      <div className="space-y-6">
-                        <div className="premium-input-wrapper">
-                          <label className="premium-label">Program Title</label>
-                          <input required value={newProg.name} onChange={e => setNewProg({...newProg, name: e.target.value})} className="premium-input" placeholder="e.g. BSc Software Engineering" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="premium-input-wrapper">
-                            <label className="premium-label">Degree Level</label>
-                            <select value={newProg.degree_level} onChange={e => setNewProg({...newProg, degree_level: e.target.value})} className="premium-input appearance-none">
-                              <option value="BSc">BSc</option>
-                              <option value="B.Eng">B.Eng</option>
-                              <option value="MSc">MSc</option>
-                              <option value="PhD">PhD</option>
-                            </select>
-                          </div>
-                          <div className="premium-input-wrapper">
-                            <label className="premium-label">Duration (Years)</label>
-                            <input type="number" min={1} max={7} value={newProg.duration_years} onChange={e => setNewProg({...newProg, duration_years: parseInt(e.target.value)})} className="premium-input" />
-                          </div>
-                        </div>
+                      <div className="space-y-8">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="md:col-span-2">
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Program Title</label>
+                               <input required value={newProg.name} onChange={e => setNewProg({...newProg, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="e.g. Master of Artificial Intelligence" />
+                            </div>
+                            <div>
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Degree Level</label>
+                               <select value={newProg.degree_level} onChange={e => setNewProg({...newProg, degree_level: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-xs uppercase appearance-none">
+                                  <option value="Associate">Associate Degree</option>
+                                  <option value="Bachelor">Bachelor (Standard)</option>
+                                  <option value="BSc">Bachelor (Honours)</option>
+                                  <option value="Master">Master Degree</option>
+                                  <option value="PhD">Doctor of Philosophy</option>
+                               </select>
+                            </div>
+                            <div>
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Duration (Years)</label>
+                               <input type="number" min={1} max={7} value={newProg.duration_years} onChange={e => setNewProg({...newProg, duration_years: parseInt(e.target.value)})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm" />
+                            </div>
+                             {/* Pricing fields */}
+                             <div>
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Application Fee ($)</label>
+                               <input type="number" value={newProg.application_fee} onChange={e => setNewProg({...newProg, application_fee: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-rose shadow-inner font-black text-sm" />
+                            </div>
+                            <div>
+                               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Tuition per Semester ($)</label>
+                               <input type="number" value={newProg.tuition_fee} onChange={e => setNewProg({...newProg, tuition_fee: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm" />
+                            </div>
+                            <div className="md:col-span-2">
+                               <div className="flex items-center gap-6 p-6 bg-offwhite border-2 border-border-soft rounded-[24px]">
+                                   <input 
+                                     id="scholarship_check"
+                                     type="checkbox" 
+                                     checked={newProg.is_scholarship_eligible} 
+                                     onChange={e => setNewProg({...newProg, is_scholarship_eligible: e.target.checked})}
+                                     className="w-6 h-6 rounded-lg text-mylms-purple focus:ring-mylms-purple bg-white border-border-soft"
+                                   />
+                                   <label htmlFor="scholarship_check" className="text-xs font-black text-text-main uppercase tracking-widest cursor-pointer flex items-center gap-3">
+                                      <Heart size={16} className={newProg.is_scholarship_eligible ? 'text-mylms-rose' : 'text-gray-200'} />
+                                      Scholarship Program Eligible
+                                   </label>
+                               </div>
+                            </div>
+                            
+                            <div className="md:col-span-2">
+                               <div className="flex items-center gap-6 p-6 bg-offwhite border-2 border-border-soft rounded-[24px]">
+                                   <input 
+                                     id="external_check"
+                                     type="checkbox" 
+                                     checked={newProg.is_external} 
+                                     onChange={e => setNewProg({...newProg, is_external: e.target.checked})}
+                                     className="w-6 h-6 rounded-lg text-mylms-purple focus:ring-mylms-purple bg-white border-border-soft"
+                                   />
+                                   <label htmlFor="external_check" className="text-xs font-black text-text-main uppercase tracking-widest cursor-pointer flex items-center gap-3">
+                                      <Globe size={16} className={newProg.is_external ? 'text-mylms-purple' : 'text-gray-200'} />
+                                      External Partner Program
+                                   </label>
+                               </div>
+                            </div>
+
+                            {newProg.is_external && (
+                               <div className="md:col-span-2 animate-in slide-in-from-top-4 duration-300">
+                                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Provider Designation</label>
+                                  <input value={newProg.external_provider} onChange={e => setNewProg({...newProg, external_provider: e.target.value})} className="w-full p-6 bg-white border-2 border-mylms-purple/30 rounded-[24px] outline-none shadow-sm font-black text-sm uppercase" placeholder="e.g. British Council, Coursera..." />
+                               </div>
+                            )}
+                         </div>
                       </div>
                     )}
 
-                    <div className="flex flex-col gap-3 pt-4">
-                      <button type="submit" className="w-full bg-mylms-purple text-white font-black uppercase tracking-[0.2em] py-5 rounded-xl shadow-xl hover:opacity-90 transition-all text-[10px]">Commit Records</button>
-                      <button type="button" onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.2em] py-5 rounded-xl text-[10px]">Abort Process</button>
+                    <div className="flex flex-col gap-4 pt-8 border-t border-offwhite">
+                      <button type="submit" className="w-full bg-mylms-purple text-white font-black uppercase tracking-[0.4em] py-6 rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all text-[11px] active:scale-[0.98]">Commit Final Records</button>
+                      <button type="button" onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.4em] py-6 rounded-2xl text-[11px] active:scale-[0.98] transition-all">Abort Registry Sync</button>
                     </div>
                   </form>
                 </>
