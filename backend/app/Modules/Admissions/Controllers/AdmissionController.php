@@ -126,9 +126,14 @@ class AdmissionController extends Controller
             'status'       => AdmissionApplication::STATUS_IN_PROGRESS,
         ]);
 
-        // Handle program selection
-        if ($validated['step'] === AdmissionApplication::STEP_PROGRAM && !empty($validated['step_data']['program_id'])) {
-            $application->update(['program_id' => $validated['step_data']['program_id']]);
+        // Handle program selection and auto-resolve faculty
+        if ($validated['step'] === self::STEP_PROGRAM && !empty($validated['step_data']['program_id'])) {
+            $program = \App\Modules\Academic\Models\Program::with('department.faculty')->find($validated['step_data']['program_id']);
+            
+            $application->update([
+                'program_id' => $validated['step_data']['program_id'],
+                'faculty_id' => $program?->department?->faculty_id ?? $application->faculty_id
+            ]);
         }
 
         return response()->json(['message' => 'Step saved.', 'application' => $application->fresh()]);

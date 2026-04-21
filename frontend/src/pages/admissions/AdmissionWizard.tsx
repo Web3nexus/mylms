@@ -30,7 +30,7 @@ import { useAuthStore } from '../../store/authStore';
 export default function AdmissionWizard() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentStepId = searchParams.get('step') || 'personal_info';
+  const currentStepId = searchParams.get('step') || 'identity_verification';
   const [application, setApplication] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -66,8 +66,9 @@ export default function AdmissionWizard() {
   ];
 
   const currentIndex = steps.findIndex(s => s.id === currentStepId);
-  const nextStep = steps[currentIndex + 1];
-  const prevStep = steps[currentIndex - 1];
+  const currentStep = currentIndex !== -1 ? steps[currentIndex] : steps[0];
+  const nextStep = currentIndex !== -1 ? steps[currentIndex + 1] : null;
+  const prevStep = currentIndex !== -1 ? steps[currentIndex - 1] : null;
 
   const [formData, setFormData] = useState<any>({});
 

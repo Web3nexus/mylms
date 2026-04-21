@@ -11,26 +11,39 @@ class AdmissionApplication extends Model
 {
     use HasFactory;
 
+    const STATUS_INCOMPLETE = 'incomplete';
+    const STATUS_IN_PROGRESS = 'in_progress';
+    const STATUS_PENDING    = 'pending';
+    const STATUS_APPROVED   = 'approved';
+    const STATUS_REJECTED   = 'rejected';
+
+    const FEE_PENDING = 'pending';
+    const FEE_PAID    = 'paid';
+    const FEE_WAIVED  = 'waived';
+
+    const SCHOLARSHIP_NOT_APPLIED = 'not_applied';
+    const SCHOLARSHIP_PENDING     = 'pending';
+    const SCHOLARSHIP_APPROVED    = 'approved';
+    const SCHOLARSHIP_REJECTED    = 'rejected';
+
+    const STEP_PERSONAL = 'identity_verification';
+    const STEP_PROGRAM  = 'program_selection';
+
     protected $fillable = [
         'user_id', 
-        'program_id', 
+        'program_id',
+        'faculty_id',
+        'instructor_id',
         'status', 
-        'personal_info', 
-        'address_info', 
-        'academic_background', 
-        'documents',
+        'current_step',
+        'step_data',
         'scholarship_reason',
         'scholarship_status',
-        'fee_status',
-        'waiver_requested'
+        'application_fee_status',
     ];
 
     protected $casts = [
-        'personal_info' => 'json',
-        'address_info' => 'json',
-        'academic_background' => 'json',
-        'documents' => 'json',
-        'waiver_requested' => 'boolean',
+        'step_data' => 'json',
     ];
 
     public function user()
@@ -40,6 +53,16 @@ class AdmissionApplication extends Model
 
     public function program()
     {
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(\App\Modules\Academic\Models\Program::class);
+    }
+
+    public function faculty()
+    {
+        return $this->belongsTo(\App\Modules\Academic\Models\Faculty::class);
+    }
+
+    public function instructor()
+    {
+        return $this->belongsTo(User::class, 'instructor_id');
     }
 }

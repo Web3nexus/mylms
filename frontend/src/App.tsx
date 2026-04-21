@@ -391,6 +391,7 @@ function App() {
           <Route path="/billing" element={<StudentBillingPortal />} />
           <Route path="/portal/forms" element={<SelfServiceForms />} />
           <Route path="/portal/links" element={<UsefulLinks />} />
+          <Route path="/scholarships" element={<ScholarshipDirectory />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/failed" element={<PaymentFailed />} />
         </Route>
