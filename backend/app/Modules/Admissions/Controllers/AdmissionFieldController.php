@@ -38,8 +38,8 @@ class AdmissionFieldController extends Controller
         $validated = $request->validate([
             'field_key' => 'required|string|unique:admission_form_fields,field_key',
             'label' => 'required|string',
-            'category' => 'required|in:personal,contact,academic,financial',
-            'type' => 'required|in:text,select,date,number,textarea',
+            'category' => 'required|in:personal,contact,academic,financial,membership,credentials,documents',
+            'type' => 'required|in:text,select,date,number,textarea,file',
             'options' => 'nullable|array',
             'is_required' => 'boolean',
             'is_active' => 'boolean',

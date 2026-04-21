@@ -14,15 +14,21 @@ import {
   X,
   AlertCircle,
   ShieldCheck,
-  CreditCard,
-  Clock,
-  Sparkles,
   Heart,
+  ArrowRight,
+  Database,
+  CreditCard,
+  Sparkles,
+  Clock,
+  Calendar,
+  Lock,
+  FileUp
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 
 export default function AdmissionWizard() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStepId = searchParams.get('step') || 'personal_info';
   const [application, setApplication] = useState<any>(null);
@@ -36,22 +42,43 @@ export default function AdmissionWizard() {
   const [waiverRequested, setWaiverRequested] = useState(false);
   const [waiverDelayMinutes, setWaiverDelayMinutes] = useState(5);
   const [submissionResult, setSubmissionResult] = useState<any>(null);
+  const [enrollmentProtocol, setEnrollmentProtocol] = useState<{
+    isOpen: boolean;
+    startDate: string | null;
+    endDate: string | null;
+  } | null>(null);
 
-  const navigate = useNavigate();
+  const [registryFields, setRegistryFields] = useState<any[]>([]);
+
   const token = useAuthStore(state => state.token);
+  const phase1Done = application?.step_data?.identity_verification;
+  const feeCleared = application?.application_fee_status === 'waived' || application?.application_fee_status === 'paid';
 
   const steps = [
-    { id: 'personal_info', title: 'Personal Information', icon: <User size={18} /> },
-    { id: 'address_info', title: 'Address Information', icon: <MapPin size={18} /> },
-    { id: 'academic_background', title: 'Academic Background', icon: <FileText size={18} /> },
-    { id: 'program_selection', title: 'Program Selection', icon: <GraduationCap size={18} /> },
-    { id: 'document_upload', title: 'Documents Upload', icon: <Upload size={18} /> },
-    { id: 'final_review', title: 'Review & Submit', icon: <CheckCircle size={18} /> },
+    { id: 'identity_verification', title: 'Bio-Data Registry', icon: <User size={18} />, categories: ['personal', 'contact'] },
+    { id: 'fee_protocol', title: 'Fee Gateway', icon: <CreditCard size={18} />, isGate: true },
+    { id: 'program_selection', title: 'Academic Pursuit', icon: <GraduationCap size={18} /> },
+    { id: 'academic_registry', title: 'Scholastic History', icon: <FileText size={18} />, categories: ['academic', 'financial'] },
+    { id: 'institutional_context', title: 'Cultural Integration', icon: <Heart size={18} />, categories: ['membership'] },
+    { id: 'credentials_setup', title: 'Portal Credentials', icon: <ShieldCheck size={18} />, categories: ['credentials'] },
+    { id: 'document_upload', title: 'Evidence Bunker', icon: <Upload size={18} />, categories: ['documents'] },
+    { id: 'final_review', title: 'Final Transmission', icon: <CheckCircle size={18} /> },
   ];
+
+  const currentIndex = steps.findIndex(s => s.id === currentStepId);
+  const nextStep = steps[currentIndex + 1];
+  const prevStep = steps[currentIndex - 1];
 
   const [formData, setFormData] = useState<any>({});
 
-  useEffect(() => { fetchApplication(); }, [token]);
+  useEffect(() => { 
+    const init = async () => {
+      setLoading(true);
+      await Promise.all([fetchApplication(), fetchProtocol(), fetchRegistry()]);
+      setLoading(false);
+    };
+    init();
+  }, [token]);
 
   useEffect(() => {
     if (selectedLevel) {
@@ -60,7 +87,6 @@ export default function AdmissionWizard() {
   }, [selectedLevel]);
 
   const fetchApplication = async () => {
-    setLoading(true);
     try {
       const res = await client.get('/my-application');
       setApplication(res.data);
@@ -69,8 +95,28 @@ export default function AdmissionWizard() {
       if (res.data.program?.degree_level) setSelectedLevel(res.data.program.degree_level);
     } catch (err) {
       console.error('Error fetching application:', err);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchProtocol = async () => {
+    try {
+      const res = await client.get('/admin/admissions/settings');
+      setEnrollmentProtocol({
+        isOpen: res.data.is_enrollment_open,
+        startDate: res.data.enrollment_start_date,
+        endDate: res.data.enrollment_end_date
+      });
+    } catch (err) {
+      console.error('Error fetching protocol:', err);
+    }
+  };
+
+  const fetchRegistry = async () => {
+    try {
+      const res = await client.get('/admissions/fields');
+      setRegistryFields(res.data);
+    } catch (err) {
+      console.error('Error fetching registry:', err);
     }
   };
 
@@ -166,20 +212,80 @@ export default function AdmissionWizard() {
     </div>
   );
 
-  const feeCleared = application?.application_fee_status === 'waived' || application?.application_fee_status === 'paid';
+  const now = new Date();
+  const isDateWindowOpen = enrollmentProtocol 
+    ? (!enrollmentProtocol.startDate || now >= new Date(enrollmentProtocol.startDate)) && 
+      (!enrollmentProtocol.endDate || now <= new Date(enrollmentProtocol.endDate))
+    : true;
+  
+  const isGateOpen = enrollmentProtocol?.isOpen && isDateWindowOpen;
 
-  // ─── FEE GATE ───────────────────────────────────────────────────────────────
-  if (!feeCleared) {
+  // Enrollment Guard Screen
+  if (!isGateOpen && enrollmentProtocol) {
     return (
       <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-20">
         <div className="w-full max-w-2xl">
-          {/* Header */}
-          <button onClick={() => navigate('/apply/dashboard')} className="flex items-center gap-3 text-gray-400 hover:text-mylms-purple transition-colors mb-12 font-black text-xs uppercase tracking-widest">
-            <ArrowLeft size={16} /> Back to Dashboard
+          <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-10 md:p-20 text-center relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-purple/5 rounded-bl-full group-hover:bg-mylms-purple/10 transition-all duration-1000" />
+            
+            <div className="relative z-10">
+              <div className="w-24 h-24 bg-mylms-rose/10 text-mylms-rose rounded-[32px] flex items-center justify-center mx-auto mb-12 shadow-inner">
+                <Lock size={48} />
+              </div>
+
+              <div className="inline-flex items-center gap-3 text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px] mb-8 bg-mylms-rose/8 px-6 py-2 rounded-full border border-mylms-rose/20">
+                Institutional Protocol: Closed
+              </div>
+
+              <h1 className="text-4xl md:text-6xl font-black text-mylms-purple uppercase tracking-tighter leading-none mb-8 italic">
+                Enrollment<br /><span className="text-mylms-rose">Suspended</span>
+              </h1>
+              
+              <p className="text-text-secondary font-medium leading-relaxed mb-12 max-w-md mx-auto">
+                The academic registry has temporarily closed the enrollment gate. This usually happens between sessions or when the quota quorum has been reached.
+              </p>
+
+              {enrollmentProtocol.startDate && new Date(enrollmentProtocol.startDate) > now && (
+                <div className="p-8 bg-offwhite rounded-3xl border border-border-soft mb-12 inline-block">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 italic">Scheduled Re-opening</p>
+                  <div className="flex items-center gap-4 text-mylms-purple">
+                    <Calendar size={20} />
+                    <span className="text-xl font-black">{new Date(enrollmentProtocol.startDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <button 
+                  onClick={() => navigate('/apply/dashboard')}
+                  className="px-12 py-5 bg-mylms-purple text-white font-black rounded-2xl shadow-xl uppercase tracking-[0.4em] text-[11px] hover:translate-y-[-2px] transition-all active:scale-[0.98]"
+                >
+                  Return to Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+    // Phase barrier logic below
+
+
+  // ─── FEE GATE ───────────────────────────────────────────────────────────────
+  // ─── FEE GATE LOGIC (Phase Barrier) ─────────────────────────────────────────
+  const isAfterPhase1 = currentIndex > 0;
+  if (isAfterPhase1 && !feeCleared && currentStepId !== 'identity_verification') {
+    return (
+      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-20">
+        <div className="w-full max-w-2xl animate-in fade-in zoom-in duration-700">
+          <button onClick={() => setSearchParams({ step: 'identity_verification' })} className="flex items-center gap-3 text-gray-400 hover:text-mylms-purple transition-colors mb-12 font-black text-xs uppercase tracking-widest">
+            <ArrowLeft size={16} /> Edit Phase 1 Details
           </button>
 
-          <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-10 md:p-16 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/5 rounded-bl-full pointer-events-none" />
+          <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-10 md:p-16 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/5 rounded-bl-full pointer-events-none group-hover:bg-mylms-rose/10 transition-all duration-1000" />
 
             <div className="relative z-10">
               <div className="w-20 h-20 bg-mylms-purple/10 text-mylms-purple rounded-[28px] flex items-center justify-center mb-10 shadow-inner">
@@ -187,14 +293,14 @@ export default function AdmissionWizard() {
               </div>
 
               <div className="inline-flex items-center gap-3 text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px] mb-6 bg-mylms-rose/8 px-5 py-2 rounded-full border border-mylms-rose/20">
-                <Sparkles size={12} /> Application Fee Protocol
+                <Sparkles size={12} /> Fee Protocol Activation
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-black text-mylms-purple uppercase tracking-tighter leading-none mb-6">
-                Application<br /><span className="text-mylms-rose">Fee</span> Required
+              <h1 className="text-4xl md:text-5xl font-black text-mylms-purple uppercase tracking-tighter leading-none mb-6 italic">
+                Application<br /><span className="text-mylms-rose">Gate</span> Lockdown
               </h1>
-              <p className="text-text-secondary font-medium leading-relaxed mb-10 max-w-lg">
-                To proceed with your formal application, a one-time non-refundable application processing fee is required. If you are facing financial constraints, you may apply for a <strong className="text-mylms-purple">fee waiver</strong> which is automatically approved.
+              <p className="text-text-secondary font-medium leading-relaxed mb-10 max-w-lg italic opacity-70">
+                Your Phase 1 Bio-Data has been secured. To proceed with the Scholastic Registry and Document Bunker, the application fee protocol must be satisfied.
               </p>
 
               {error && (
@@ -207,12 +313,12 @@ export default function AdmissionWizard() {
               {waiverRequested ? (
                 <div className="p-8 bg-amber-50 border-2 border-amber-200 rounded-[28px] text-center">
                   <Clock size={40} className="text-amber-500 mx-auto mb-4 animate-pulse" />
-                  <h3 className="text-xl font-black text-amber-800 uppercase tracking-tight mb-2">Waiver Pending Approval</h3>
+                  <h3 className="text-xl font-black text-amber-800 uppercase tracking-tight mb-2 italic">Standard Wait Period Active</h3>
                   <p className="text-amber-700 font-medium text-sm leading-relaxed">
-                    Your fee waiver request has been submitted. The system will automatically approve it in approximately <strong>{waiverDelayMinutes} minutes</strong>. Please refresh this page after the timer.
+                    Your fee waiver is being processed by the institutional protocol. Access to Phase 2 will unlock automatically in approximately <strong>{waiverDelayMinutes} minutes</strong>.
                   </p>
-                  <button onClick={() => fetchApplication()} className="mt-6 bg-amber-500 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-amber-600 transition-all">
-                    Check Status
+                  <button onClick={() => fetchApplication()} className="mt-8 bg-amber-500 text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-amber-600 transition-all shadow-lg active:scale-95">
+                    Check Protocol Status
                   </button>
                 </div>
               ) : (
@@ -220,10 +326,10 @@ export default function AdmissionWizard() {
                   <button
                     onClick={handlePayFee}
                     disabled={saving}
-                    className="flex-1 py-6 bg-mylms-purple text-white font-black rounded-2xl shadow-xl uppercase tracking-[0.3em] text-[11px] hover:opacity-90 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-4"
+                    className="flex-1 py-6 bg-mylms-purple text-white font-black rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,34,85,0.4)] uppercase tracking-[0.3em] text-[11px] hover:translate-y-[-2px] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-4"
                   >
                     <CreditCard size={20} />
-                    {saving ? 'Processing...' : 'Pay Application Fee'}
+                    {saving ? 'Processing...' : 'Pay Protocol Fee'}
                   </button>
                   <button
                     onClick={handleRequestWaiver}
@@ -231,13 +337,13 @@ export default function AdmissionWizard() {
                     className="flex-1 py-6 bg-white border-2 border-border-soft text-mylms-purple font-black rounded-2xl uppercase tracking-[0.3em] text-[11px] hover:border-mylms-purple/30 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-4"
                   >
                     <Heart size={20} />
-                    Apply for Fee Waiver
+                    Request Waiver Wait
                   </button>
                 </div>
               )}
 
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center mt-8">
-                Fee waivers are reviewed and auto-approved. No financial documentation required.
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center mt-10 opacity-50 italic">
+                Fee waivers are reviewed in real-time. Document Phase follows this gateway.
               </p>
             </div>
           </div>
@@ -288,9 +394,7 @@ export default function AdmissionWizard() {
     );
   }
 
-  const currentIndex = steps.findIndex(s => s.id === currentStepId);
-  const nextStep = steps[currentIndex + 1];
-  const prevStep = steps[currentIndex - 1];
+
 
   return (
     <div className="min-h-screen bg-offwhite flex flex-col">
@@ -385,88 +489,100 @@ export default function AdmissionWizard() {
               <div className="absolute top-0 right-0 w-48 h-48 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-all duration-1000"></div>
 
               <div className="relative z-10">
-                {/* PERSONAL INFO */}
-                {currentStepId === 'personal_info' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="md:col-span-2 flex items-center gap-6 mb-4">
-                      <div className="w-14 h-14 rounded-2xl bg-mylms-purple text-white flex items-center justify-center shadow-lg"><User size={24}/></div>
-                      <p className="text-text-secondary font-bold text-sm italic">Standard legal identity verification as per institutional guidelines.</p>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Full Legal Name</label>
-                      <input type="text" name="full_name" value={formData.full_name || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase" placeholder="Enter full name" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Preferred Name (Alias)</label>
-                      <input type="text" name="alias" value={formData.alias || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase" placeholder="e.g. Kwame Babangida" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Date of Birth</label>
-                      <input type="date" name="dob" value={formData.dob || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Gender Identification</label>
-                      <select name="gender" value={formData.gender || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="nonbinary">Non-Binary</option>
-                        <option value="other">Prefer not to say</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  {registryFields
+                    .filter(f => steps[currentIndex].categories?.includes(f.category))
+                    .map(field => (
+                      <div key={field.id} className={`${field.type === 'textarea' || field.category === 'documents' ? 'md:col-span-2' : ''}`}>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">
+                          {field.label} {field.is_required && <span className="text-mylms-rose">*</span>}
+                        </label>
+                        
+                        {field.type === 'text' && (
+                          <input 
+                            type="text" 
+                            name={field.field_key} 
+                            value={formData[field.field_key] || ''} 
+                            onChange={handleInputChange} 
+                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase" 
+                            placeholder={`Enter ${field.label.toLowerCase()}`}
+                          />
+                        )}
 
-                {/* ADDRESS */}
-                {currentStepId === 'address_info' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="md:col-span-2">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Street Address</label>
-                      <input type="text" name="street" value={formData.street || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">City/Province</label>
-                      <input type="text" name="city" value={formData.city || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Country/Region</label>
-                      <input type="text" name="country" value={formData.country || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase" />
-                    </div>
-                  </div>
-                )}
+                        {field.type === 'select' && (
+                          <select 
+                            name={field.field_key} 
+                            value={formData[field.field_key] || ''} 
+                            onChange={handleInputChange} 
+                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                          >
+                            <option value="">-- Select {field.label} --</option>
+                            {field.options?.map((o: string) => <option key={o} value={o}>{o.toUpperCase()}</option>)}
+                          </select>
+                        )}
 
-                {/* ACADEMIC BACKGROUND */}
-                {currentStepId === 'academic_background' && (
-                  <div className="space-y-10">
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Highest Education Level Attained</label>
-                      <select name="highest_ed" value={formData.highest_ed || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase">
-                        <option value="">Select Level</option>
-                        <option value="highschool">High School / GED</option>
-                        <option value="associate">Associate Degree</option>
-                        <option value="bachelor">Bachelor's Degree</option>
-                        <option value="master">Master's Degree</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Institution Name</label>
-                      <input type="text" name="institution" value={formData.institution || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Graduation Year</label>
-                      <input type="text" name="grad_year" value={formData.grad_year || ''} onChange={handleInputChange} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase" />
-                    </div>
-                  </div>
-                )}
+                        {field.type === 'date' && (
+                          <input 
+                            type="date" 
+                            name={field.field_key} 
+                            value={formData[field.field_key] || ''} 
+                            onChange={handleInputChange} 
+                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                          />
+                        )}
 
-                {/* PROGRAM SELECTION */}
+                        {field.type === 'number' && (
+                          <input 
+                            type="number" 
+                            name={field.field_key} 
+                            value={formData[field.field_key] || ''} 
+                            onChange={handleInputChange} 
+                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                          />
+                        )}
+
+                        {field.type === 'textarea' && (
+                          <textarea 
+                            name={field.field_key} 
+                            value={formData[field.field_key] || ''} 
+                            onChange={handleInputChange} 
+                            rows={4}
+                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-medium text-text-main text-sm shadow-inner"
+                            placeholder={`Describe ${field.label.toLowerCase()}...`}
+                          />
+                        )}
+
+                        {field.type === 'file' && (
+                          <div className={`p-10 bg-offwhite rounded-[40px] border-2 transition-all group/file shadow-inner relative overflow-hidden ${application?.documents?.[field.field_key] ? 'border-green-200' : 'border-border-soft hover:border-mylms-rose'}`}>
+                            <div className="relative z-10">
+                              {application?.documents?.[field.field_key] ? (
+                                <div className="flex items-center gap-6 bg-green-50/50 p-4 rounded-2xl">
+                                  <CheckCircle size={20} className="text-green-600" />
+                                  <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">{field.label} Secured</span>
+                                  <input type="file" onChange={(e) => handleFileChange(e, field.field_key)} className="hidden" id={`file-${field.field_key}`} />
+                                  <label htmlFor={`file-${field.field_key}`} className="ml-auto text-[9px] font-black text-mylms-purple uppercase tracking-widest cursor-pointer underline hover:text-mylms-rose">Replace</label>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center py-4">
+                                  <FileUp size={32} className="text-gray-300 mb-6 group-hover/file:text-mylms-rose transition-colors" />
+                                  <input type="file" onChange={(e) => handleFileChange(e, field.field_key)} className="w-full text-[10px] font-black uppercase tracking-widest file:bg-mylms-purple file:text-white file:px-8 file:py-3 file:rounded-xl file:border-0 file:mr-6 cursor-pointer" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+
+                {/* PROGRAM SELECTION - Special Logic Override */}
                 {currentStepId === 'program_selection' && (
-                  <div className="space-y-12">
+                  <div className="space-y-12 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/10 rounded-[32px] flex items-center gap-8">
                       <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-mylms-purple shadow-sm"><GraduationCap size={32}/></div>
                       <div>
-                        <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight">Academic Pursuit</h4>
-                        <p className="text-[10px] font-medium text-text-secondary opacity-60 uppercase tracking-widest mt-1">Select your target level and specific degree program.</p>
+                        <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight italic">Enrollment Pursuit</h4>
+                        <p className="text-[10px] font-medium text-text-secondary opacity-60 uppercase tracking-widest mt-1">Authorized Phase 2: Select your academic destination.</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -498,7 +614,7 @@ export default function AdmissionWizard() {
                       </div>
                     </div>
                     {formData.program_id && (
-                      <div className="p-8 bg-offwhite rounded-[32px] border border-border-soft flex items-center justify-between border-l-8 border-l-mylms-rose animate-in slide-in-from-left duration-500">
+                      <div className="p-10 bg-offwhite rounded-[40px] border border-border-soft flex items-center justify-between border-l-8 border-l-mylms-rose animate-in slide-in-from-left duration-700 shadow-inner">
                         <div>
                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 italic">Institutional Context</p>
                           <p className="text-sm font-black text-text-main uppercase tracking-tight">
@@ -508,50 +624,6 @@ export default function AdmissionWizard() {
                         <ShieldCheck className="text-mylms-rose opacity-40" size={32} />
                       </div>
                     )}
-                  </div>
-                )}
-
-                {/* DOCUMENT UPLOAD */}
-                {currentStepId === 'document_upload' && (
-                  <div className="space-y-10">
-                    <div className="p-10 bg-offwhite rounded-[40px] border-2 border-border-soft hover:border-mylms-rose transition-all group/file shadow-inner relative overflow-hidden">
-                      <div className="relative z-10">
-                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 flex items-center gap-3">
-                          <FileText size={18} className="text-mylms-rose" />
-                          Official Academic Transcript
-                        </p>
-                        <p className="text-[10px] font-medium text-text-secondary opacity-50 mb-10 max-w-md italic">Upload a verified digital copy of your previous academic records (PDF preferred).</p>
-                        {application?.documents?.transcript ? (
-                          <div className="flex items-center gap-6 bg-green-50 p-6 rounded-2xl border border-green-200">
-                            <CheckCircle size={20} className="text-green-600" />
-                            <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">Transcript Secured & Verified</span>
-                            <input type="file" onChange={(e) => handleFileChange(e, 'transcript')} className="hidden" id="transcript-upload" />
-                            <label htmlFor="transcript-upload" className="ml-auto text-[9px] font-black text-mylms-purple uppercase tracking-widest cursor-pointer underline hover:text-mylms-rose">Replace File</label>
-                          </div>
-                        ) : (
-                          <input type="file" onChange={(e) => handleFileChange(e, 'transcript')} className="w-full text-xs file:bg-mylms-purple file:text-white file:px-8 file:py-3 file:rounded-xl file:border-0 file:font-black file:uppercase file:tracking-widest file:mr-6 cursor-pointer" />
-                        )}
-                      </div>
-                    </div>
-                    <div className="p-10 bg-offwhite rounded-[40px] border-2 border-border-soft hover:border-mylms-purple transition-all group/file shadow-inner relative overflow-hidden">
-                      <div className="relative z-10">
-                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 flex items-center gap-3">
-                          <MapPin size={18} className="text-mylms-purple" />
-                          Identity Matrix Verification
-                        </p>
-                        <p className="text-[10px] font-medium text-text-secondary opacity-50 mb-10 max-w-md italic">National ID Card, Passport, or Residency Permit.</p>
-                        {application?.documents?.id_proof ? (
-                          <div className="flex items-center gap-6 bg-green-50 p-6 rounded-2xl border border-green-200">
-                            <CheckCircle size={20} className="text-green-600" />
-                            <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">Identity Document Secured</span>
-                            <input type="file" onChange={(e) => handleFileChange(e, 'id_proof')} className="hidden" id="id-upload" />
-                            <label htmlFor="id-upload" className="ml-auto text-[9px] font-black text-mylms-purple uppercase tracking-widest cursor-pointer underline hover:text-mylms-rose">Replace File</label>
-                          </div>
-                        ) : (
-                          <input type="file" onChange={(e) => handleFileChange(e, 'id_proof')} className="w-full text-xs file:bg-mylms-purple file:text-white file:px-8 file:py-3 file:rounded-xl file:border-0 file:font-black file:uppercase file:tracking-widest file:mr-6 cursor-pointer" />
-                        )}
-                      </div>
-                    </div>
                   </div>
                 )}
 

@@ -57,6 +57,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(CMSPageSeeder::class);
         $this->call(LandingPageSeeder::class);
+        $this->call(AcademicProgramsSeeder::class);
+        $this->call(AdmissionFieldsSeeder::class);
 
         echo "Seeding completed successfully.\n";
     }

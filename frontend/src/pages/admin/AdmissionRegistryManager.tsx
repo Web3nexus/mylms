@@ -13,7 +13,11 @@ import {
   Type,
   List,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  FileCode,
+  ShieldAlert,
+  UserCheck,
+  FileUp
 } from 'lucide-react';
 
 interface AdmissionField {
@@ -134,7 +138,7 @@ export default function AdmissionRegistryManager() {
     }
   };
 
-  const categories = ['personal', 'contact', 'academic', 'financial'];
+  const categories = ['personal', 'contact', 'academic', 'financial', 'membership', 'credentials', 'documents'];
 
   if (loading) return (
     <div className="py-20 text-center">
@@ -216,6 +220,7 @@ export default function AdmissionRegistryManager() {
                     <option value="date">DATE PICKER</option>
                     <option value="number">NUMERIC DATA</option>
                     <option value="textarea">EXTENDED CONTENT</option>
+                    <option value="file">FILE UPLOAD</option>
                  </select>
               </div>
               <div>
@@ -282,6 +287,7 @@ export default function AdmissionRegistryManager() {
                                {field.type === 'date' && <Calendar size={18} />}
                                {field.type === 'number' && <Hash size={18} />}
                                {field.type === 'textarea' && <AlertCircle size={18} />}
+                               {field.type === 'file' && <FileUp size={18} />}
                             </div>
                             <div>
                                <p className="text-sm font-black text-text-main uppercase flex items-center gap-3">

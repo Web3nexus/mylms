@@ -24,7 +24,11 @@ import {
   Globe,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  ToggleRight,
+  Lock,
+  Zap,
+  Activity
 } from 'lucide-react';
 
 interface Program {
@@ -77,7 +81,11 @@ export default function AcademicManager() {
     admission_fee_waiver_delay_minutes: 5,
     scholarship_auto_approval: true,
     admission_email_delay_hours: 24,
-    scholarship_renewal_min_gpa: 2.0
+    scholarship_renewal_min_gpa: 2.0,
+    is_enrollment_open: true,
+    enrollment_start_date: '',
+    enrollment_end_date: '',
+    enrollment_quota: 1000
   });
 
   const [lastSync, setLastSync] = useState<string>(new Date().toLocaleTimeString());
@@ -414,76 +422,126 @@ export default function AcademicManager() {
            <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-12 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-offwhite rounded-bl-full"></div>
               
-              <div className="flex items-center gap-6 mb-12">
-                 <div className="w-16 h-16 bg-mylms-purple/5 text-mylms-purple rounded-2xl flex items-center justify-center border border-mylms-purple/10">
-                    <Settings size={32} />
-                 </div>
-                 <div>
-                    <h3 className="text-2xl font-black text-text-main uppercase tracking-tight">Global Admission Logic</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                       <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em]">Configuring System Behavior</p>
-                       <span className="text-[8px] font-bold text-gray-300 uppercase tracking-widest ml-4 italic">Last Sync: {lastSync}</span>
-                    </div>
-                 </div>
-              </div>
+               <div className="flex items-center gap-6 mb-12">
+                  <div className="w-16 h-16 bg-mylms-purple/5 text-mylms-purple rounded-2xl flex items-center justify-center border border-mylms-purple/10">
+                     <Settings size={32} />
+                  </div>
+                  <div>
+                     <h3 className="text-2xl font-black text-text-main uppercase tracking-tight">Institutional Protocols</h3>
+                     <div className="flex items-center gap-2 mt-1">
+                        <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em]">Global System Configuration</p>
+                        <span className="text-[8px] font-bold text-gray-300 uppercase tracking-widest ml-4 italic">Last Sync: {lastSync}</span>
+                     </div>
+                  </div>
+               </div>
 
-              <form onSubmit={handleUpdateSettings} className="space-y-10">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div>
-                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Fee Waiver Delay (Minutes)</label>
-                       <div className="relative">
-                          <Clock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                          <input 
-                            type="number" 
-                            value={settings.admission_fee_waiver_delay_minutes || 0} 
-                            onChange={e => setSettings({...settings, admission_fee_waiver_delay_minutes: parseInt(e.target.value)})}
-                            className="w-full pl-16 pr-8 py-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
-                          />
-                       </div>
-                       <p className="text-[9px] text-gray-400 mt-3 font-bold uppercase italic pl-1">Time students must wait for waiver approval.</p>
-                    </div>
-                    <div>
-                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Auto-Approval Protocol</label>
-                       <select 
-                         value={settings.scholarship_auto_approval ? '1' : '0'} 
-                         onChange={e => setSettings({...settings, scholarship_auto_approval: e.target.value === '1'})}
-                         className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-xs uppercase appearance-none"
-                       >
-                          <option value="1">Enabled (System Evaluate)</option>
-                          <option value="0">Disabled (Review Only)</option>
-                       </select>
-                    </div>
-                    <div>
-                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Admission Email Delay (Hours)</label>
-                       <input 
-                          type="number" 
-                          value={settings.admission_email_delay_hours || 0} 
-                          onChange={e => setSettings({...settings, admission_email_delay_hours: parseInt(e.target.value)})}
-                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
-                       />
-                    </div>
-                    <div>
-                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Scholarship Renewal Min GPA</label>
-                       <input 
-                          type="number" 
-                          step="0.1" 
-                          value={settings.scholarship_renewal_min_gpa || 0} 
-                          onChange={e => setSettings({...settings, scholarship_renewal_min_gpa: parseFloat(e.target.value)})}
-                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
-                       />
-                    </div>
-                 </div>
+               <form onSubmit={handleUpdateSettings} className="space-y-12">
+                  {/* Master Enrollment Protocol */}
+                  <div className="bg-offwhite/50 border-2 border-border-soft p-10 rounded-[32px] relative overflow-hidden group/protocol">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-bl-full group-hover/protocol:bg-mylms-purple/5 transition-all"></div>
+                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-10 pb-10 border-b border-white relative z-10">
+                        <div className="flex items-center gap-6">
+                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all ${settings.is_enrollment_open ? 'bg-green-500 text-white shadow-green-200' : 'bg-gray-400 text-white opacity-50'}`}>
+                              {settings.is_enrollment_open ? <Zap size={24} /> : <Lock size={24} />}
+                           </div>
+                           <div>
+                              <h4 className="text-lg font-black text-text-main uppercase tracking-tight">Enrollment Master Protocol</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                 <Activity size={12} className={settings.is_enrollment_open ? 'text-green-500' : 'text-gray-400'} />
+                                 <span className={`text-[10px] font-black uppercase tracking-widest ${settings.is_enrollment_open ? 'text-green-600' : 'text-gray-400'}`}>
+                                    Gate Status: {settings.is_enrollment_open ? 'Operational (OPEN)' : 'Suspended (CLOSED)'}
+                                 </span>
+                              </div>
+                           </div>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={() => setSettings({...settings, is_enrollment_open: !settings.is_enrollment_open})}
+                          className={`w-20 h-10 rounded-full p-1.5 transition-all relative ${settings.is_enrollment_open ? 'bg-mylms-purple' : 'bg-gray-200'}`}
+                        >
+                           <div className={`w-7 h-7 bg-white rounded-full shadow-md transition-all transform ${settings.is_enrollment_open ? 'translate-x-10' : 'translate-x-0'}`} />
+                        </button>
+                     </div>
 
-                 <div className="pt-6 border-t border-offwhite">
-                    <button 
-                      type="submit" 
-                      disabled={syncing}
-                      className="w-full py-6 bg-mylms-purple text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
-                    >
-                       {syncing && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                       {syncing ? 'Synchronizing Protocols...' : 'Commit Global Config'}
-                    </button>
-                 </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
+                        <div>
+                           <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Enrollment Window Start</label>
+                           <input 
+                             type="datetime-local" 
+                             value={settings.enrollment_start_date ? settings.enrollment_start_date.substring(0, 16) : ''} 
+                             onChange={e => setSettings({...settings, enrollment_start_date: e.target.value})}
+                             className="w-full p-5 bg-white border-2 border-border-soft rounded-2xl font-black text-xs uppercase outline-none focus:border-mylms-purple"
+                           />
+                        </div>
+                        <div>
+                           <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Enrollment Window End</label>
+                           <input 
+                             type="datetime-local" 
+                             value={settings.enrollment_end_date ? settings.enrollment_end_date.substring(0, 16) : ''} 
+                             onChange={e => setSettings({...settings, enrollment_end_date: e.target.value})}
+                             className="w-full p-5 bg-white border-2 border-border-soft rounded-2xl font-black text-xs uppercase outline-none focus:border-mylms-purple"
+                           />
+                        </div>
+                     </div>
+                  </div>
+
+                  {/* Secondary Admission Logic */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                     <div>
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Fee Waiver Approval Delay</label>
+                        <div className="relative">
+                           <Clock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                           <input 
+                             type="number" 
+                             value={settings.admission_fee_waiver_delay_minutes || 0} 
+                             onChange={e => setSettings({...settings, admission_fee_waiver_delay_minutes: parseInt(e.target.value)})}
+                             className="w-full pl-16 pr-8 py-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
+                           />
+                        </div>
+                        <p className="text-[8px] text-gray-400 mt-3 font-bold uppercase italic pl-1">Auto-approval timer for candidate fee waivers.</p>
+                     </div>
+                     <div>
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Scholarship Quota Quorum</label>
+                        <select 
+                          value={settings.scholarship_auto_approval ? '1' : '0'} 
+                          onChange={e => setSettings({...settings, scholarship_auto_approval: e.target.value === '1'})}
+                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-[10px] uppercase appearance-none"
+                        >
+                           <option value="1">Enabled (System Evaluate)</option>
+                           <option value="0">Disabled (Review Only)</option>
+                        </select>
+                     </div>
+                     <div>
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Target Admission Quota (Limit)</label>
+                        <input 
+                           type="number" 
+                           value={settings.enrollment_quota || 0} 
+                           onChange={e => setSettings({...settings, enrollment_quota: parseInt(e.target.value)})}
+                           className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
+                        />
+                     </div>
+                     <div>
+                        <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Renewal Minimum Performance (GPA)</label>
+                        <input 
+                           type="number" 
+                           step="0.1" 
+                           value={settings.scholarship_renewal_min_gpa || 0} 
+                           onChange={e => setSettings({...settings, scholarship_renewal_min_gpa: parseFloat(e.target.value)})}
+                           className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm"
+                        />
+                     </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-offwhite">
+                     <button 
+                       type="submit" 
+                       disabled={syncing}
+                       className="w-full py-6 bg-mylms-purple text-white font-black uppercase tracking-[0.4em] text-[11px] rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+                     >
+                        {syncing && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                        {syncing ? 'Synchronizing Protocols...' : 'Commit Institutional Configuration'}
+                     </button>
+                  </div>
               </form>
            </div>
         </div>
