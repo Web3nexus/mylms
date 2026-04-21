@@ -92,7 +92,7 @@ export default function VerifyEmail() {
                 <ShieldCheck size={32} className="text-white" />
               </div>
               <h1 className="text-2xl font-black text-white uppercase tracking-tighter">Security Protocol</h1>
-              <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Identity Verification Required</p>
+              <p className="text-white text-[10px] font-black uppercase tracking-[0.3em] mt-2">Identity Verification Required</p>
             </div>
           </div>
 
