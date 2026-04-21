@@ -39,7 +39,7 @@ const DualLogosStripInner = ({ leftTitle, leftLogos, rightTitle, rightLogos }: a
           {accreditorLogos.map((logo: any, i: number) => {
              const src = typeof logo === 'string' ? logo : logo?.src;
              if (!src) return null;
-             return <img key={i} src={src} alt={logo?.alt || "Accreditor"} className="h-10 md:h-12 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />;
+             return <img key={i} src={src} alt={logo?.alt || "Accreditor"} className="h-10 md:h-12 w-auto object-contain" />;
           })}
         </div>
       </div>
@@ -49,7 +49,7 @@ const DualLogosStripInner = ({ leftTitle, leftLogos, rightTitle, rightLogos }: a
           {partnerLogos.map((logo: any, i: number) => {
              const src = typeof logo === 'string' ? logo : logo?.src;
              if (!src) return null;
-             return <img key={i} src={src} alt={logo?.alt || "Partner"} className="h-8 md:h-10 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />;
+             return <img key={i} src={src} alt={logo?.alt || "Partner"} className="h-8 md:h-10 w-auto object-contain" />;
           })}
         </div>
       </div>
@@ -117,7 +117,7 @@ export const config: Config<Props> = {
               )}
               <div className="relative z-10 px-6 md:px-20 max-w-7xl mx-auto w-full flex items-center">
                 <div className="max-w-2xl bg-white/5 backdrop-blur-sm p-10 md:p-16 border-l-8 border-mylms-rose rounded-r-3xl shadow-2xl">
-                  <h1 className="font-serif font-black leading-tight mb-8 drop-shadow-xl" style={{ fontSize: '42px', color: titleColor || "white" }}>{title}</h1>
+                  <h1 className="font-serif font-black leading-tight mb-8 drop-shadow-xl" style={{ fontSize: '42px', color: titleColor || "#edaa16" }}>{title}</h1>
                   <p className="text-base font-medium text-white/90 mb-12 drop-shadow-md">{description}</p>
                   <a href={buttonLink} className="bg-mylms-rose text-white px-10 py-5 rounded-lg font-black uppercase tracking-widest text-xs hover:bg-[#A00E26] shadow-xl inline-flex items-center gap-3 active:scale-95 transition-all">{buttonText}<ArrowRight size={16} /></a>
                 </div>
@@ -134,7 +134,7 @@ export const config: Config<Props> = {
               </div>
             )}
             <div className="relative z-10 max-w-4xl px-6 py-20">
-              <h1 className="font-serif font-black tracking-tight mb-8 leading-tight uppercase" style={{ fontSize: '42px', color: titleColor || "white" }}>{title}</h1>
+              <h1 className="font-serif font-black tracking-tight mb-8 leading-tight uppercase" style={{ fontSize: '42px', color: titleColor || "#edaa16" }}>{title}</h1>
               <p className="text-base text-white/80 font-medium mb-12 max-w-2xl mx-auto leading-relaxed">{description}</p>
               <a href={buttonLink} className="bg-mylms-rose text-white px-10 py-5 rounded-lg font-black uppercase tracking-widest text-xs hover:bg-[#A00E26] shadow-xl inline-flex items-center gap-3 active:scale-95 transition-all">{buttonText}<ArrowRight size={16} /></a>
             </div>
