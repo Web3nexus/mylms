@@ -30,15 +30,7 @@ class LandingPageSeeder extends Seeder
                     "props" => [
                         "id" => "DualLogosStrip-1",
                         "leftTitle" => "Accredited By",
-                        "leftLogos" => [
-                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png", "alt" => "DEAC Accreditation"],
-                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/2048px-Microsoft_logo.svg.png", "alt" => "WASC Accreditation"]
-                        ],
-                        "rightTitle" => "In Partnership With",
-                        "rightLogos" => [
-                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/IBM_logo.svg/800px-IBM_logo.svg.png", "alt" => "IBM"],
-                            ["_arrayId" => (string) Str::uuid(), "src" => "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1200px-Amazon_logo.svg.png", "alt" => "Amazon AWS"]
-                        ]
+                        "rightTitle" => "In Partnership With"
                     ]
                 ],
                 [
