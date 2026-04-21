@@ -136,6 +136,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         // Student Directory
         Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
+        Route::post('/admin/students/bulk-delete', [StudentDirectoryController::class, 'bulkDestroy']);
         Route::get('/admin/students/{id}', [StudentDirectoryController::class, 'show']);
 
         // Staff & Personnel Management

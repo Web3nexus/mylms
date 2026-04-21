@@ -70,4 +70,21 @@ class StudentDirectoryController extends Controller
 
         return response()->json($student);
     }
+
+    /**
+     * Bulk delete students.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:users,id'
+        ]);
+
+        User::whereIn('id', $request->student_ids)
+            ->where('role', 'student') // Protect admins/instructors
+            ->delete();
+
+        return response()->json(['message' => 'Selected students have been removed.']);
+    }
 }

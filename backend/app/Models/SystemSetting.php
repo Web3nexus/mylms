@@ -14,7 +14,11 @@ class SystemSetting extends Model
     public static function getVal(string $key, $default = null)
     {
         $setting = self::where('key', $key)->first();
-        if (!$setting) return $default;
+        
+        // If the setting doesn't exist, or if it exists but the value is empty/null, return default
+        if (!$setting || $setting->value === null || $setting->value === '') {
+            return $default;
+        }
 
         return match($setting->type) {
             'boolean' => filter_var($setting->value, FILTER_VALIDATE_BOOLEAN),

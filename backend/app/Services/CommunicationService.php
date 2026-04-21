@@ -71,13 +71,13 @@ class CommunicationService
             // Fallback to institutional settings or system default
             config([
                 'mail.default' => 'smtp',
-                'mail.mailers.smtp.host' => \App\Models\SystemSetting::getVal('mail_host'),
-                'mail.mailers.smtp.port' => \App\Models\SystemSetting::getVal('mail_port'),
-                'mail.mailers.smtp.encryption' => \App\Models\SystemSetting::getVal('mail_encryption'),
-                'mail.mailers.smtp.username' => \App\Models\SystemSetting::getVal('mail_username'),
-                'mail.mailers.smtp.password' => \App\Models\SystemSetting::getVal('mail_password'),
-                'mail.from.address' => \App\Models\SystemSetting::getVal('mail_from_address'),
-                'mail.from.name' => \App\Models\SystemSetting::getVal('mail_from_name'),
+                'mail.mailers.smtp.host' => \App\Models\SystemSetting::getVal('mail_host', env('MAIL_HOST', '127.0.0.1')),
+                'mail.mailers.smtp.port' => \App\Models\SystemSetting::getVal('mail_port', env('MAIL_PORT', 2525)),
+                'mail.mailers.smtp.encryption' => \App\Models\SystemSetting::getVal('mail_encryption', env('MAIL_ENCRYPTION', 'tls')),
+                'mail.mailers.smtp.username' => \App\Models\SystemSetting::getVal('mail_username', env('MAIL_USERNAME')),
+                'mail.mailers.smtp.password' => \App\Models\SystemSetting::getVal('mail_password', env('MAIL_PASSWORD')),
+                'mail.from.address' => \App\Models\SystemSetting::getVal('mail_from_address', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+                'mail.from.name' => \App\Models\SystemSetting::getVal('mail_from_name', env('MAIL_FROM_NAME', 'MyLMS')),
             ]);
         }
     }
