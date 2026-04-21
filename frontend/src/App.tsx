@@ -212,7 +212,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     sidebarLinks = [
       { name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> },
 
-      { name: 'Academic Office', path: '/admin/academic', icon: <Settings size={18} /> },
+      { name: 'Enrollment Management', path: '/admin/academic', icon: <Settings size={18} /> },
       { name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> },
       { name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> },
       { name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> },

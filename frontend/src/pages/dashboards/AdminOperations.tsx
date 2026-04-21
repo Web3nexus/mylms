@@ -91,7 +91,7 @@ export default function AdminOperations() {
         <div className="flex gap-4">
            <Link to="/admin/academic" className="btn-purple flex items-center gap-3 px-10 py-3.5 shadow-xl">
               <BookOpen size={16} />
-              Academic Manager
+              Enrollment & Programs
            </Link>
            <Link to="/admin/admissions" className="btn-minimal flex items-center gap-3 px-10 py-3.5 shadow-sm">
               <Inbox size={16} />
@@ -177,7 +177,7 @@ export default function AdminOperations() {
              <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
                 <BookOpen size={28} />
              </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Academic Office</h4>
+             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Enrollment Management</h4>
              <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Curriculum Control & Session Management.</p>
           </Link>
 

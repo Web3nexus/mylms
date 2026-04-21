@@ -68,7 +68,7 @@ export default function AcademicManager() {
 
   const fetchStructure = async () => {
     try {
-      const res = await client.get('/academic', {
+      const res = await client.get('/admin/academic/structure', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFaculties(res.data);
