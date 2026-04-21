@@ -29,7 +29,8 @@ import {
   Menu,
   X,
   ChevronLeft,
-  Terminal
+  Terminal,
+  Mail
 } from 'lucide-react'
 
 // Auth & API
@@ -95,6 +96,7 @@ import StudentCampus from './pages/dashboards/StudentCampus'
 import InstructorRegistry from './pages/dashboards/InstructorRegistry'
 import AdminOperations from './pages/dashboards/AdminOperations'
 import BrandingManager from './pages/admin/BrandingManager'
+import CommunicationManager from './pages/admin/CommunicationManager'
 import CommandCenter from './pages/admin/CommandCenter'
 
 // Hooks
@@ -217,6 +219,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       { name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> },
       { name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> },
       { name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> },
+      { name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> },
       { name: 'Branding', path: '/branding', icon: <ShieldCheck size={18} /> },
       { name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> },
     ]
@@ -426,6 +429,7 @@ function App() {
           <Route path="/admin/cms/edit/:slug" element={<LandingEditor />} />
           <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />
           <Route path="/branding" element={<BrandingManager />} />
+          <Route path="/admin/communications" element={<CommunicationManager />} />
           <Route path="/admin/command-center" element={<CommandCenter />} />
         </Route>
         

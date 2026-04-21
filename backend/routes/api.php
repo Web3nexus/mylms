@@ -160,6 +160,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // Command Center
         Route::get('/admin/commands', [CommandCenterController::class, 'index']);
         Route::post('/admin/commands/run', [CommandCenterController::class, 'run']);
+
+        // Communication Settings
+        Route::get('/communications/settings', [\App\Http\Controllers\CommunicationController::class, 'getSettings']);
+        Route::post('/communications/settings', [\App\Http\Controllers\CommunicationController::class, 'updateSettings']);
+        Route::post('/communications/test-email', [\App\Http\Controllers\CommunicationController::class, 'sendTestEmail']);
     });
 
     // Student Enrollments (legacy)
