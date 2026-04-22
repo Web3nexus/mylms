@@ -125,7 +125,7 @@ export default function AdmissionWizard() {
         setRemainingSeconds(prev => {
           if (prev === null || prev <= 1) {
             clearInterval(timer);
-            fetchApplication(); // Refresh to check if fee is now waived
+            fetchApplication(); 
             return 0;
           }
           return prev - 1;
@@ -134,6 +134,13 @@ export default function AdmissionWizard() {
     }
     return () => clearInterval(timer);
   }, [waiverRequested, remainingSeconds]);
+
+  // Handle Automatic Redirect after Fee Protocol Clearance
+  useEffect(() => {
+    if (feeCleared && (currentStepId === 'fee_protocol' || currentIndex === 1)) {
+      setSearchParams({ step: 'program_selection' });
+    }
+  }, [feeCleared, currentStepId]);
 
   const fetchProtocol = async () => {
     try {
