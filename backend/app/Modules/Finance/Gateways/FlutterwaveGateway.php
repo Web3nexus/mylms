@@ -6,14 +6,20 @@ use App\Modules\Finance\Interfaces\PaymentGatewayInterface;
 use App\Modules\Finance\Models\Invoice;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\SystemSetting;
 
 class FlutterwaveGateway implements PaymentGatewayInterface
 {
     protected $baseUrl = 'https://api.flutterwave.com/v3';
 
+    private function getSecret()
+    {
+        return SystemSetting::getEncryptedVal('flutterwave_secret_key', config('services.flutterwave.secret'));
+    }
+
     public function initializePayment(Invoice $invoice): array
     {
-        $response = Http::withToken(config('services.flutterwave.secret'))
+        $response = Http::withToken($this->getSecret())
             ->post("{$this->baseUrl}/payments", [
                 'tx_ref' => 'FLW-' . uniqid(),
                 'amount' => $invoice->total_amount,
@@ -47,7 +53,7 @@ class FlutterwaveGateway implements PaymentGatewayInterface
 
     public function verifyPayment(string $id): bool
     {
-        $response = Http::withToken(config('services.flutterwave.secret'))
+        $response = Http::withToken($this->getSecret())
             ->get("{$this->baseUrl}/transactions/{$id}/verify");
 
         if ($response->failed()) {

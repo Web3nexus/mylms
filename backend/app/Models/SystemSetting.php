@@ -28,6 +28,30 @@ class SystemSetting extends Model
         };
     }
 
+    /**
+     * Get a value and decrypt it if it exists.
+     */
+    public static function getEncryptedVal(string $key, $default = null)
+    {
+        $value = self::getVal($key);
+        if ($value === null) return $default;
+        
+        try {
+            return \Illuminate\Support\Facades\Crypt::decryptString($value);
+        } catch (\Exception $e) {
+            return $value; // Fallback to raw if decryption fails (e.g. migration transition)
+        }
+    }
+
+    /**
+     * Set a value and encrypt it before storage.
+     */
+    public static function setEncryptedVal(string $key, $value, string $group = 'general')
+    {
+        $encrypted = \Illuminate\Support\Facades\Crypt::encryptString((string) $value);
+        return self::setVal($key, $encrypted, 'string', $group);
+    }
+
     public static function setVal(string $key, $value, string $type = 'string', string $group = 'general')
     {
         $stringValue = is_array($value) ? json_encode($value) : (string) $value;

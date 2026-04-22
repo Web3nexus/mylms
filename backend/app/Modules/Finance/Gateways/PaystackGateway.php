@@ -6,14 +6,20 @@ use App\Modules\Finance\Interfaces\PaymentGatewayInterface;
 use App\Modules\Finance\Models\Invoice;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\SystemSetting;
 
 class PaystackGateway implements PaymentGatewayInterface
 {
     protected $baseUrl = 'https://api.paystack.co';
 
+    private function getSecret()
+    {
+        return SystemSetting::getEncryptedVal('paystack_secret_key', config('services.paystack.secret'));
+    }
+
     public function initializePayment(Invoice $invoice): array
     {
-        $response = Http::withToken(config('services.paystack.secret'))
+        $response = Http::withToken($this->getSecret())
             ->post("{$this->baseUrl}/transaction/initialize", [
                 'amount' => (int)($invoice->total_amount * 100), // Paystack uses Kobo (cents)
                 'email' => $invoice->user->email,
@@ -40,7 +46,7 @@ class PaystackGateway implements PaymentGatewayInterface
 
     public function verifyPayment(string $reference): bool
     {
-        $response = Http::withToken(config('services.paystack.secret'))
+        $response = Http::withToken($this->getSecret())
             ->get("{$this->baseUrl}/transaction/verify/{$reference}");
 
         if ($response->failed()) {

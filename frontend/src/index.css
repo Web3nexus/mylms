@@ -64,13 +64,13 @@ h1, h2, h3, h4 {
 }
 
 h1:not([style*="color"]) {
-  @apply text-mylms-purple text-[42px] leading-[1.1];
+  @apply text-mylms-purple text-[32px] leading-[1.1] uppercase tracking-tighter italic;
 }
 h2:not([style*="color"]) {
-  @apply text-mylms-purple text-[32px] leading-[1.2];
+  @apply text-mylms-purple text-[24px] leading-[1.2] uppercase tracking-tight italic;
 }
 h3:not([style*="color"]) {
-  @apply text-mylms-purple text-[24px] leading-[1.2];
+  @apply text-mylms-purple text-[18px] leading-[1.2] uppercase tracking-tight italic;
 }
 
 /* Use this on any heading inside a dark/purple section */
@@ -84,19 +84,19 @@ h3:not([style*="color"]) {
 
 /* MyLMS Professional Components */
 .btn-rose {
-  @apply bg-mylms-rose text-white font-black uppercase tracking-[0.15em] px-10 py-5 rounded-lg hover:bg-[#A00E26] shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] text-[10px] flex items-center justify-center gap-3;
+  @apply bg-mylms-rose text-white font-black uppercase tracking-[0.15em] px-7 py-3 rounded-xl hover:bg-[#A00E26] shadow-lg hover:shadow-xl transition-all active:scale-[0.98] text-[10px] flex items-center justify-center gap-2;
 }
 
 .btn-purple {
-  @apply bg-mylms-purple text-white font-black uppercase tracking-[0.15em] px-10 py-5 rounded-lg hover:opacity-90 shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] text-[10px] flex items-center justify-center gap-3;
+  @apply bg-mylms-purple text-white font-black uppercase tracking-[0.15em] px-7 py-3 rounded-xl hover:opacity-90 shadow-lg hover:shadow-xl transition-all active:scale-[0.98] text-[10px] flex items-center justify-center gap-2;
 }
 
 .btn-minimal {
-  @apply bg-white border-2 border-border-soft text-mylms-purple font-black uppercase tracking-[0.1em] px-10 py-5 rounded-lg hover:border-mylms-purple/30 transition-all text-[10px] shadow-sm flex items-center justify-center gap-3;
+  @apply bg-white border border-border-soft text-mylms-purple font-black uppercase tracking-[0.1em] px-7 py-3 rounded-xl hover:border-mylms-purple/30 transition-all text-[10px] shadow-sm flex items-center justify-center gap-2;
 }
 
 .card-minimal {
-  @apply bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple/20 transition-all p-12 relative overflow-hidden;
+  @apply bg-white border border-border-soft rounded-3xl shadow-sm hover:border-mylms-purple/20 transition-all p-8 relative overflow-hidden;
 }
 
 .card-shadow {
@@ -132,7 +132,7 @@ h3:not([style*="color"]) {
 }
 
 .premium-input {
-  @apply w-full p-[18px] pl-14 bg-offwhite border border-border-soft rounded-2xl outline-none transition-all duration-500 font-bold text-sm text-text-main shadow-inner;
+  @apply w-full p-4 pl-12 bg-offwhite border border-border-soft rounded-2xl outline-none transition-all duration-500 font-bold text-sm text-text-main shadow-inner;
 }
 
 .premium-input:focus {

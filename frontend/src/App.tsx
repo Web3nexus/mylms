@@ -103,6 +103,7 @@ import CommunicationManager from './pages/admin/CommunicationManager'
 import EmailTemplateManager from './pages/admin/EmailTemplateManager'
 import EmailAccountManager from './pages/admin/EmailAccountManager'
 import CommandCenter from './pages/admin/CommandCenter'
+import PaymentSettings from './pages/admin/PaymentSettings'
 
 // Hooks
 import { useBranding } from './hooks/useBranding'
@@ -258,6 +259,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     }
     if (isAdmin || permissions.includes('finance_bursary')) {
        sidebarLinks.push({ name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> });
+       if (isAdmin) {
+         sidebarLinks.push({ name: 'Payment Settings', path: '/admin/finance/settings', icon: <ShieldCheck size={18} /> });
+       }
     }
     if (isAdmin || permissions.includes('branding_identity')) {
        sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <ShieldCheck size={18} /> });
@@ -472,6 +476,7 @@ function App() {
             <Route path="/admin/students" element={<StudentDirectory />} />
             <Route path="/admin/staff" element={<AdminStaffDirectory />} />
             <Route path="/admin/finance" element={<AdminFinanceDashboard />} />
+            <Route path="/admin/finance/settings" element={<PaymentSettings />} />
             <Route path="/admin/pages" element={<CMSPageManager />} />
             <Route path="/admin/cms/edit/:slug" element={<LandingEditor />} />
             <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />

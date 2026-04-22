@@ -179,6 +179,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/email-templates', [\App\Http\Controllers\EmailTemplateController::class, 'index']);
         Route::get('/admin/email-templates/{id}', [\App\Http\Controllers\EmailTemplateController::class, 'show']);
         Route::put('/admin/email-templates/{id}', [\App\Http\Controllers\EmailTemplateController::class, 'update']);
+
+        // Payment & Security Settings (Sprint 22)
+        Route::get('/admin/finance/settings', [\App\Modules\Admin\Controllers\PaymentSettingsController::class, 'index']);
+        Route::post('/admin/finance/settings', [\App\Modules\Admin\Controllers\PaymentSettingsController::class, 'update']);
     });
 
     // Student Enrollments (legacy)
@@ -243,6 +247,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Student Finances & Billing (Sprint 11)
     Route::get('/finance/my-invoices', [FinanceController::class, 'myInvoices']);
+    Route::get('/finance/gateways', [FinanceController::class, 'getGatewayConfig']);
     Route::post('/finance/invoices/{invoice:id}/pay', [FinanceController::class, 'processPayment']);
     Route::get('/finance/verify-payment', [FinanceController::class, 'verifyPayment']);
 

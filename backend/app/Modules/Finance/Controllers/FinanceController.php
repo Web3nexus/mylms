@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 use App\Notifications\InvoiceGenerated;
 
 use App\Modules\Finance\PaymentManager;
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Http;
 
 class FinanceController extends Controller
 {
@@ -135,7 +137,21 @@ class FinanceController extends Controller
 
         $validated = $request->validate([
             'gateway' => 'required|string|in:stripe,paystack,flutterwave',
+            'turnstile_token' => 'nullable|string',
         ]);
+
+        // 1. Cloudflare Turnstile Security Layer
+        if (SystemSetting::getVal('turnstile_enabled', false)) {
+            if (!$request->turnstile_token || !$this->verifyTurnstile($request->turnstile_token)) {
+                return response()->json(['message' => 'Security Protocol Error: Verification failed. Please refresh and try again.'], 403);
+            }
+        }
+
+        // 2. Gateway Enablement Guardrail
+        $isEnabled = (bool) SystemSetting::getVal($validated['gateway'] . '_enabled', false);
+        if (!$isEnabled) {
+            return response()->json(['message' => "The " . ucfirst($validated['gateway']) . " gateway is currently suspended by administration."], 422);
+        }
 
         try {
             $gateway = $this->paymentManager->driver($validated['gateway']);
@@ -170,6 +186,53 @@ class FinanceController extends Controller
             return response()->json(['status' => 'failed', 'message' => 'Payment verification failed.'], 400);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Public/Student: Get enabled gateways and their public configuration.
+     */
+    public function getGatewayConfig()
+    {
+        return response()->json([
+            'paystack' => [
+                'enabled' => (bool) SystemSetting::getVal('paystack_enabled', false),
+                'public_key' => SystemSetting::getVal('paystack_public_key', ''),
+            ],
+            'flutterwave' => [
+                'enabled' => (bool) SystemSetting::getVal('flutterwave_enabled', false),
+                'public_key' => SystemSetting::getVal('flutterwave_public_key', ''),
+            ],
+            'stripe' => [
+                'enabled' => (bool) SystemSetting::getVal('stripe_enabled', false),
+                'public_key' => SystemSetting::getVal('stripe_public_key', ''),
+            ],
+            'turnstile' => [
+                'enabled' => (bool) SystemSetting::getVal('turnstile_enabled', false),
+                'site_key' => SystemSetting::getVal('turnstile_site_key', ''),
+            ]
+        ]);
+    }
+
+    /**
+     * Internal: Verify Cloudflare Turnstile token against Institutional Registry.
+     */
+    private function verifyTurnstile(string $token): bool
+    {
+        $secret = SystemSetting::getEncryptedVal('turnstile_secret_key');
+        if (!$secret) return true; // Fail-safe if not configured
+
+        try {
+            $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                'secret' => $secret,
+                'response' => $token,
+                'remoteip' => request()->ip(),
+            ]);
+
+            return $response->json('success') === true;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Turnstile verification failed: ' . $e->getMessage());
+            return false;
         }
     }
 }
