@@ -43,10 +43,12 @@ class AdmissionApplication extends Model
         'scholarship_reason',
         'scholarship_status',
         'application_fee_status',
+        'waiver_requested_at',
     ];
 
     protected $casts = [
         'step_data' => 'json',
+        'waiver_requested_at' => 'datetime',
     ];
 
     public function user()

@@ -41,6 +41,7 @@ export default function AdmissionWizard() {
   const [scholarshipReason, setScholarshipReason] = useState('');
   const [waiverRequested, setWaiverRequested] = useState(false);
   const [waiverDelayMinutes, setWaiverDelayMinutes] = useState(5);
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [submissionResult, setSubmissionResult] = useState<any>(null);
   const [showSaved, setShowSaved] = useState(false);
   const [enrollmentProtocol, setEnrollmentProtocol] = useState<{
@@ -95,10 +96,44 @@ export default function AdmissionWizard() {
       const currentData = res.data.step_data?.[currentStepId] || {};
       setFormData(currentData);
       if (res.data.program?.degree_level) setSelectedLevel(res.data.program.degree_level);
+      
+      // Sync Waiver Protocols
+      if (res.data.fee_waiver_delay_minutes) {
+        setWaiverDelayMinutes(res.data.fee_waiver_delay_minutes);
+      }
+
+      if (res.data.waiver_requested_at && res.data.application_fee_status === 'pending') {
+        setWaiverRequested(true);
+        calculateRemainingTime(res.data.waiver_requested_at, res.data.fee_waiver_delay_minutes || 5);
+      }
     } catch (err) {
       console.error('Error fetching application:', err);
     }
   };
+
+  const calculateRemainingTime = (requestedAt: string, delayMins: number) => {
+    const start = new Date(requestedAt).getTime();
+    const expiry = start + (delayMins * 60 * 1000);
+    const diff = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+    setRemainingSeconds(diff);
+  };
+
+  useEffect(() => {
+    let timer: any;
+    if (waiverRequested && remainingSeconds !== null && remainingSeconds > 0) {
+      timer = setInterval(() => {
+        setRemainingSeconds(prev => {
+          if (prev === null || prev <= 1) {
+            clearInterval(timer);
+            fetchApplication(); // Refresh to check if fee is now waived
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [waiverRequested, remainingSeconds]);
 
   const fetchProtocol = async () => {
     try {
@@ -315,14 +350,36 @@ export default function AdmissionWizard() {
               )}
 
               {waiverRequested ? (
-                <div className="p-8 bg-amber-50 border-2 border-amber-200 rounded-[28px] text-center">
-                  <Clock size={40} className="text-amber-500 mx-auto mb-4 animate-pulse" />
-                  <h3 className="text-xl font-black text-amber-800 uppercase tracking-tight mb-2 italic">Standard Wait Period Active</h3>
-                  <p className="text-amber-700 font-medium text-sm leading-relaxed">
-                    Your fee waiver is being processed by the institutional protocol. Access to Phase 2 will unlock automatically in approximately <strong>{waiverDelayMinutes} minutes</strong>.
+                <div className="p-8 bg-offwhite border-2 border-border-soft rounded-[32px] text-center max-w-md mx-auto animate-in zoom-in-95 duration-500">
+                  <div className="relative w-20 h-20 mx-auto mb-6">
+                    <div className="absolute inset-0 border-4 border-mylms-rose/10 rounded-full"></div>
+                    <div 
+                      className="absolute inset-0 border-4 border-mylms-rose rounded-full transition-all duration-1000"
+                      style={{ 
+                        clipPath: `inset(0 0 0 0)`, // Simplified for build safety
+                        opacity: 0.8
+                      }}
+                    ></div>
+                    <Clock size={32} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-mylms-rose animate-pulse" />
+                  </div>
+                  
+                  <h3 className="text-lg font-black text-mylms-purple uppercase tracking-tight mb-2 italic">Wait Period Active</h3>
+                  
+                  <div className="flex flex-col items-center justify-center gap-1 mb-6">
+                    <p className="text-2xl font-black text-mylms-purple tabular-nums">
+                      {remainingSeconds !== null ? 
+                        `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60).toString().padStart(2, '0')}` 
+                        : '--:--'}
+                    </p>
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Security Transmission Time Remaining</p>
+                  </div>
+
+                  <p className="text-text-secondary font-medium text-[11px] leading-relaxed mb-8 opacity-70">
+                    Institutional protocols require a short verification window. Access will unlock automatically.
                   </p>
-                  <button onClick={() => fetchApplication()} className="mt-8 bg-amber-500 text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-amber-600 transition-all shadow-lg active:scale-95">
-                    Check Protocol Status
+                  
+                  <button onClick={() => fetchApplication()} className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm active:scale-95">
+                    Refresh Protocol Status
                   </button>
                 </div>
               ) : (
