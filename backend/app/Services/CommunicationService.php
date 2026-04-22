@@ -19,25 +19,21 @@ class CommunicationService
         $template = EmailTemplate::where('slug', $templateSlug)->first();
 
         if (!$template) {
-            // Auto-heal missing critical templates with better anti-spam language
+            // Auto-heal missing critical templates with ultra-safe anti-spam language
             if ($templateSlug === 'otp_verification') {
                 $template = EmailTemplate::create([
                     'slug' => 'otp_verification',
-                    'subject' => '🪪 Identity Verification Code',
+                    'subject' => 'Verification Code: {{otp_code}}',
                     'category' => 'system',
                     'placeholders' => '["student_name", "otp_code", "campus_name"]',
                     'content_html' => '
-                        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 40px; background: #fff;">
-                            <div style="text-align: center; margin-bottom: 40px;">
-                                <h1 style="color: #4c1d95; font-size: 24px; font-weight: 950; text-transform: uppercase;">Identity Verification</h1>
-                                <p style="color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Institutional Authentication</p>
+                        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+                            <p>Hello {{student_name}},</p>
+                            <p>Your verification code for <strong>{{campus_name}}</strong> is:</p>
+                            <div style="font-size: 32px; font-weight: bold; margin: 20px 0; color: #4c1d95; letter-spacing: 5px;">
+                                {{otp_code}}
                             </div>
-                            <p style="color: #334155; font-size: 16px; line-height: 1.6;">Hello <strong>{{student_name}}</strong>,</p>
-                            <p style="color: #334155; font-size: 16px; line-height: 1.6;">To verify your account at <strong>{{campus_name}}</strong>, please use the following authentication code:</p>
-                            <div style="background: #f8fafc; padding: 40px; border-radius: 32px; text-align: center; margin: 32px 0; border: 1px solid #e2e8f0;">
-                                <h2 style="font-family: monospace; font-size: 52px; color: #4c1d95; margin: 0; letter-spacing: 12px; font-weight: 800;">{{otp_code}}</h2>
-                            </div>
-                            <p style="color: #64748b; font-size: 12px; text-align: center; margin-top: 32px;">This code is valid for 15 minutes. If you did not request this verification, please contact support.</p>
+                            <p style="font-size: 12px; color: #777;">This code expires in 15 minutes.</p>
                         </div>'
                 ]);
             } else {
@@ -67,11 +63,17 @@ class CommunicationService
             $content = str_replace("{{{$key}}}", $value, $content);
         }
 
+        // Pre-flight: Capture explicit From identity to pass into Mailable
+        $currentFromEmail = config('mail.from.address');
+        $currentFromName  = config('mail.from.name');
+
+        \Illuminate\Support\Facades\Log::info("🚀 [PRE-FLIGHT] Host: " . config('mail.mailers.smtp.host') . " | From: {$currentFromEmail}");
+
         try {
             // Pro-active detection: If the new Mailable class didn't pull correctly to live, 
             // we use a temporary fallback to prevent a fatal application crash.
             if (class_exists(\App\Mail\DynamicTemplateMail::class)) {
-                Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content));
+                Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content, $currentFromEmail, $currentFromName));
             } else {
                 \Illuminate\Support\Facades\Log::warning("⚠️ DynamicTemplateMail class missing. Falling back to legacy transmission mode.");
                 Mail::html($content, function ($message) use ($recipientEmail, $subject) {
@@ -84,10 +86,12 @@ class CommunicationService
             
             // Revert to system default and try again
             self::configureMailer('system_fallback_override');
+            $fallbackFromEmail = config('mail.from.address');
+            $fallbackFromName  = config('mail.from.name');
             
             try {
                 if (class_exists(\App\Mail\DynamicTemplateMail::class)) {
-                    Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content));
+                    Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content, $fallbackFromEmail, $fallbackFromName));
                 } else {
                     Mail::html($content, function ($message) use ($recipientEmail, $subject) {
                         $message->to($recipientEmail)->subject($subject);

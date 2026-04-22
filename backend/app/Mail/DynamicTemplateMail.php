@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -12,16 +13,20 @@ class DynamicTemplateMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $subject;
-    public $content_html;
+    public $subjectString;
+    public $contentHtml;
+    public $fromAddress;
+    public $fromName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(string $subject, string $content_html)
+    public function __construct(string $subject, string $contentHtml, string $fromAddress, string $fromName)
     {
-        $this->subject = $subject;
-        $this->content_html = $content_html;
+        $this->subjectString = $subject;
+        $this->contentHtml = $contentHtml;
+        $this->fromAddress = $fromAddress;
+        $this->fromName = $fromName;
     }
 
     /**
@@ -30,7 +35,8 @@ class DynamicTemplateMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->subject,
+            from: new Address($this->fromAddress, $this->fromName),
+            subject: $this->subjectString,
         );
     }
 
@@ -40,7 +46,7 @@ class DynamicTemplateMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            htmlString: $this->content_html,
+            htmlString: $this->contentHtml,
         );
     }
 
