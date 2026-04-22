@@ -79,7 +79,7 @@ export function ExperienceInner() {
       <section className="py-20 px-6 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {(columnSection.columns || []).map((feature: any, idx: number) => (
+            {(columnSection.columns || []).filter(Boolean).map((feature: any, idx: number) => (
               <div key={idx} className="group/card p-10 rounded-[40px] bg-offwhite border border-border-soft hover:border-mylms-purple/20 hover:shadow-2xl transition-all duration-500">
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-mylms-purple mb-8 shadow-sm group-hover/card:scale-110 group-hover/card:rotate-6 transition-all">
                   {iconMap[feature.icon] || <Zap size={24} />}

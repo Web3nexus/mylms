@@ -141,10 +141,10 @@ export function AdmissionsInner() {
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-6">
-            {statsData.map((s, i) => (
+            {(statsData || []).filter(Boolean).map((s: any, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-all group">
                 <div className="text-mylms-rose mb-4 group-hover:scale-110 transition-transform">{getIcon(s.label)}</div>
-                <p className="text-4xl font-black text-white tracking-tighter mb-2">{s.value}{'suffix' in s ? s.suffix : ''}</p>
+                <p className="text-4xl font-black text-white tracking-tighter mb-2">{s.value}{s.suffix || ''}</p>
                 <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">{s.label}</p>
               </div>
             ))}
@@ -242,13 +242,13 @@ export function AdmissionsInner() {
               { title: '100% Online', desc: 'Study from anywhere in the world, on your schedule. No campus visits required.' },
               { title: 'Internationally Accredited', desc: 'Our degrees are recognized by employers and institutions worldwide.' },
               { title: 'Flexible Pacing', desc: 'Self-paced modules designed for working professionals and busy learners.' },
-            ]).map((item, i) => (
+            ]).filter(Boolean).map((item, i) => (
               <div key={i} className="p-10 rounded-3xl border border-border-soft hover:border-mylms-purple/30 transition-all group hover:shadow-xl">
                 <div className="w-16 h-16 bg-mylms-purple/5 text-mylms-purple rounded-2xl flex items-center justify-center mb-8 group-hover:bg-mylms-purple group-hover:text-white transition-all">
                   {getIcon(item.title)}
                 </div>
                 <h3 className="text-xl font-black text-text-main mb-4 uppercase tracking-tight">{item.title}</h3>
-                <p className="text-text-secondary font-medium opacity-60 leading-relaxed font-sans text-sm">{item.desc}</p>
+                <p className="text-text-secondary text-sm font-medium leading-relaxed opacity-70 italic">{item.desc}</p>
               </div>
             ))}
           </div>

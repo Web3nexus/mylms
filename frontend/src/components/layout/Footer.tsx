@@ -57,7 +57,7 @@ export default function Footer() {
             <Link to="/" className="flex items-center gap-5 text-white mb-10 group">
               {(branding?.logo_light_url || branding?.logo_url) ? (
                 <div className="h-16 overflow-hidden shrink-0 transition-all flex items-center">
-                  <img src={branding.logo_light_url || branding.logo_url} className="h-full w-auto object-contain" alt="Institutional Logo" />
+                  <img src={branding?.logo_light_url || branding?.logo_url || ''} className="h-full w-auto object-contain" alt="Institutional Logo" />
                 </div>
               ) : (
                 <div className="flex items-center gap-5">
@@ -94,7 +94,7 @@ export default function Footer() {
           </div>
 
           {/* Dynamic Columns */}
-          {columns.map((col: any) => (
+          {columns.filter(Boolean).map((col: any) => (
             <div key={col.title}>
               <h4 className="text-white text-[11px] font-black uppercase tracking-[0.3em] mb-10 pb-4 border-b border-white/5">
                 {col.title}

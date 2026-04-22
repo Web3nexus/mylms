@@ -138,7 +138,7 @@ export function AboutInner() {
                 { name: 'Dr. Alistair Thorne', role: 'Chancellor of Academic Affairs', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1974' },
                 { name: 'Sarah Montgomery', role: 'Director of Global Enrollment', img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976' },
                 { name: 'Dr. Elena Rossi', role: 'Dean of Information Systems', img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961' }
-              ].map((member, i) => (
+              ].filter(Boolean).map((member, i) => (
                 <div key={i} className="group/member text-center">
                   <div className="aspect-square rounded-[50px] overflow-hidden mb-8 shadow-xl border-4 border-white group-hover/member:border-mylms-rose/20 transition-all duration-500">
                     <img src={member.img} className="w-full h-full object-cover group-hover/member:scale-105 transition-all duration-700" alt={member.name} />
