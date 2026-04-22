@@ -98,13 +98,13 @@ export default function AdmissionWizard() {
       if (res.data.program?.degree_level) setSelectedLevel(res.data.program.degree_level);
       
       // Sync Waiver Protocols
-      if (res.data.fee_waiver_delay_minutes) {
-        setWaiverDelayMinutes(res.data.fee_waiver_delay_minutes);
+      if (res.data.admission_fee_waiver_delay_minutes) {
+        setWaiverDelayMinutes(res.data.admission_fee_waiver_delay_minutes);
       }
 
       if (res.data.waiver_requested_at && res.data.application_fee_status === 'pending') {
         setWaiverRequested(true);
-        calculateRemainingTime(res.data.waiver_requested_at, res.data.fee_waiver_delay_minutes || 5);
+        calculateRemainingTime(res.data.waiver_requested_at, res.data.admission_fee_waiver_delay_minutes || 5);
       }
     } catch (err) {
       console.error('Error fetching application:', err);

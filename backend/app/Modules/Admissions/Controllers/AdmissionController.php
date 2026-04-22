@@ -89,7 +89,7 @@ class AdmissionController extends Controller
         }
 
         $application = $application->load(['program', 'offer', 'user', 'faculty', 'instructor']);
-        $application->fee_waiver_delay_minutes = (int) SystemSetting::getVal('fee_waiver_delay_minutes', 5);
+        $application->admission_fee_waiver_delay_minutes = (int) SystemSetting::getVal('admission_fee_waiver_delay_minutes', 5);
 
         return response()->json($application);
     }
@@ -136,7 +136,7 @@ class AdmissionController extends Controller
         }
 
         // Register institutional delay and request timestamp
-        $delayMinutes = (int) SystemSetting::getVal('fee_waiver_delay_minutes', 5);
+        $delayMinutes = (int) SystemSetting::getVal('admission_fee_waiver_delay_minutes', 5);
         $application->update(['waiver_requested_at' => now()]);
 
         ProcessFeeWaiverJob::dispatch($application->id)
