@@ -47,6 +47,7 @@ class DynamicTemplateMail extends Mailable
     {
         return new Content(
             htmlString: $this->contentHtml,
+            textString: strip_tags(str_replace(['<br>', '</div>', '</p>'], "\n", $this->contentHtml))
         );
     }
 

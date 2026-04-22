@@ -138,12 +138,17 @@ class CommunicationService
             $fallbackUser = \App\Models\SystemSetting::getVal('mail_username', env('MAIL_USERNAME'));
             $fromAddress  = \App\Models\SystemSetting::getVal('mail_from_address', env('MAIL_FROM_ADDRESS'));
 
-            // Anti-Spam: Force From to match Username if from is generic or missing (Avoids 550 Spam Error)
-            if (empty($fromAddress) || $fromAddress === 'hello@example.com') {
+            // 🛡️ CRITICAL SECURITY REASON: 
+            // Most SMTP servers (like yours) will reject emails (550 Spam) 
+            // if the 'From' address (academic@...) does NOT match the 
+            // authenticated 'User' (noreply@...). 
+            // We are now FORCING them to match to ensure delivery success.
+            if ($fromAddress !== $fallbackUser) {
+                \Illuminate\Support\Facades\Log::warning("⚠️ SMTP Identity Mismatch detected. Forcing From [{$fromAddress}] to match Auth User [{$fallbackUser}] to bypass 550 Spam block.");
                 $fromAddress = $fallbackUser;
             }
 
-            \Illuminate\Support\Facades\Log::info("Using system fallback SMTP: {$fallbackHost}. From identity: {$fromAddress}");
+            \Illuminate\Support\Facades\Log::info("Using system fallback SMTP: {$fallbackHost}. Final Resolved Identity: {$fromAddress}");
             
             // Fallback to institutional settings or system default
             config([
@@ -155,6 +160,7 @@ class CommunicationService
                 'mail.mailers.smtp.password' => \App\Models\SystemSetting::getVal('mail_password', env('MAIL_PASSWORD')),
                 'mail.mailers.smtp.scheme' => null,
                 'mail.mailers.smtp.url' => null,
+                'mail.mailers.smtp.local_domain' => parse_url(SystemSetting::getVal('institutional_url', 'learnforthuniversity.com'), PHP_URL_HOST) ?? 'learnforthuniversity.com',
                 'mail.from.address' => $fromAddress,
                 'mail.from.name' => \App\Models\SystemSetting::getVal('mail_from_name', env('MAIL_FROM_NAME', 'MyLMS')),
             ]);
