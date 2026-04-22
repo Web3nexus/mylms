@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 import { 
   Clock, 
   CheckCircle, 
@@ -113,6 +114,8 @@ export default function AssessmentPlayer() {
     setAnswers({ ...answers, [questionId]: answer });
   };
 
+  const { notify } = useNotificationStore();
+
   const handleSubmit = async () => {
     if (submitted) return;
     if (timerRef.current) clearInterval(timerRef.current);
@@ -124,8 +127,10 @@ export default function AssessmentPlayer() {
       });
       setResult(res.data);
       setSubmitted(true);
+      notify("Academic Registry: Assessment protocol synchronized successfully.", "success");
     } catch (err) {
       console.error('Submission failed:', err);
+      notify("Academic Registry: Failed to transmit submission protocol.", "error");
     } finally {
       setLoading(false);
     }
@@ -148,8 +153,9 @@ export default function AssessmentPlayer() {
       });
       setResult(res.data);
       setSubmitted(true);
+      notify("Academic Registry: File submission synchronized successfully.", "success");
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Upload protocol failed');
+      notify(err.response?.data?.message || 'Proctoring Protocol: Upload failure.', "error");
     } finally {
       setUploading(false);
     }

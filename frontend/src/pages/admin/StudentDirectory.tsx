@@ -14,6 +14,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 import client from '../../api/client';
 import { Link } from 'react-router-dom';
 
@@ -128,9 +129,20 @@ export default function StudentDirectory() {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
+  const { confirm, notify } = useNotificationStore();
+
   const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
-    if (!confirm(`Are you sure you want to permanently delete ${selectedIds.length} student(s)? This action cannot be undone.`)) return;
+    
+    const confirmed = await confirm({
+      title: 'Decommission Student Records',
+      message: `Are you sure you want to permanently delete ${selectedIds.length} candidate(s)? This action will purge all associated academic history from the institutional registry.`,
+      confirmText: 'Purge Records',
+      cancelText: 'Abort Protocol',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
 
     setDeleting(true);
     try {
@@ -138,7 +150,7 @@ export default function StudentDirectory() {
       setSelectedIds([]);
       fetchStudents(currentPage);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete selected students.');
+      notify(err.response?.data?.message || 'Institutional Registry: Failed to purge selected candidate records.', 'error');
     } finally {
       setDeleting(false);
     }

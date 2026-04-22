@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface StaffMember {
   id: number;
@@ -54,24 +55,33 @@ export default function AdminStaffDirectory() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await client.post('/admin/staff', formData, { headers });
-      setShowModal(false);
-      setFormData({ name: '', email: '', password: 'Password123!', role: 'instructor' });
       fetchStaff();
+      notify("Personnel Registry: Staff member successfully onboarded.", "success");
     } catch (err) {
       console.error('Error creating staff:', err);
-      alert('Failed to onboard personnel. Please check credentials.');
+      notify('Personnel Registry Error: Failed to onboard personnel. Please verify institutional credentials.', "error");
     }
   };
 
+  const { confirm, notify } = useNotificationStore();
+
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to purge this staff record? This action is irreversible.')) return;
+    const confirmed = await confirm({
+      title: 'Purge Personnel Record',
+      message: 'Are you sure you want to permanently remove this staff member from the institutional registry? This action is irreversible and will revoke all access immediately.',
+      confirmText: 'Purge Record',
+      cancelText: 'Abort Protocol',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
     try {
       await client.delete(`/admin/staff/${id}`, { headers });
+      notify("Personnel Registry: Record successfully purged.", "success");
       fetchStaff();
     } catch (err) {
       console.error('Error deleting staff:', err);
-      alert('Failed to purge record.');
+      notify('Personnel Registry Error: Failed to purge record.', "error");
     }
   };
 

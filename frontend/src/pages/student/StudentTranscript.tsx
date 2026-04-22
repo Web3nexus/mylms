@@ -9,6 +9,7 @@ import {
   Bell
 } from 'lucide-react';
 import { useBranding } from '../../hooks/useBranding';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface CourseRecord {
   course_id: number;
@@ -73,9 +74,11 @@ export default function StudentTranscript() {
       link.remove();
     } catch (err) {
       console.error('Failed to download transcript:', err);
-      alert('Institutional Registry: Failed to generate your official transcript at this time.');
+      notify('Institutional Registry: Failed to generate your official transcript at this time.', 'error');
     }
   };
+
+  const { notify } = useNotificationStore();
 
   if (loading) {
     return (

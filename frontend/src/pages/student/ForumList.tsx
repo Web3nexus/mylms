@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Volume2
 } from 'lucide-react';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface Forum {
   id: number;
@@ -86,6 +87,8 @@ export default function ForumList() {
     }
   };
 
+  const { notify } = useNotificationStore();
+
   const handleCreateTopic = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeForum) return;
@@ -97,10 +100,11 @@ export default function ForumList() {
       setNewTitle('');
       setNewContent('');
       setShowCreateTopic(false);
+      notify("Institutional Discourse: Topic initialized and published to the academic registry.", "success");
       fetchTopics(activeForum.id);
     } catch (err) {
        console.error('Failed to create topic:', err);
-       alert('Institutional Registry Error: Failed to publish discussion topic.');
+       notify('Institutional Registry Error: Failed to publish discussion topic protocol.', "error");
     }
   };
 

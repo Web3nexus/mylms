@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 import { 
   ArrowLeft, 
   MessageCircle, 
@@ -70,6 +71,8 @@ export default function TopicViewer() {
     }
   };
 
+  const { confirm, notify } = useNotificationStore();
+
   const handleReply = async (parentId: number | null = null) => {
     if (!replyContent.trim()) return;
     try {
@@ -79,20 +82,31 @@ export default function TopicViewer() {
       }, { headers });
       setReplyContent('');
       setReplyingTo(null);
+      notify("Institutional Discourse: Contribution published successfully.", "success");
       fetchTopicData();
     } catch (err) {
       console.error('Reply failed:', err);
-      alert('Institutional Registry: Failed to publish reply.');
+      notify('Institutional Registry: Failed to publish reply protocol.', "error");
     }
   };
 
   const handleDeletePost = async (postId: number) => {
-    if (!confirm('Institutional Cleanup Protocol: Confirm content removal?')) return;
+    const confirmed = await confirm({
+      title: 'Institutional Cleanup Protocol',
+      message: 'Are you sure you want to permanently remove this content from the academic registry? This action will purge the data from all active caches.',
+      confirmText: 'Purge Content',
+      cancelText: 'Retain Post',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
     try {
       await client.delete(`/posts/${postId}`, { headers });
+      notify("Content purged from discouse history.", "success");
       fetchTopicData();
     } catch (err) {
       console.error('Delete failed:', err);
+      notify("Cleanup protocol execution failure.", "error");
     }
   };
 

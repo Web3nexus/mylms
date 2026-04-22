@@ -23,6 +23,7 @@ import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 import { useBranding } from '../../hooks/useBranding';
 import RegistryError from '../../components/layout/RegistryError';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface Faculty {
   id: number;
@@ -131,10 +132,12 @@ export function AdmissionFormWidget() {
     });
   };
 
+  const { notify } = useNotificationStore();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!files.transcript || !files.id_proof) {
-      alert('Please upload all required documents.');
+      notify('Evidence Identity Error: Please upload all required documents to the registry.', 'error');
       return;
     }
 
@@ -160,9 +163,10 @@ export function AdmissionFormWidget() {
         }
       });
       setApplication(res.data.application);
+      notify("Admissions Registry: Candidacy protocol transmitted successfully.", "success");
       setStep(5); // Move to payment
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Submission failed');
+      notify(err.response?.data?.message || 'Academic Registry: Submission protocol failed.', 'error');
     } finally {
       setLoading(false);
     }
@@ -180,7 +184,7 @@ export function AdmissionFormWidget() {
       window.location.href = res.data.checkout_url;
     } catch (err) {
       console.error('Payment Init Error:', err);
-      alert('Failed to initialize secure payment protocol.');
+      notify('Financial Security: Failed to initialize secure payment protocol.', 'error');
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@ import { config } from "../../cms/puck.config";
 import client from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { useNotificationStore } from "../../store/useNotificationStore";
 
 export default function LandingEditor() {
   const { slug } = useParams();
@@ -15,6 +16,7 @@ export default function LandingEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [pageId, setPageId] = useState<number | null>(null);
+  const { notify } = useNotificationStore();
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -28,7 +30,7 @@ export default function LandingEditor() {
         setPageId(res.data.id);
       } catch (err) {
         console.error("Error fetching CMS page:", err);
-        alert("The Requested Page Protocol could not be synchronized.");
+        notify("The Requested Page Protocol could not be synchronized.", "error");
         navigate('/admin/pages');
       } finally {
         setLoading(false);
@@ -47,10 +49,10 @@ export default function LandingEditor() {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert("Page successfully synchronized with the Registry.");
+      notify("Institutional Registry: Content synchronized successfully.", "success");
     } catch (err) {
       console.error("Save failure:", err);
-      alert("Failed to synchronize layout.");
+      notify("Failed to synchronize layout with the central registry.", "error");
     } finally {
       setSaving(false);
     }

@@ -23,17 +23,18 @@ class CommunicationService
             if ($templateSlug === 'otp_verification') {
                 $template = EmailTemplate::create([
                     'slug' => 'otp_verification',
-                    'subject' => '👋 Welcome! Your verification code is here',
+                    'subject' => 'Security Protocol: Your Verification Code',
                     'category' => 'system',
                     'placeholders' => '["student_name", "otp_code", "campus_name"]',
                     'content_html' => '
                         <div style="font-family: sans-serif; padding: 40px; color: #333; max-width: 600px; margin: auto; border: 1px solid #f0f0f0; border-radius: 30px;">
-                            <h2 style="color: #4c1d95;">We\'re so glad you\'re here!</h2>
-                            <p>Hi {{student_name}}, welcome to the family. To get started at <strong>{{campus_name}}</strong>, please use the code below:</p>
+                            <h2 style="color: #4c1d95;">Security Verification</h2>
+                            <p>Hello {{student_name}},</p>
+                            <p>To finalize your access to the <strong>{{campus_name}}</strong> institutional portal, please use the following security code:</p>
                             <div style="font-size: 42px; font-weight: bold; margin: 30px 0; color: #4c1d95; letter-spacing: 10px; text-align: center; background: #f8fafc; padding: 30px; border-radius: 20px;">
                                 {{otp_code}}
                             </div>
-                            <p style="font-size: 12px; color: #777; text-align: center;">This code expires in 15 minutes. See you inside!</p>
+                            <p style="font-size: 12px; color: #777; text-align: center;">This code is valid for 15 minutes. If you did not request this code, please contact the IT Service Desk.</p>
                         </div>'
                 ]);
             } else {
@@ -121,6 +122,13 @@ class CommunicationService
             \Illuminate\Support\Facades\Log::info("Configuring institutional SMTP for category [{$category}]: {$account->host}");
             
             $fromAddress = !empty($account->from_address) ? $account->from_address : $account->username;
+
+            // 🛡️ SMTP Identity Hardening:
+            // Ensure From address matches authenticated user to bypass strict SPF/Anti-Spam filters.
+            if ($fromAddress !== $account->username) {
+                \Illuminate\Support\Facades\Log::warning("⚠️ Primary SMTP Identity Mismatch. Overriding [{$fromAddress}] with [{$account->username}] for stability.");
+                $fromAddress = $account->username;
+            }
 
             config([
                 'mail.default' => 'smtp',

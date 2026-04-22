@@ -11,6 +11,7 @@ import {
   Send,
   Info
 } from 'lucide-react';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface RubricCriterion {
   id: number;
@@ -71,6 +72,8 @@ export default function PeerReviewPlayer() {
     }
   };
 
+  const { notify } = useNotificationStore();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting || (review && review.status === 'completed')) return;
@@ -80,9 +83,10 @@ export default function PeerReviewPlayer() {
       await client.post(`/peer-reviews/${reviewId}/submit`, { score, feedback }, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      notify("Academic Registry: Peer audit protocol synchronized successfully.", "success");
       navigate('/campus/peer-reviews');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Submission protocol failed');
+      notify(err.response?.data?.message || 'Academic Registry: Submission protocol failure.', "error");
     } finally {
       setSubmitting(false);
     }

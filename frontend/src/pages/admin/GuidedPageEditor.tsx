@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import client from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
+import { useNotificationStore } from "../../store/useNotificationStore";
 
 export default function GuidedPageEditor() {
   const { slug } = useParams();
@@ -21,6 +22,7 @@ export default function GuidedPageEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const { notify } = useNotificationStore();
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -62,9 +64,10 @@ export default function GuidedPageEditor() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSaveSuccess(true);
+      notify("Institutional Registry: Content synchronized successfully.", "success");
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
-      alert("Failed to save changes to the registry.");
+      notify("Institutional Registry Error: Failed to synchronize changes.", "error");
     } finally {
       setSaving(false);
     }

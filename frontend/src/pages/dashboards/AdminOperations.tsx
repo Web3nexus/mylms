@@ -18,10 +18,12 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { useBranding } from '../../hooks/useBranding';
 import client from '../../api/client';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 export default function AdminOperations() {
   const { token } = useAuthStore();
   const { branding, loading: brandingLoading } = useBranding();
+  const { notify } = useNotificationStore();
   const headers = { Authorization: `Bearer ${token}` };
   
   const [metrics, setMetrics] = useState({
@@ -244,9 +246,10 @@ export default function AdminOperations() {
                         const newState = !branding?.admissions_enabled;
                         try {
                            await client.patch('/branding', { admissions_enabled: newState }, { headers });
-                           window.location.reload(); // Refresh to sync branding state
+                           notify(`Institutional Control: Admissions protocol successfully ${newState ? 'activated' : 'deactivated'}.`, "success");
+                           setTimeout(() => window.location.reload(), 1000); // Small delay for the toast to be seen
                         } catch (err) {
-                           alert('Control Protocol Failed');
+                           notify('Control Protocol Failed: Unauthorized system override attempted.', "error");
                         }
                      }}
                      className={`relative w-20 h-10 rounded-full transition-all duration-500 shadow-lg ${branding?.admissions_enabled ? 'bg-green-500 ring-4 ring-green-100' : 'bg-mylms-rose ring-4 ring-mylms-rose/10'}`}

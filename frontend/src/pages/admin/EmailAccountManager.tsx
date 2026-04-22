@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Activity
 } from 'lucide-react';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface MailAccount {
   id?: number;
@@ -30,7 +31,7 @@ export default function EmailAccountManager() {
   const [accounts, setAccounts] = useState<MailAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [notif, setNotif] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const { notify, confirm } = useNotificationStore();
 
   useEffect(() => {
     fetchAccounts();
@@ -72,17 +73,16 @@ export default function EmailAccountManager() {
 
   const handleSave = async (account: MailAccount) => {
     setSaving(true);
-    setNotif(null);
     try {
       if (account.id) {
         await client.put(`/admin/mail-accounts/${account.id}`, account);
       } else {
         await client.post('/admin/mail-accounts', account);
       }
-      setNotif({ type: 'success', message: 'SMTP Gateway updated successfully.' });
+      notify('Institutional Communication: SMTP Gateway synchronized successfully.', 'success');
       fetchAccounts();
     } catch (err: any) {
-      setNotif({ type: 'error', message: err.response?.data?.message || 'Failed to update gateway.' });
+      notify(err.response?.data?.message || 'Gateway Protocol Failure: Unable to synchronize SMTP settings.', 'error');
     } finally {
       setSaving(false);
     }
@@ -96,14 +96,22 @@ export default function EmailAccountManager() {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this SMTP configuration?')) return;
+    const confirmed = await confirm({
+      title: 'Decommission SMTP Gateway',
+      message: `Are you sure you want to permanently remove this SMTP configuration? This will impact all communications routed through the "${account.category}" channel.`,
+      confirmText: 'Purge Gateway',
+      cancelText: 'Maintain Setup',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
 
     try {
       await client.delete(`/admin/mail-accounts/${account.id}`);
-      setNotif({ type: 'success', message: 'SMTP Gateway removed.' });
+      notify('Institutional Communication: SMTP Gateway decommissioned.', 'success');
       fetchAccounts();
     } catch (err) {
-      setNotif({ type: 'error', message: 'Failed to delete gateway.' });
+      notify('Gateway Protocol Failure: Unable to purge configuration.', 'error');
     }
   };
 
@@ -135,13 +143,7 @@ export default function EmailAccountManager() {
           </button>
         </div>
 
-        {notif && (
-          <div className={`mb-12 p-6 rounded-3xl border flex items-center gap-6 animate-in slide-in-from-top-4 duration-500 ${notif.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-mylms-rose/5 border-mylms-rose/20 text-mylms-rose'}`}>
-            {notif.type === 'success' ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
-            <p className="text-xs font-black uppercase tracking-widest">{notif.message}</p>
-            <button onClick={() => setNotif(null)} className="ml-auto opacity-50 hover:opacity-100 transition-opacity">✕</button>
-          </div>
-        )}
+
 
         <div className="space-y-8">
           {accounts.map((account, idx) => (

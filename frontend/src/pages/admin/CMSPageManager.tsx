@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import client from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
+import { useNotificationStore } from "../../store/useNotificationStore";
 
 interface CMSPage {
   id: number;
@@ -45,6 +46,8 @@ export default function CMSPageManager() {
     fetchPages();
   }, [token]);
 
+  const { confirm, notify } = useNotificationStore();
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -53,21 +56,31 @@ export default function CMSPageManager() {
       });
       setShowCreateModal(false);
       setNewPage({ title: "", slug: "" });
+      notify("Institutional page protocol initialized successfully.", "success");
       fetchPages();
     } catch (err) {
-      alert("Failed to create page registry entry.");
+      notify("Failed to create page registry entry.", "error");
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to decommission this page?")) return;
+    const confirmed = await confirm({
+      title: 'Decommission Page Protocol',
+      message: 'Are you sure you want to permanently decommission this page? This action will remove the content from the live registry and update all routing tables.',
+      confirmText: 'Purge Page',
+      cancelText: 'Abort Protocol',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
     try {
       await client.delete(`/admin/pages/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      notify("Page successfully decommissioned.", "success");
       fetchPages();
     } catch (err) {
-      alert("Decommissioning failed.");
+      notify("Decommissioning protocol failed.", "error");
     }
   };
 
@@ -78,9 +91,10 @@ export default function CMSPageManager() {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      notify(`Publication status synchronized: ${!page.is_published ? 'Live' : 'Draft'}`, 'success');
       fetchPages();
     } catch (err) {
-      alert("Failed to update publication status.");
+      notify("Field synchronization failure.", "error");
     }
   };
 

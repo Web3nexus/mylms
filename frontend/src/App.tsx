@@ -38,6 +38,7 @@ import { useAuthStore } from './store/authStore'
 import client from './api/client'
 import ProtectedRoute from './components/ProtectedRoute'
 import NotificationDropdown from './components/NotificationDropdown'
+import { NotificationProvider } from './components/NotificationProvider'
 
 // Base Pages
 import Login from './pages/Login'
@@ -387,78 +388,80 @@ function App() {
   }, [branding?.favicon_url]);
 
   return (
-    <MainLayout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/office" element={<Login />} />
-        <Route path="/securegate" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/verify" element={<PublicVerification />} />
-        
-        <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
+    <NotificationProvider>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/office" element={<Login />} />
+          <Route path="/securegate" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/verify" element={<PublicVerification />} />
+          
+          <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
 
-        <Route element={<ProtectedRoute roles={['student']} />}>
-          <Route path="/portal" element={user?.student_id ? <StudentPortal /> : <Navigate to="/apply/dashboard" replace />} />
-          <Route path="/apply/dashboard" element={<AdmissionDashboard />} />
-          <Route path="/apply/wizard" element={<AdmissionWizard />} />
-          <Route path="/register-courses" element={<CourseRegistrationPage />} />
-          <Route path="/transcript" element={<StudentTranscript />} />
-          <Route path="/billing" element={<StudentBillingPortal />} />
-          <Route path="/portal/forms" element={<SelfServiceForms />} />
-          <Route path="/portal/links" element={<UsefulLinks />} />
-          <Route path="/scholarships" element={<ScholarshipDirectory />} />
-          <Route path="/payment/success" element={<PaymentSuccess />} />
-          <Route path="/payment/failed" element={<PaymentFailed />} />
-        </Route>
+          <Route element={<ProtectedRoute roles={['student']} />}>
+            <Route path="/portal" element={user?.student_id ? <StudentPortal /> : <Navigate to="/apply/dashboard" replace />} />
+            <Route path="/apply/dashboard" element={<AdmissionDashboard />} />
+            <Route path="/apply/wizard" element={<AdmissionWizard />} />
+            <Route path="/register-courses" element={<CourseRegistrationPage />} />
+            <Route path="/transcript" element={<StudentTranscript />} />
+            <Route path="/billing" element={<StudentBillingPortal />} />
+            <Route path="/portal/forms" element={<SelfServiceForms />} />
+            <Route path="/portal/links" element={<UsefulLinks />} />
+            <Route path="/scholarships" element={<ScholarshipDirectory />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/failed" element={<PaymentFailed />} />
+          </Route>
 
-        <Route element={<ProtectedRoute roles={['student']} />}>
-          <Route path="/campus" element={<StudentCampus />} />
-          <Route path="/campus/calendar" element={<CampusCalendar />} />
-          <Route path="/campus/peer-reviews" element={<PeerReviewList />} />
-          <Route path="/peer-reviews/:reviewId" element={<PeerReviewPlayer />} />
-          <Route path="/courses/:slug/lessons" element={<LessonViewer />} />
-          <Route path="/courses/:slug/lessons/:lessonSlug" element={<LessonViewer />} />
-          <Route path="/courses/:slug/forums" element={<ForumList />} />
-          <Route path="/forums/:forumId/topics/:topicId" element={<TopicViewer />} />
-          <Route path="/courses/:slug/certificate" element={<CourseCertificate />} />
-          <Route path="/assessments/:assessmentId" element={<AssessmentPlayer />} />
-        </Route>
- 
-        <Route element={<ProtectedRoute roles={['instructor']} />}>
-          <Route path="/office/portal" element={<InstructorRegistry />} />
-          <Route path="/courses/create" element={<CourseCreate />} />
-          <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
-          <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
-          <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
-          <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
-        </Route>
- 
-        <Route element={<ProtectedRoute roles={['admin']} />}>
-          <Route path="/admin/portal" element={<AdminOperations />} />
-          <Route path="/admin/academic" element={<AcademicManager />} />
-          <Route path="/admin/admissions" element={<AdmissionsReview />} />
-          <Route path="/admin/admissions/registry" element={<AdmissionRegistryManager />} />
-          <Route path="/admin/students" element={<StudentDirectory />} />
-          <Route path="/admin/staff" element={<AdminStaffDirectory />} />
-          <Route path="/admin/finance" element={<AdminFinanceDashboard />} />
-          <Route path="/admin/pages" element={<CMSPageManager />} />
-          <Route path="/admin/cms/edit/:slug" element={<LandingEditor />} />
-          <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />
-          <Route path="/branding" element={<BrandingManager />} />
-          <Route path="/admin/communications" element={<CommunicationManager />} />
-          <Route path="/admin/communications/templates" element={<EmailTemplateManager />} />
-          <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
-          <Route path="/admin/command-center" element={<CommandCenter />} />
-        </Route>
-        
-        <Route path="/:slug" element={<PublicPage />} />
-        <Route path="/p/:slug" element={<PublicPage />} />
-      </Routes>
-    </MainLayout>
+          <Route element={<ProtectedRoute roles={['student']} />}>
+            <Route path="/campus" element={<StudentCampus />} />
+            <Route path="/campus/calendar" element={<CampusCalendar />} />
+            <Route path="/campus/peer-reviews" element={<PeerReviewList />} />
+            <Route path="/peer-reviews/:reviewId" element={<PeerReviewPlayer />} />
+            <Route path="/courses/:slug/lessons" element={<LessonViewer />} />
+            <Route path="/courses/:slug/lessons/:lessonSlug" element={<LessonViewer />} />
+            <Route path="/courses/:slug/forums" element={<ForumList />} />
+            <Route path="/forums/:forumId/topics/:topicId" element={<TopicViewer />} />
+            <Route path="/courses/:slug/certificate" element={<CourseCertificate />} />
+            <Route path="/assessments/:assessmentId" element={<AssessmentPlayer />} />
+          </Route>
+   
+          <Route element={<ProtectedRoute roles={['instructor']} />}>
+            <Route path="/office/portal" element={<InstructorRegistry />} />
+            <Route path="/courses/create" element={<CourseCreate />} />
+            <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
+            <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
+            <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
+            <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
+          </Route>
+   
+          <Route element={<ProtectedRoute roles={['admin']} />}>
+            <Route path="/admin/portal" element={<AdminOperations />} />
+            <Route path="/admin/academic" element={<AcademicManager />} />
+            <Route path="/admin/admissions" element={<AdmissionsReview />} />
+            <Route path="/admin/admissions/registry" element={<AdmissionRegistryManager />} />
+            <Route path="/admin/students" element={<StudentDirectory />} />
+            <Route path="/admin/staff" element={<AdminStaffDirectory />} />
+            <Route path="/admin/finance" element={<AdminFinanceDashboard />} />
+            <Route path="/admin/pages" element={<CMSPageManager />} />
+            <Route path="/admin/cms/edit/:slug" element={<LandingEditor />} />
+            <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />
+            <Route path="/branding" element={<BrandingManager />} />
+            <Route path="/admin/communications" element={<CommunicationManager />} />
+            <Route path="/admin/communications/templates" element={<EmailTemplateManager />} />
+            <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
+            <Route path="/admin/command-center" element={<CommandCenter />} />
+          </Route>
+          
+          <Route path="/:slug" element={<PublicPage />} />
+          <Route path="/p/:slug" element={<PublicPage />} />
+        </Routes>
+      </MainLayout>
+    </NotificationProvider>
   )
 }
 

@@ -20,6 +20,7 @@ import {
   History,
   Menu
 } from 'lucide-react';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface Lesson {
   id: number;
@@ -116,6 +117,8 @@ export default function LessonViewer() {
     }
   };
 
+  const { notify } = useNotificationStore();
+
   const saveNotes = async (content: string) => {
     if (!currentLesson) return;
     
@@ -127,6 +130,7 @@ export default function LessonViewer() {
       setLastSaved(new Date());
     } catch (err) {
       console.error('Error saving notes:', err);
+      notify("Registry Error: Failed to secure observation log.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -154,7 +158,7 @@ export default function LessonViewer() {
       if (err.response?.status === 409) {
         navigate(`/courses/${course.slug}/certificate`);
       } else {
-        alert(err.response?.data?.message || 'Failed to claim certificate');
+        notify(err.response?.data?.message || 'Academic Registry: Failed to claim unit credential.', 'error');
       }
     } finally {
       setClaimingCert(false);

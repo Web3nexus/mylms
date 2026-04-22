@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface Rubric {
   id: number;
@@ -98,17 +99,27 @@ export default function AssessmentCreator() {
     }
   };
 
+  const { confirm, notify } = useNotificationStore();
+
   const handleAllocatePeers = async (assessmentId: number) => {
-     if (!window.confirm("Initialize peer assessment allocation for all current submissions?")) return;
+     const confirmed = await confirm({
+        title: 'Neural Allocation Protocol',
+        message: 'This will distribute all submitted assignments to peers for evaluation. Once initialized, the allocation logic is finalized.',
+        confirmText: 'Initialize Allocation',
+        cancelText: 'Abort Protocol',
+        type: 'info'
+     });
+
+     if (!confirmed) return;
      
      setAllocating(assessmentId);
      try {
         await client.post(`/assessments/${assessmentId}/allocate-peers`, { reviews_per_student: 3 }, {
            headers: { Authorization: `Bearer ${token}` }
         });
-        alert("Peer allocation successful.");
+        notify("Peer allocation successfully initialized.", "success");
      } catch (err: any) {
-        alert(err.response?.data?.message || "Allocation failed");
+        notify(err.response?.data?.message || "Allocation protocol failure.", "error");
      } finally {
         setAllocating(null);
      }
@@ -147,7 +158,7 @@ export default function AssessmentCreator() {
       
     } catch (err: any) {
       console.error('Error generating AI assessment:', err);
-      alert(err.response?.data?.error || err.message || 'Error generating assessment');
+      notify(err.response?.data?.error || err.message || 'Question synthesis failed.', 'error');
     } finally {
       setAiGenerating(false);
     }

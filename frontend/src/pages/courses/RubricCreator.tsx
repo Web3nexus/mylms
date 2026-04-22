@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 import { 
   Plus, 
   Trash2, 
@@ -86,12 +87,22 @@ export default function RubricCreator() {
       fetchCourseAndRubrics();
     } catch (err) {
       console.error('Error adding rubric:', err);
-      alert('Failed to register rubric protocol.');
+      notify('Institutional Registry: Failed to register rubric protocol.', 'error');
     }
   };
 
+  const { confirm, notify } = useNotificationStore();
+
   const handleDeleteSubric = async (id: number) => {
-    if (!window.confirm("Permanent deletion of this rubric registry?")) return;
+    const confirmed = await confirm({
+      title: 'Decommission Grading Schema',
+      message: 'Are you sure you want to permanently delete this rubric registry? This action will impact all existing assessments using this schema and cannot be undone.',
+      confirmText: 'Purge Schema',
+      cancelText: 'Retain Protocol',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
     try {
       await client.delete(`/rubrics/${id}`, {
         headers: { Authorization: `Bearer ${token}` }

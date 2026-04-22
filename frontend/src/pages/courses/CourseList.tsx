@@ -21,6 +21,7 @@ import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 import RegistryError from '../../components/layout/RegistryError';
 import { useBranding } from '../../hooks/useBranding';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface Course {
   id: number;
@@ -80,6 +81,8 @@ export function CourseCatalogWidget() {
     }
   };
 
+  const { notify } = useNotificationStore();
+
   const handleEnroll = async (courseId: number, courseSlug: string) => {
     if (!user) {
       navigate('/login');
@@ -89,12 +92,13 @@ export function CourseCatalogWidget() {
       await client.post(`/courses/${courseId}/enroll`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      notify("Academic Registry: Enrollment protocol synchronized successfully.", "success");
       navigate(`/courses/${courseSlug}/lessons`);
     } catch (err: any) {
       if (err.response?.status === 400) {
         navigate(`/courses/${courseSlug}/lessons`);
       } else {
-        alert('Failed to enroll in course. Please try again.');
+        notify('Academic Registry: Failed to synchronize enrollment protocol. Please re-authenticate.', 'error');
       }
     }
   };

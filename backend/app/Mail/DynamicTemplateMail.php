@@ -46,8 +46,10 @@ class DynamicTemplateMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            htmlString: $this->contentHtml,
-            textString: strip_tags(str_replace(['<br>', '</div>', '</p>'], "\n", $this->contentHtml))
+            view: 'emails.dynamic',
+            with: [
+                'contentHtml' => $this->contentHtml,
+            ],
         );
     }
 

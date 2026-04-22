@@ -11,6 +11,7 @@ import {
   Layers,
   CreditCard
 } from 'lucide-react';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface User {
   id: number;
@@ -80,6 +81,8 @@ export default function AdminFinanceDashboard() {
     }
   };
 
+  const { notify } = useNotificationStore();
+
   const handleGenerateInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     setGenerating(true);
@@ -92,10 +95,11 @@ export default function AdminFinanceDashboard() {
       setShowGenerateModal(false);
       setTargetUserId('');
       setTargetSemesterId('');
+      notify("Financial Registry: Invoice successfully provisioned for the requested scholar.", "success");
       fetchDashboard();
     } catch (err: any) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to generate invoice.');
+      notify(err.response?.data?.message || 'Financial Registry: Failed to authorize invoice provision.', "error");
     } finally {
       setGenerating(false);
     }
