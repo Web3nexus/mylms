@@ -130,26 +130,26 @@ export default function PaymentSettings() {
 
            <div className={`space-y-8 relative z-10 transition-all ${!settings.paystack_enabled ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
               <div className="space-y-3">
-                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                    Public Key <Info size={12} className="opacity-50" />
+                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    Public Key <Info size={12} className="opacity-70" />
                  </label>
                  <input 
                    type="text" 
                    value={settings.paystack_public_key}
                    onChange={e => setSettings({...settings, paystack_public_key: e.target.value})}
                    placeholder="pk_live_..."
-                   className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-blue-500 transition-all font-mono text-xs"
+                   className="w-full p-5 bg-white border border-gray-200 rounded-2xl outline-none focus:border-blue-500 transition-all font-mono text-[13px] text-text-main shadow-sm"
                  />
               </div>
               <div className="space-y-3">
-                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Secret Key (Encrypted)</label>
+                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Secret Key (Encrypted)</label>
                  <div className="relative">
                     <input 
                       type={showSecrets['paystack'] ? 'text' : 'password'} 
                       value={settings.paystack_secret_key}
                       onChange={e => setSettings({...settings, paystack_secret_key: e.target.value})}
                       placeholder="sk_live_..."
-                      className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-blue-500 transition-all font-mono text-xs"
+                      className="w-full p-5 bg-white border border-gray-200 rounded-2xl outline-none focus:border-blue-500 transition-all font-mono text-[13px] text-text-main shadow-sm"
                     />
                     <button 
                       onClick={() => toggleSecret('paystack')}
@@ -185,24 +185,24 @@ export default function PaymentSettings() {
 
            <div className={`space-y-8 relative z-10 transition-all ${!settings.flutterwave_enabled ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
               <div className="space-y-3">
-                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Public Key</label>
+                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Public Key</label>
                  <input 
                    type="text" 
                    value={settings.flutterwave_public_key}
                    onChange={e => setSettings({...settings, flutterwave_public_key: e.target.value})}
                    placeholder="FLWPUBK_..."
-                   className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-xs"
+                   className="w-full p-5 bg-white border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-[13px] text-text-main shadow-sm"
                  />
               </div>
               <div className="space-y-3">
-                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Secret Key (Encrypted)</label>
+                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Secret Key (Encrypted)</label>
                  <div className="relative">
                     <input 
                       type={showSecrets['flutterwave'] ? 'text' : 'password'} 
                       value={settings.flutterwave_secret_key}
                       onChange={e => setSettings({...settings, flutterwave_secret_key: e.target.value})}
                       placeholder="FLWSECK_..."
-                      className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-xs"
+                      className="w-full p-5 bg-white border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-[13px] text-text-main shadow-sm"
                     />
                     <button 
                       onClick={() => toggleSecret('flutterwave')}
@@ -252,24 +252,24 @@ export default function PaymentSettings() {
               </div>
               <div className="space-y-8">
                  <div className="space-y-3">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Site Key (Public API)</label>
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Site Key (Public API)</label>
                     <input 
                       type="text" 
                       value={settings.turnstile_site_key}
                       onChange={e => setSettings({...settings, turnstile_site_key: e.target.value})}
                       placeholder="0x4AAAAAA..."
-                      className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-xs"
+                      className="w-full p-5 bg-white border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-[13px] text-text-main shadow-sm"
                     />
                  </div>
                  <div className="space-y-3">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Secret Key (Encrypted)</label>
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Secret Key (Encrypted)</label>
                     <div className="relative">
                        <input 
                          type={showSecrets['turnstile'] ? 'text' : 'password'} 
                          value={settings.turnstile_secret_key}
                          onChange={e => setSettings({...settings, turnstile_secret_key: e.target.value})}
                          placeholder="0x4AAAAAA..."
-                         className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-xs"
+                         className="w-full p-5 bg-white border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition-all font-mono text-[13px] text-text-main shadow-sm"
                        />
                        <button 
                          onClick={() => toggleSecret('turnstile')}
