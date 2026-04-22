@@ -23,17 +23,17 @@ class CommunicationService
             if ($templateSlug === 'otp_verification') {
                 $template = EmailTemplate::create([
                     'slug' => 'otp_verification',
-                    'subject' => 'Verification Code: {{otp_code}}',
+                    'subject' => '👋 Welcome! Your verification code is here',
                     'category' => 'system',
                     'placeholders' => '["student_name", "otp_code", "campus_name"]',
                     'content_html' => '
-                        <div style="font-family: sans-serif; padding: 20px; color: #333;">
-                            <p>Hello {{student_name}},</p>
-                            <p>Your verification code for <strong>{{campus_name}}</strong> is:</p>
-                            <div style="font-size: 32px; font-weight: bold; margin: 20px 0; color: #4c1d95; letter-spacing: 5px;">
+                        <div style="font-family: sans-serif; padding: 40px; color: #333; max-width: 600px; margin: auto; border: 1px solid #f0f0f0; border-radius: 30px;">
+                            <h2 style="color: #4c1d95;">We\'re so glad you\'re here!</h2>
+                            <p>Hi {{student_name}}, welcome to the family. To get started at <strong>{{campus_name}}</strong>, please use the code below:</p>
+                            <div style="font-size: 42px; font-weight: bold; margin: 30px 0; color: #4c1d95; letter-spacing: 10px; text-align: center; background: #f8fafc; padding: 30px; border-radius: 20px;">
                                 {{otp_code}}
                             </div>
-                            <p style="font-size: 12px; color: #777;">This code expires in 15 minutes.</p>
+                            <p style="font-size: 12px; color: #777; text-align: center;">This code expires in 15 minutes. See you inside!</p>
                         </div>'
                 ]);
             } else {
