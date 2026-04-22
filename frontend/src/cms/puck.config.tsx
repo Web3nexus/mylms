@@ -58,7 +58,7 @@ const DualLogosStripInner = ({ leftTitle, leftLogos, rightTitle, rightLogos }: a
 };
 
 export type Props = {
-  Hero: { title: string; titleColor?: string; description: string; buttonText: string; buttonLink: string; bgImage?: string; variant: "default" | "split-gradient"; showOverlay?: boolean | string; overlayColor?: string; overlayOpacity?: number };
+  Hero: { title: string; titleColor?: string; description: string; buttonText: string; buttonLink: string; bgImage?: string; showBgImage?: string; variant: "default" | "split-gradient"; showOverlay?: boolean | string; overlayColor?: string; overlayOpacity?: number };
   DualLogosStrip: { leftTitle: string; leftLogos: { src: string; alt: string }[]; rightTitle: string; rightLogos: { src: string; alt: string }[] };
   ProgramGrid: { title: string; description: string; categories: { name: string; programs: { name: string; link: string }[] }[] };
   FeaturedHighlights: { title: string; items: { category: string; title: string; image: string; link: string }[] };
@@ -99,27 +99,30 @@ export const config: Config<Props> = {
         description: { type: "textarea" },
         buttonText: { type: "text" },
         buttonLink: { type: "text" },
+        showBgImage: { type: "select", options: [{ label: "Yes", value: "true" }, { label: "No", value: "false" }] },
         bgImage: { type: "text" },
         variant: {
-          type: "radio",
+          type: "select",
           options: [{ label: "Modern Purple", value: "default" }, { label: "Split Gradient Overlay", value: "split-gradient" }]
         },
-        showOverlay: { type: "radio", options: [{ label: "Enabled", value: "true" }, { label: "Disabled", value: "false" }] },
+        showOverlay: { type: "select", options: [{ label: "Yes", value: "true" }, { label: "No", value: "false" }] },
         overlayColor: { type: "text" },
         overlayOpacity: { type: "number" }
       },
-      render: ({ title, titleColor, description, buttonText, buttonLink, bgImage, variant, showOverlay = "true", overlayColor, overlayOpacity = 0.8 }) => {
+      render: ({ title, titleColor, description, buttonText, buttonLink, bgImage, showBgImage = "true", variant, showOverlay = "true", overlayColor, overlayOpacity = 0.8 }) => {
         const titleStyle = { fontSize: '42px', color: titleColor || "#C6C09A" };
         const overlayEnabled = showOverlay === "true" || showOverlay === true;
+        const imageEnabled = showBgImage === "true";
         const overlayStyle = overlayEnabled ? { 
-           backgroundColor: overlayColor || 'transparent', 
+           backgroundColor: overlayColor || undefined, 
+           backgroundImage: overlayColor ? 'none' : undefined,
            opacity: overlayOpacity 
         } : { display: 'none' };
 
         if (variant === "split-gradient") {
           return (
             <div className="relative min-h-[85vh] flex items-center pt-20">
-              {bgImage && (
+              {bgImage && imageEnabled && (
                 <div className="absolute inset-0 z-0">
                   <img src={bgImage} className="w-full h-full object-cover" alt="" />
                   <div 
@@ -140,7 +143,7 @@ export const config: Config<Props> = {
         }
         return (
           <div className="relative bg-mylms-purple min-h-[70vh] flex items-center justify-center text-center overflow-hidden">
-            {bgImage && (
+            {bgImage && imageEnabled && (
               <div className="absolute inset-0 opacity-40">
                 <img src={bgImage} className="w-full h-full object-cover" alt="" />
                 <div 
