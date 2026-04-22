@@ -19,11 +19,13 @@ import { useAuthStore } from '../../store/authStore';
 import { useBranding } from '../../hooks/useBranding';
 import client from '../../api/client';
 import { useNotificationStore } from '../../store/useNotificationStore';
+import { usePermissions } from '../../hooks/usePermissions';
 
 export default function AdminOperations() {
   const { token } = useAuthStore();
   const { branding, loading: brandingLoading } = useBranding();
   const { notify } = useNotificationStore();
+  const { hasPermission } = usePermissions();
   const headers = { Authorization: `Bearer ${token}` };
   
   const [metrics, setMetrics] = useState({
@@ -164,69 +166,83 @@ export default function AdminOperations() {
       </div>
 
       {/* High Fidelity Service Hub */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
-          <Link to="/admin/pages" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-rose hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-rose rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-rose group-hover:text-white transition-all duration-500 shadow-inner">
-                <Layers size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">CMS & Marketing</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Visual Page Builder & Content Strategy.</p>
-          </Link>
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+          {hasPermission('cms_marketing') && (
+            <Link to="/admin/pages" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-rose hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-rose rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-rose group-hover:text-white transition-all duration-500 shadow-inner">
+                  <Layers size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">CMS & Marketing</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Visual Page Builder & Content Strategy.</p>
+            </Link>
+          )}
 
-          <Link to="/admin/academic" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
-                <BookOpen size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Enrollment Management</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Curriculum Control & Session Management.</p>
-          </Link>
+          {hasPermission('academic_enrollment') && (
+            <Link to="/admin/academic" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
+                  <BookOpen size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Enrollment Management</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Curriculum Control & Session Management.</p>
+            </Link>
+          )}
 
-          <Link to="/admin/staff" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
-                <Users size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Staff Registry</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Faculty Hiring & Security Access Management.</p>
-          </Link>
+          {hasPermission('staff_registry') && (
+            <Link to="/admin/staff" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
+                  <Users size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Staff Registry</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Faculty Hiring & Security Access Management.</p>
+            </Link>
+          )}
 
-          <Link to="/admin/admissions" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
-                <Inbox size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Admissions</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Candidate Evaluation & Registry Sync.</p>
-          </Link>
+          {hasPermission('admissions_portal') && (
+            <Link to="/admin/admissions" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
+                  <Inbox size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Admissions</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Candidate Evaluation & Registry Sync.</p>
+            </Link>
+          )}
 
-          <Link to="/admin/finance" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
-                <CreditCard size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Bursary Desk</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Revenue Tracking & Payment Settlement.</p>
-          </Link>
+          {hasPermission('finance_bursary') && (
+            <Link to="/admin/finance" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
+                  <CreditCard size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Bursary Desk</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Revenue Tracking & Payment Settlement.</p>
+            </Link>
+          )}
 
-          <Link to="/admin/students" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
-                <GraduationCap size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Student Registry</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Student Directory & Matriculation Info.</p>
-          </Link>
+          {hasPermission('student_registry') && (
+            <Link to="/admin/students" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
+                  <GraduationCap size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Student Registry</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Student Directory & Matriculation Info.</p>
+            </Link>
+          )}
 
-          <Link to="/branding" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
-             <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-colors"></div>
-             <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
-                <Palette size={28} />
-             </div>
-             <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Brand Identity</h4>
-             <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Global Aesthetics & Footer Matrix.</p>
-          </Link>
+          {hasPermission('branding_identity') && (
+            <Link to="/branding" className="p-10 bg-white border border-border-soft rounded-2xl shadow-sm hover:border-mylms-purple hover:shadow-xl transition-all group relative overflow-hidden flex flex-col items-center text-center">
+               <div className="absolute top-0 right-0 w-12 h-12 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-colors"></div>
+               <div className="w-16 h-16 bg-offwhite text-mylms-purple rounded-2xl flex items-center justify-center mb-8 border border-gray-100 group-hover:bg-mylms-purple group-hover:text-white transition-all duration-500 shadow-inner">
+                  <Palette size={28} />
+               </div>
+               <h4 className="text-xl font-black text-text-main uppercase tracking-tighter mb-3 leading-none">Brand Identity</h4>
+               <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-loose">Global Aesthetics & Footer Matrix.</p>
+            </Link>
+          )}
       </div>
 
       <div className="mt-20 p-12 bg-white rounded-3xl border border-border-soft shadow-sm border-t-8 border-t-mylms-purple relative overflow-hidden group transition-all hover:border-mylms-purple/20">

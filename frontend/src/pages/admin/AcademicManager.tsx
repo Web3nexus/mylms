@@ -29,7 +29,8 @@ import {
   ToggleRight,
   Lock,
   Zap,
-  Activity
+  Activity,
+  Edit
 } from 'lucide-react';
 
 interface Program {
@@ -95,10 +96,11 @@ export default function AcademicManager() {
   
   const [modal, setModal] = useState<{
     isOpen: boolean;
-    mode: 'add_faculty' | 'add_department' | 'add_program' | 'delete' | null;
+    mode: 'add_faculty' | 'edit_faculty' | 'add_department' | 'edit_department' | 'add_program' | 'edit_program' | 'delete' | null;
     type?: 'faculty' | 'department' | 'program';
     targetId?: number | null;
     targetName?: string;
+    targetData?: any;
   }>({
     isOpen: false,
     mode: null,
@@ -197,6 +199,94 @@ export default function AcademicManager() {
         type: 'error',
         title: 'Registration Error',
         message: 'Could not Provision the new faculty at this time.'
+      });
+    }
+  };
+
+  const handleUpdateFaculty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modal.targetId) return;
+    try {
+      await client.put(`/admin/academic/faculties/${modal.targetId}`, newFaculty, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNewFaculty({ name: '', description: '' });
+      setModal({ isOpen: false, mode: null });
+      fetchStructure();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Faculty Updated',
+        message: 'The institutional record for this faculty has been updated.'
+      });
+    } catch (err) {
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Update Failure',
+        message: 'Could not commit changes to the registry.'
+      });
+    }
+  };
+
+  const handleUpdateDepartment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modal.targetId) return;
+    try {
+      await client.put(`/admin/academic/departments/${modal.targetId}`, {
+        ...newDept,
+        faculty_id: modal.targetData.faculty_id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNewDept({ name: '', code: '' });
+      setModal({ isOpen: false, mode: null });
+      fetchStructure();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Department Updated',
+        message: 'Departmental metadata has been successfully modified.'
+      });
+    } catch (err) {
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Sync Failure',
+        message: 'Institutional guardrails prevented this update.'
+      });
+    }
+  };
+
+  const handleUpdateProgram = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modal.targetId) return;
+    try {
+      await client.put(`/admin/academic/programs/${modal.targetId}`, {
+        ...newProg,
+        department_id: modal.targetData.department_id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNewProg({ 
+        name: '', degree_level: 'BSc', duration_years: 4, pricing_type: 'hybrid',
+        tuition_fee: '0', application_fee: '0', certificate_fee: '0',
+        is_scholarship_eligible: true, is_external: false, external_provider: ''
+      });
+      setModal({ isOpen: false, mode: null });
+      fetchStructure();
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Program Updated',
+        message: 'Academic program parameters have been synchronized.'
+      });
+    } catch (err) {
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Protocol Error',
+        message: 'Unable to update program definitions.'
       });
     }
   };
@@ -567,6 +657,16 @@ export default function AcademicManager() {
                       </div>
                        <div className="flex gap-4 z-10">
                           <button 
+                             onClick={() => {
+                               setNewFaculty({ name: faculty.name, description: faculty.description });
+                               setModal({ isOpen: true, mode: 'edit_faculty', targetId: faculty.id, targetName: faculty?.name });
+                             }}
+                             className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-purple transition-all rounded-lg shadow-sm"
+                             title="Edit Faculty"
+                           >
+                              <Edit size={18} />
+                           </button>
+                          <button 
                             onClick={() => {
                               setNewDept({ name: '', code: '' });
                               setModal({ isOpen: true, mode: 'add_department', targetId: faculty.id, targetName: faculty?.name });
@@ -601,12 +701,24 @@ export default function AcademicManager() {
                                           <Target size={14} className="text-mylms-rose" />
                                           <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
                                        </div>
-                                       <button 
-                                          onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'department', targetId: dept.id, targetName: dept?.name })}
-                                          className="text-gray-200 hover:text-mylms-rose transition-all p-2"
-                                       >
-                                          <Trash2 size={16} />
-                                       </button>
+                                       <div className="flex gap-2">
+                                           <button 
+                                              onClick={() => {
+                                                 setNewDept({ name: dept.name, code: dept.code });
+                                                 setModal({ isOpen: true, mode: 'edit_department', targetId: dept.id, targetName: dept?.name, targetData: { faculty_id: faculty.id } });
+                                              }}
+                                              className="text-gray-200 hover:text-mylms-purple transition-all p-2"
+                                              title="Edit Department"
+                                           >
+                                              <Edit size={16} />
+                                           </button>
+                                           <button 
+                                              onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'department', targetId: dept.id, targetName: dept?.name })}
+                                              className="text-gray-200 hover:text-mylms-rose transition-all p-2"
+                                           >
+                                              <Trash2 size={16} />
+                                           </button>
+                                        </div>
                                     </div>
                                     <h3 className="text-2xl font-black text-text-main group-hover:text-mylms-purple transition-colors leading-tight uppercase tracking-tighter">
                                        {dept?.name}
@@ -653,9 +765,16 @@ export default function AcademicManager() {
                                                 >
                                                    <Trash2 size={16} />
                                                 </button>
-                                                <button className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-purple transition-all rounded-xl shadow-sm" title="Program Settings">
-                                                   <ChevronRight size={18} />
-                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                       setNewProg({ ...program });
+                                                       setModal({ isOpen: true, mode: 'edit_program', targetId: program.id, targetName: program?.name, targetData: { department_id: dept.id } });
+                                                    }}
+                                                    className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-purple transition-all rounded-xl shadow-sm" 
+                                                    title="Edit Program"
+                                                 >
+                                                    <Edit size={16} />
+                                                 </button>
                                             </div>
                                         </div>
                                       ))
@@ -723,8 +842,11 @@ export default function AcademicManager() {
                   </div>
                   <h2 className="text-3xl font-black text-text-main uppercase tracking-tighter leading-tight mb-2">
                     {modal.mode === 'add_faculty' && 'Provision New Faculty'}
+                    {modal.mode === 'edit_faculty' && 'Edit Faculty Designation'}
                     {modal.mode === 'add_department' && 'Initialize Department'}
+                    {modal.mode === 'edit_department' && 'Edit Departmental Info'}
                     {modal.mode === 'add_program' && 'Define Program'}
+                    {modal.mode === 'edit_program' && 'Edit Program Parameters'}
                   </h2>
                   <p className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.5em] mb-12">
                     {modal.mode === 'add_faculty' && 'System Registry: Institutional Branch'}
@@ -734,10 +856,13 @@ export default function AcademicManager() {
 
                   <form onSubmit={
                     modal.mode === 'add_faculty' ? handleAddFaculty : 
+                    modal.mode === 'edit_faculty' ? handleUpdateFaculty :
                     modal.mode === 'add_department' ? handleAddDepartment : 
+                    modal.mode === 'edit_department' ? handleUpdateDepartment :
+                    modal.mode === 'edit_program' ? handleUpdateProgram :
                     handleAddProgram
                   } className="space-y-8">
-                    {modal.mode === 'add_faculty' && (
+                    {modal.mode === 'add_faculty' || modal.mode === 'edit_faculty' ? (
                       <div className="space-y-8">
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Official Designation</label>
@@ -748,9 +873,9 @@ export default function AcademicManager() {
                           <textarea value={newFaculty.description} onChange={e => setNewFaculty({...newFaculty, description: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight min-h-[120px]" placeholder="Brief mission statement..." />
                         </div>
                       </div>
-                    )}
+                    ) : null}
 
-                    {modal.mode === 'add_department' && (
+                    {modal.mode === 'add_department' || modal.mode === 'edit_department' ? (
                       <div className="space-y-8">
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Department Identifier</label>
@@ -761,9 +886,9 @@ export default function AcademicManager() {
                           <input required maxLength={4} value={newDept.code} onChange={e => setNewDept({...newDept, code: e.target.value.toUpperCase()})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-rose shadow-inner font-black text-sm uppercase tracking-[0.2em]" placeholder="PHYS" />
                         </div>
                       </div>
-                    )}
+                    ) : null}
 
-                    {modal.mode === 'add_program' && (
+                    {modal.mode === 'add_program' || modal.mode === 'edit_program' ? (
                       <div className="space-y-8">
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="md:col-span-2">
@@ -833,12 +958,14 @@ export default function AcademicManager() {
                             )}
                          </div>
                       </div>
-                    )}
+                    ) : null}
 
-                    <div className="flex flex-col gap-4 pt-8 border-t border-offwhite">
-                      <button type="submit" className="w-full bg-mylms-purple text-white font-black uppercase tracking-[0.4em] py-6 rounded-2xl shadow-xl hover:translate-y-[-2px] transition-all text-[11px] active:scale-[0.98]">Commit Final Records</button>
-                      <button type="button" onClick={() => setModal({ isOpen: false, mode: null })} className="w-full bg-offwhite border border-border-soft text-gray-400 font-black uppercase tracking-[0.4em] py-6 rounded-2xl text-[11px] active:scale-[0.98] transition-all">Abort Registry Sync</button>
-                    </div>
+                    <div className="flex items-center gap-6 pt-6">
+                        <button type="button" onClick={() => setModal({ isOpen: false, mode: null })} className="flex-1 py-5 border border-border-soft rounded-full text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] hover:bg-offwhite transition-all">Cancel</button>
+                        <button type="submit" className="flex-1 py-5 bg-mylms-purple text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-mylms-purple/90 transition-all">
+                           {modal.mode?.startsWith('edit') ? 'Commit Changes' : 'Complete Registry'}
+                        </button>
+                     </div>
                   </form>
                 </>
               )}

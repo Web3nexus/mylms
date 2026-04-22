@@ -42,6 +42,7 @@ export default function AdmissionWizard() {
   const [waiverRequested, setWaiverRequested] = useState(false);
   const [waiverDelayMinutes, setWaiverDelayMinutes] = useState(5);
   const [submissionResult, setSubmissionResult] = useState<any>(null);
+  const [showSaved, setShowSaved] = useState(false);
   const [enrollmentProtocol, setEnrollmentProtocol] = useState<{
     isOpen: boolean;
     startDate: string | null;
@@ -135,6 +136,8 @@ export default function AdmissionWizard() {
         step_data: formData,
       });
       setApplication(res.data.application);
+      setShowSaved(true);
+      setTimeout(() => setShowSaved(false), 3000);
       if (nextStepId) {
         setSearchParams({ step: nextStepId });
         setFormData(res.data.application?.step_data?.[nextStepId] || {});
@@ -419,8 +422,13 @@ export default function AdmissionWizard() {
               Fee {application?.application_fee_status === 'waived' ? 'Waived' : 'Paid'}
             </span>
           </div>
-          <button onClick={() => saveStep()} className="p-3 bg-mylms-purple/5 text-mylms-purple rounded-xl hover:bg-mylms-purple/10 transition-all">
-            <Save size={18} />
+          <button onClick={() => saveStep()} disabled={saving} className={`p-3 rounded-xl transition-all flex items-center gap-3 ${showSaved ? 'bg-green-500 text-white' : 'bg-mylms-purple/5 text-mylms-purple hover:bg-mylms-purple/10'}`}>
+            {showSaved ? (
+              <>
+                <CheckCircle size={18} />
+                <span className="text-[9px] font-black uppercase tracking-widest pr-1">Secured</span>
+              </>
+            ) : <Save size={18} />}
           </button>
         </div>
       </div>

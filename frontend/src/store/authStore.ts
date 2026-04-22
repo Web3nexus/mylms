@@ -5,9 +5,10 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'instructor' | 'student';
+  role: 'admin' | 'staff' | 'instructor' | 'student';
   student_id?: string | null;
   program_id?: number | null;
+  permissions?: string[];
 }
 
 interface AuthState {

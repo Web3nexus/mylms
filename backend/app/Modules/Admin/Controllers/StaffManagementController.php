@@ -15,9 +15,9 @@ class StaffManagementController extends Controller
      */
     public function index()
     {
-        $staff = User::whereIn('role', [User::ROLE_INSTRUCTOR, User::ROLE_ADMIN])
+        $staff = User::whereIn('role', [User::ROLE_INSTRUCTOR, User::ROLE_ADMIN, User::ROLE_STAFF])
             ->latest()
-            ->get(['id', 'name', 'email', 'role', 'created_at']);
+            ->get(['id', 'name', 'email', 'role', 'permissions', 'created_at']);
 
         return response()->json($staff);
     }
@@ -31,8 +31,9 @@ class StaffManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', Password::defaults()],
-            'role' => ['required', 'string', 'in:instructor,admin'],
+            'role' => ['required', 'string', 'in:instructor,admin,staff'],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
+            'permissions' => ['nullable', 'array'],
         ]);
 
         $user = User::create([
@@ -41,12 +42,42 @@ class StaffManagementController extends Controller
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'faculty_id' => $validated['faculty_id'] ?? null,
+            'permissions' => $validated['permissions'] ?? [],
         ]);
 
         return response()->json([
             'message' => 'Staff member onboarded successfully.',
             'user' => $user
         ], 201);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email,'.$user->id],
+            'role' => ['required', 'string', 'in:instructor,admin,staff'],
+            'faculty_id' => ['nullable', 'exists:faculties,id'],
+            'password' => ['nullable', Password::defaults()],
+            'permissions' => ['nullable', 'array'],
+        ]);
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->role = $validated['role'];
+        $user->faculty_id = $validated['faculty_id'] ?? $user->faculty_id;
+        $user->permissions = $validated['permissions'] ?? $user->permissions;
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Staff record updated successfully.',
+            'user' => $user
+        ]);
     }
 
     /**

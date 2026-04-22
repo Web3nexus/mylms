@@ -142,6 +142,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Staff & Personnel Management
         Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);
         Route::post('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'store']);
+        Route::put('/admin/staff/{user}', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'update']);
         Route::delete('/admin/staff/{user}', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'destroy']);
 
         // Scholarship Sync

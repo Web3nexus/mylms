@@ -9,7 +9,8 @@ import {
   Clock, 
   CheckCircle,
   XCircle,
-  Plus
+  Plus,
+  Edit
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
@@ -21,6 +22,7 @@ interface StaffMember {
   name: string;
   email: string;
   role: string;
+  permissions?: string[];
   created_at: string;
 }
 
@@ -33,8 +35,21 @@ export default function AdminStaffDirectory() {
     name: '',
     email: '',
     password: 'Password123!',
-    role: 'instructor'
+    role: 'instructor',
+    permissions: [] as string[]
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+
+  const AVAILABLE_FEATURES = [
+    { key: 'cms_marketing', label: 'CMS & Marketing', color: 'text-mylms-rose' },
+    { key: 'academic_enrollment', label: 'Academic & Enrollment', color: 'text-mylms-purple' },
+    { key: 'staff_registry', label: 'Personnel Registry', color: 'text-mylms-purple' },
+    { key: 'admissions_portal', label: 'Admissions Desk', color: 'text-mylms-purple' },
+    { key: 'finance_bursary', label: 'Bursary & Finance', color: 'text-mylms-rose' },
+    { key: 'student_registry', label: 'Student Registry', color: 'text-mylms-purple' },
+    { key: 'branding_identity', label: 'Brand Identity', color: 'text-mylms-rose' },
+  ];
   
   const { token } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
@@ -54,15 +69,45 @@ export default function AdminStaffDirectory() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (isEditing && editingId) {
+        await client.put(`/admin/staff/${editingId}`, formData, { headers });
+        notify("Personnel Registry: Record successfully updated.", "success");
+      } else {
+        await client.post('/admin/staff', formData, { headers });
+        notify("Personnel Registry: Staff member successfully onboarded.", "success");
+      }
+      setShowModal(false);
+      resetForm();
       fetchStaff();
-      notify("Personnel Registry: Staff member successfully onboarded.", "success");
-    } catch (err) {
-      console.error('Error creating staff:', err);
-      notify('Personnel Registry Error: Failed to onboard personnel. Please verify institutional credentials.', "error");
+    } catch (err: any) {
+      console.error('Error saving staff:', err);
+      notify(err.response?.data?.message || 'Personnel Registry Error: Failed to commit record.', "error");
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      password: 'Password123!',
+      role: 'instructor',
+      permissions: []
+    });
+    setIsEditing(false);
+    setEditingId(null);
+  };
+
+  const togglePermission = (featureKey: string) => {
+    setFormData(prev => {
+      const current = prev.permissions || [];
+      const updated = current.includes(featureKey)
+        ? current.filter(k => k !== featureKey)
+        : [...current, featureKey];
+      return { ...prev, permissions: updated };
+    });
   };
 
   const { confirm, notify } = useNotificationStore();
@@ -159,12 +204,33 @@ export default function AdminStaffDirectory() {
                    <CheckCircle size={14} />
                    Active Record
                 </span>
-                <button 
-                  onClick={() => handleDelete(member.id)}
-                  className="p-3 text-gray-300 hover:text-mylms-rose hover:bg-mylms-rose/5 rounded-xl transition-all"
-                >
-                   <Trash2 size={18} />
-                </button>
+                 <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => {
+                        setFormData({ 
+                          name: member.name, 
+                          email: member.email, 
+                          role: member.role, 
+                          password: '',
+                          permissions: member.permissions || [] 
+                        });
+                        setIsEditing(true);
+                        setEditingId(member.id);
+                        setShowModal(true);
+                      }}
+                      className="p-3 text-gray-300 hover:text-mylms-purple hover:bg-mylms-purple/5 rounded-xl transition-all"
+                      title="Edit Personnel"
+                    >
+                       <Edit size={18} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(member.id)}
+                      className="p-3 text-gray-300 hover:text-mylms-rose hover:bg-mylms-rose/5 rounded-xl transition-all"
+                      title="Purge Record"
+                    >
+                       <Trash2 size={18} />
+                    </button>
+                 </div>
              </div>
           </div>
         ))}
@@ -173,13 +239,17 @@ export default function AdminStaffDirectory() {
       {/* Creation Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-8">
-           <div className="absolute inset-0 bg-mylms-purple/40 backdrop-blur-md" onClick={() => setShowModal(false)}></div>
+           <div className="absolute inset-0 bg-mylms-purple/40 backdrop-blur-md" onClick={resetForm}></div>
            <div className="bg-white w-full max-w-xl rounded-[40px] shadow-2xl relative z-110 overflow-hidden animate-in zoom-in-95 duration-300 border border-border-soft">
               <div className="p-12">
-                 <h3 className="text-3xl font-black text-text-main uppercase tracking-tighter mb-4">Personnel Onboarding</h3>
-                 <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-10 opacity-60">{appName} Security: New Staff Protocol</p>
+                 <h3 className="text-3xl font-black text-text-main uppercase tracking-tighter mb-4">
+                    {isEditing ? 'Modify Personnel Record' : 'Personnel Onboarding'}
+                 </h3>
+                 <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-10 opacity-60">
+                    {appName} Security: {isEditing ? 'Edit Protocol' : 'New Staff Protocol'}
+                 </p>
 
-                 <form onSubmit={handleCreate} className="space-y-8">
+                 <form onSubmit={handleSave} className="space-y-8">
                     <div className="space-y-3">
                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Legal Name</label>
                        <input 
@@ -202,7 +272,7 @@ export default function AdminStaffDirectory() {
                          placeholder="staff@mylms.edu"
                        />
                     </div>
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                        <div className="space-y-3">
                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Personnel Role</label>
                           <select 
@@ -211,25 +281,60 @@ export default function AdminStaffDirectory() {
                             className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner appearance-none cursor-pointer"
                           >
                              <option value="instructor">Instructor</option>
+                             <option value="staff">Administrative Staff</option>
                              <option value="admin">Administrator</option>
                           </select>
                        </div>
                        <div className="space-y-3">
-                          <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Initial Password</label>
-                          <input 
-                            type="text"
-                            required
-                            value={formData.password}
-                            onChange={e => setFormData({...formData, password: e.target.value})}
-                            className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
-                          />
-                       </div>
+                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                              {isEditing ? 'New Password (Optional)' : 'Initial Password'}
+                           </label>
+                           <input 
+                             type="text"
+                             required={!isEditing}
+                             value={formData.password}
+                             onChange={e => setFormData({...formData, password: e.target.value})}
+                             className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
+                             placeholder={isEditing ? 'Leave blank to keep current' : ''}
+                           />
+                        </div>
                     </div>
+
+                    {formData.role === 'staff' && (
+                       <div className="space-y-6 animate-in slide-in-from-top-4 duration-500 bg-offwhite p-8 rounded-3xl border border-border-soft">
+                          <div>
+                             <h4 className="text-[10px] font-black text-mylms-purple uppercase tracking-[0.4em] mb-2">Feature Permissions</h4>
+                             <p className="text-[9px] font-medium text-gray-400 uppercase tracking-widest leading-loose">Select administrative modules available for this staff account.</p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             {AVAILABLE_FEATURES.map(feature => (
+                                <button
+                                  key={feature.key}
+                                  type="button"
+                                  onClick={() => togglePermission(feature.key)}
+                                  className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all text-left ${
+                                    formData.permissions?.includes(feature.key)
+                                      ? 'bg-white border-mylms-purple shadow-md scale-[1.02]'
+                                      : 'bg-white/50 border-transparent opacity-60 hover:opacity-100 hover:border-gray-200'
+                                  }`}
+                                >
+                                   <span className={`text-[10px] font-black uppercase tracking-widest ${feature.color}`}>
+                                      {feature.label}
+                                   </span>
+                                   {formData.permissions?.includes(feature.key) && (
+                                      <CheckCircle size={14} className="text-mylms-purple" />
+                                   )}
+                                </button>
+                             ))}
+                          </div>
+                       </div>
+                    )}
 
                     <div className="flex items-center gap-6 pt-6">
                        <button 
                         type="button" 
-                        onClick={() => setShowModal(false)}
+                        onClick={resetForm}
                         className="flex-1 py-5 border border-border-soft rounded-full text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] hover:bg-offwhite transition-all"
                        >
                           Cancel Protocol
@@ -238,8 +343,8 @@ export default function AdminStaffDirectory() {
                         type="submit"
                         className="flex-1 py-5 bg-mylms-purple text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-mylms-purple/90 transition-all flex items-center justify-center gap-3"
                        >
-                          Complete Registry
-                          <Plus size={16} />
+                          {isEditing ? 'Commit Changes' : 'Complete Registry'}
+                          {isEditing ? <Edit size={16} /> : <Plus size={16} />}
                        </button>
                     </div>
                  </form>

@@ -21,6 +21,7 @@ class User extends Authenticatable
      */
     const ROLE_ADMIN = 'admin';
     const ROLE_INSTRUCTOR = 'instructor';
+    const ROLE_STAFF = 'staff';
     const ROLE_STUDENT = 'student';
 
     /**
@@ -39,6 +40,7 @@ class User extends Authenticatable
         'otp_code',
         'otp_expires_at',
         'email_verified_at',
+        'permissions',
     ];
 
     /**
@@ -63,6 +65,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'otp_expires_at' => 'datetime',
+            'permissions' => 'array',
         ];
     }
 
@@ -77,6 +80,11 @@ class User extends Authenticatable
     public function isInstructor(): bool
     {
         return $this->role === self::ROLE_INSTRUCTOR;
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === self::ROLE_STAFF;
     }
 
     public function isStudent(): bool

@@ -229,19 +229,37 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       { name: 'Faculty Registry', path: '/office/portal', icon: <LayoutDashboard size={18} /> },
       { name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> },
     ]
-  } else if (userRole === 'admin') {
+  } else if (userRole === 'admin' || userRole === 'staff') {
+    const isAdmin = userRole === 'admin';
+    const permissions = user?.permissions || [];
+    
     sidebarLinks = [
       { name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> },
+    ];
 
-      { name: 'Enrollment Management', path: '/admin/academic', icon: <Settings size={18} /> },
-      { name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> },
-      { name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> },
-      { name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> },
-      { name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> },
-      { name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> },
-      { name: 'Branding', path: '/branding', icon: <ShieldCheck size={18} /> },
-      { name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> },
-    ]
+    if (isAdmin || permissions.includes('academic_enrollment')) {
+      sidebarLinks.push({ name: 'Academic Manager', path: '/admin/academic', icon: <Settings size={18} /> });
+    }
+    if (isAdmin || permissions.includes('admissions_portal')) {
+       sidebarLinks.push({ name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> });
+    }
+    if (isAdmin || permissions.includes('student_registry')) {
+       sidebarLinks.push({ name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> });
+    }
+    if (isAdmin || permissions.includes('cms_marketing')) {
+       sidebarLinks.push({ name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> });
+    }
+    if (isAdmin || permissions.includes('finance_bursary')) {
+       sidebarLinks.push({ name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> });
+    }
+    if (isAdmin || permissions.includes('branding_identity')) {
+       sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <ShieldCheck size={18} /> });
+    }
+    
+    if (isAdmin) {
+      sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
+      sidebarLinks.push({ name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> });
+    }
   }
 
   return (
@@ -439,7 +457,7 @@ function App() {
             <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
           </Route>
    
-          <Route element={<ProtectedRoute roles={['admin']} />}>
+          <Route element={<ProtectedRoute roles={['admin', 'staff']} />}>
             <Route path="/admin/portal" element={<AdminOperations />} />
             <Route path="/admin/academic" element={<AcademicManager />} />
             <Route path="/admin/admissions" element={<AdmissionsReview />} />
