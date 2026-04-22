@@ -172,7 +172,7 @@ export function ScholarshipFinderWidget() {
                            </div>
                            <p className="text-[10px] font-black uppercase text-text-secondary tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-opacity">{scholarship.provider}</p>
                         </div>
-                        <h2 className="text-3xl font-black text-text-main leading-tight mb-8 group-hover:text-mylms-purple transition-colors line-clamp-2 uppercase tracking-tighter italic">{scholarship.title}</h2>
+                        <h2 className="text-3xl font-black text-text-main leading-tight mb-8 group-hover:text-mylms-purple transition-colors line-clamp-2 uppercase tracking-tighter italic">{scholarship?.title}</h2>
                       </div>
                       
                       {scholarship.amount && (

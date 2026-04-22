@@ -60,7 +60,7 @@ export function ExperienceInner() {
           </div>
           
           <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic text-mylms-purple">
-            {hero.title || 'Student Experience.'}
+            {hero?.title || 'Student Experience.'}
           </h1>
           
           <p className="max-w-2xl text-text-secondary font-medium text-lg mb-12 opacity-80 leading-relaxed font-sans italic">
@@ -85,7 +85,7 @@ export function ExperienceInner() {
                   {iconMap[feature.icon] || <Zap size={24} />}
                 </div>
                 <h3 className="text-2xl font-black text-text-main mb-4 tracking-tighter italic uppercase group-hover/card:text-mylms-purple transition-colors">
-                  {feature.title}
+                  {feature?.title}
                 </h3>
                 <p className="text-[13px] text-text-secondary font-medium leading-relaxed opacity-70">
                   {feature.desc}

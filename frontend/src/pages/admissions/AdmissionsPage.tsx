@@ -188,7 +188,7 @@ export function AdmissionsInner() {
                 >
                   <span className="flex items-center gap-4">
                     <Layers size={16} className={activeFaculty === faculty.id ? 'text-mylms-rose' : 'text-gray-300 group-hover:text-mylms-purple'} />
-                    {faculty.name}
+                    {faculty?.name}
                   </span>
                   <ChevronRight size={14} className={activeFaculty === faculty.id ? 'text-mylms-rose' : 'text-gray-300'} />
                 </button>
@@ -201,7 +201,7 @@ export function AdmissionsInner() {
                 <div key={dept.id} className="bg-white rounded-3xl border border-border-soft overflow-hidden shadow-sm">
                   <div className="bg-offwhite px-8 py-6 border-b border-border-soft flex items-center gap-4">
                     <BookOpen size={16} className="text-mylms-purple" />
-                    <h3 className="font-black text-[11px] uppercase tracking-[0.3em] text-text-main">{dept.name}</h3>
+                    <h3 className="font-black text-[11px] uppercase tracking-[0.3em] text-text-main">{dept?.name}</h3>
                     <span className="ml-auto bg-white text-mylms-purple text-[9px] font-black px-4 py-1.5 rounded-full border border-border-soft">
                       {dept.programs.length} programs
                     </span>
@@ -211,7 +211,7 @@ export function AdmissionsInner() {
                       <div key={prog.id} className="flex items-center justify-between px-8 py-5 hover:bg-offwhite transition-all group">
                         <div className="flex items-center gap-4">
                           <CheckCircle size={14} className="text-mylms-rose shrink-0" />
-                          <span className="font-bold text-text-main text-sm">{prog.name}</span>
+                          <span className="font-bold text-text-main text-sm">{prog?.name}</span>
                         </div>
                         {branding?.admissions_enabled && (
                           <Link to="/register" className="text-[9px] font-black uppercase tracking-widest text-mylms-purple opacity-0 group-hover:opacity-100 flex items-center gap-2 transition-all">

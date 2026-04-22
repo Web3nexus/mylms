@@ -190,7 +190,7 @@ export default function PeerReviewPlayer() {
                     {(review.submission?.assessment?.rubric?.criteria ?? []).map(criterion => (
                       <div key={criterion.id} className="p-6 rounded-2xl border border-gray-50 bg-offwhite/30 hover:border-mylms-purple/20 transition-all group/crit">
                          <div className="flex justify-between items-start mb-4">
-                            <h5 className="text-[11px] font-black text-text-main uppercase tracking-tight group-hover/crit:text-mylms-purple transition-colors">{criterion.name}</h5>
+                            <h5 className="text-[11px] font-black text-text-main uppercase tracking-tight group-hover/crit:text-mylms-purple transition-colors">{criterion?.name}</h5>
                             <span className="px-2 py-0.5 bg-mylms-rose/5 text-mylms-rose text-[8px] font-black rounded border border-mylms-rose/10">{criterion.max_score} MAX</span>
                          </div>
                          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">

@@ -549,7 +549,7 @@ export default function BrandingManager() {
                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-2">Column Title</label>
                          <input 
                             type="text" 
-                            value={col.title}
+                            value={col?.title}
                             onChange={(e) => updateColumnTitle(colIdx, e.target.value)}
                             className="bg-transparent border-b border-gray-200 w-full font-black text-lg uppercase tracking-tighter text-mylms-purple outline-none focus:border-mylms-rose transition-all"
                          />

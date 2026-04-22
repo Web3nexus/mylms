@@ -105,7 +105,7 @@ export default function CurriculumManager() {
                       type="text" 
                       placeholder="e.g. Introduction to Thermodynamics"
                       required
-                      value={newLesson.title}
+                      value={newLesson?.title}
                       onChange={e => setNewLesson({...newLesson, title: e.target.value})}
                       className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-blue-900 focus:border-blue-900 outline-none transition-colors"
                     />

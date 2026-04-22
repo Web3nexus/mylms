@@ -562,14 +562,14 @@ export default function AcademicManager() {
                    <div className="p-10 bg-offwhite border-b border-border-soft flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden group-hover:bg-white transition-all border-t-8 border-t-mylms-purple">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/50 rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
                       <div className="z-10">
-                         <h2 className="text-2xl font-black text-text-main tracking-tighter uppercase">{faculty.name}</h2>
+                         <h2 className="text-2xl font-black text-text-main tracking-tighter uppercase">{faculty?.name}</h2>
                          <p className="text-xs font-black text-mylms-rose uppercase tracking-[0.4em] mt-3 tracking-widest">Registry Index: AUTH-{faculty.id.toString().padStart(4, '0')}</p>
                       </div>
                        <div className="flex gap-4 z-10">
                           <button 
                             onClick={() => {
                               setNewDept({ name: '', code: '' });
-                              setModal({ isOpen: true, mode: 'add_department', targetId: faculty.id, targetName: faculty.name });
+                              setModal({ isOpen: true, mode: 'add_department', targetId: faculty.id, targetName: faculty?.name });
                             }}
                             className="btn-minimal px-6 py-3 flex items-center gap-2 text-xs"
                           >
@@ -577,7 +577,7 @@ export default function AcademicManager() {
                              Add Department
                           </button>
                            <button 
-                             onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'faculty', targetId: faculty.id, targetName: faculty.name })}
+                             onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'faculty', targetId: faculty.id, targetName: faculty?.name })}
                              className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-lg shadow-sm"
                            >
                               <Trash2 size={18} />
@@ -602,14 +602,14 @@ export default function AcademicManager() {
                                           <span className="text-xs font-black text-mylms-rose uppercase tracking-widest font-mono">CODE: {dept.code}</span>
                                        </div>
                                        <button 
-                                          onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'department', targetId: dept.id, targetName: dept.name })}
+                                          onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'department', targetId: dept.id, targetName: dept?.name })}
                                           className="text-gray-200 hover:text-mylms-rose transition-all p-2"
                                        >
                                           <Trash2 size={16} />
                                        </button>
                                     </div>
                                     <h3 className="text-2xl font-black text-text-main group-hover:text-mylms-purple transition-colors leading-tight uppercase tracking-tighter">
-                                       {dept.name}
+                                       {dept?.name}
                                     </h3>
                                  </div>
                                  
@@ -621,7 +621,7 @@ export default function AcademicManager() {
                                       dept.programs.map((program) => (
                                         <div key={program.id} className="bg-offwhite/50 px-8 py-8 border border-border-soft rounded-2xl flex justify-between items-center group/program hover:bg-white transition-all shadow-sm hover:shadow-md border-l-4 border-l-mylms-purple">
                                            <div className="flex-1">
-                                              <p className="font-black text-text-main text-sm uppercase leading-tight tracking-tight mb-3">{program.name}</p>
+                                              <p className="font-black text-text-main text-sm uppercase leading-tight tracking-tight mb-3">{program?.name}</p>
                                               <div className="flex items-center gap-4 flex-wrap">
                                                 <span className="text-[10px] font-black text-mylms-rose uppercase tracking-widest bg-mylms-rose/5 px-3 py-1 rounded-md border border-mylms-rose/10">{program.degree_level}</span>
                                                 <span className="text-[10px] font-black text-text-secondary uppercase tracking-widest">{program.duration_years} Years</span>
@@ -648,7 +648,7 @@ export default function AcademicManager() {
                                            </div>
                                             <div className="flex flex-col gap-4 ml-8">
                                                 <button 
-                                                   onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'program', targetId: program.id, targetName: program.name })}
+                                                   onClick={() => setModal({ isOpen: true, mode: 'delete', type: 'program', targetId: program.id, targetName: program?.name })}
                                                    className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-rose transition-all rounded-xl shadow-sm"
                                                 >
                                                    <Trash2 size={16} />
@@ -676,7 +676,7 @@ export default function AcademicManager() {
                                           is_external: false,
                                           external_provider: ''
                                         });
-                                        setModal({ isOpen: true, mode: 'add_program', targetId: dept.id, targetName: dept.name });
+                                        setModal({ isOpen: true, mode: 'add_program', targetId: dept.id, targetName: dept?.name });
                                       }}
                                       className="w-full py-5 mt-12 bg-mylms-purple/5 border border-dashed border-mylms-purple/20 text-mylms-purple font-black rounded-xl hover:bg-mylms-purple hover:text-white transition-all text-[11px] uppercase tracking-[0.4em] flex items-center justify-center gap-3 relative z-10"
                                     >
@@ -741,7 +741,7 @@ export default function AcademicManager() {
                       <div className="space-y-8">
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Official Designation</label>
-                          <input required value={newFaculty.name} onChange={e => setNewFaculty({...newFaculty, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Faculty of Humanities..." />
+                          <input required value={newFaculty?.name} onChange={e => setNewFaculty({...newFaculty, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Faculty of Humanities..." />
                         </div>
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Administrative Summary</label>
@@ -754,7 +754,7 @@ export default function AcademicManager() {
                       <div className="space-y-8">
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Department Identifier</label>
-                          <input required value={newDept.name} onChange={e => setNewDept({...newDept, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Dept. of Theoretical Physics..." />
+                          <input required value={newDept?.name} onChange={e => setNewDept({...newDept, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Dept. of Theoretical Physics..." />
                         </div>
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Registry Code (4 Chars)</label>
@@ -768,7 +768,7 @@ export default function AcademicManager() {
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="md:col-span-2">
                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Program Title</label>
-                               <input required value={newProg.name} onChange={e => setNewProg({...newProg, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="e.g. Master of Artificial Intelligence" />
+                               <input required value={newProg?.name} onChange={e => setNewProg({...newProg, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="e.g. Master of Artificial Intelligence" />
                             </div>
                             <div>
                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Degree Level</label>
@@ -853,7 +853,7 @@ export default function AcademicManager() {
               <div className={`w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-8 shadow-inner ${notification.type === 'success' ? 'bg-green-50 text-green-500' : 'bg-mylms-rose/10 text-mylms-rose'}`}>
                  {notification.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
               </div>
-              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification.title}</h3>
+              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification?.title}</h3>
               <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">{notification.message}</p>
               <button 
                 onClick={() => setNotification({ ...notification, isOpen: false })}

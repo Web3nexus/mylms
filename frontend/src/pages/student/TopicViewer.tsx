@@ -187,7 +187,7 @@ export default function TopicViewer() {
     <div className="max-w-5xl mx-auto py-16 px-12 min-h-screen transition-all">
       <div className="mb-12">
         <Link to={`/courses/${topic.forum.course?.slug}/forums`} className="text-[9px] font-black uppercase text-gray-400 mb-6 hover:text-mylms-purple transition-all flex items-center gap-2">
-          <ArrowLeft size={10} /> Back to {topic.forum.name}
+          <ArrowLeft size={10} /> Back to {topic.forum?.name}
         </Link>
         <div className="flex justify-between items-start">
            <div>
@@ -198,7 +198,7 @@ export default function TopicViewer() {
                  {topic.is_pinned && <Pin size={14} className="text-mylms-rose" />}
                  {topic.is_locked && <Lock size={14} className="text-gray-300" />}
               </div>
-              <h1 className="text-4xl font-serif font-black text-mylms-purple uppercase tracking-tight mb-4">{topic.title}</h1>
+              <h1 className="text-4xl font-serif font-black text-mylms-purple uppercase tracking-tight mb-4">{topic?.title}</h1>
            </div>
            
            {(currentUser?.role === 'instructor' || currentUser?.role === 'admin') && (

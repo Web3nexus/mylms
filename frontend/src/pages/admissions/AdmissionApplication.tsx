@@ -402,7 +402,7 @@ export function AdmissionFormWidget() {
                <BookOpen size={18} className="text-mylms-purple" />
                Selected Degree Program
             </p>
-            <h3 className="text-4xl font-black text-text-main tracking-tighter uppercase italic">{application.program.name}</h3>
+            <h3 className="text-4xl font-black text-text-main tracking-tighter uppercase italic">{application.program?.name}</h3>
           </div>
 
           {application.status === 'approved' && application.offer && !application.offer.accepted && (
@@ -565,7 +565,7 @@ export function AdmissionFormWidget() {
                       >
                          <option value="">-- FORMAL FACULTY SELECT --</option>
                          {faculties.map(f => (
-                           <option key={f.id} value={f.id}>{f.name}</option>
+                           <option key={f.id} value={f.id}>{f?.name}</option>
                          ))}
                       </select>
                    </div>
@@ -581,9 +581,9 @@ export function AdmissionFormWidget() {
                       >
                         <option value="">-- OFFICIAL PROGRAM SELECTION --</option>
                         {faculties.find(f => f.id.toString() === formData.faculty_id.toString())?.departments.map(d => (
-                           <optgroup key={d.id} label={d.name} className="font-black text-[10px] uppercase tracking-[0.4em] py-6 bg-white text-gray-300">
+                           <optgroup key={d.id} label={d?.name} className="font-black text-[10px] uppercase tracking-[0.4em] py-6 bg-white text-gray-300">
                              {d.programs.map(p => (
-                               <option key={p.id} value={p.id} className="text-text-main normal-case font-bold p-6">{p.name}</option>
+                               <option key={p.id} value={p.id} className="text-text-main normal-case font-bold p-6">{p?.name}</option>
                              ))}
                           </optgroup>
                         ))}
@@ -602,7 +602,7 @@ export function AdmissionFormWidget() {
                       >
                         <option value="">-- {formData.faculty_id ? 'FORMAL ADVISOR SELECT' : 'SELECT FACULTY FIRST'} --</option>
                         {instructors.map(instr => (
-                           <option key={instr.id} value={instr.id}>{instr.name}</option>
+                           <option key={instr.id} value={instr.id}>{instr?.name}</option>
                         ))}
                       </select>
                     </div>

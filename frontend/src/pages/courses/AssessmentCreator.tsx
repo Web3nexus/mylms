@@ -283,7 +283,7 @@ export default function AssessmentCreator() {
                      <input 
                        type="text" 
                        required
-                       value={newAssessment.title}
+                       value={newAssessment?.title}
                        onChange={e => setNewAssessment({...newAssessment, title: e.target.value})}
                        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 outline-none font-bold"
                        placeholder="e.g. Unit 3 Summative Evaluation"
@@ -339,7 +339,7 @@ export default function AssessmentCreator() {
                       >
                         <option value="">No Rubric Assigned</option>
                         {rubrics.map(r => (
-                          <option key={r.id} value={r.id}>{r.title}</option>
+                          <option key={r.id} value={r.id}>{r?.title}</option>
                         ))}
                       </select>
                    </div>

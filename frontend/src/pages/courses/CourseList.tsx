@@ -60,14 +60,14 @@ export function CourseCatalogWidget() {
           dept.programs.forEach((prog: any) => {
             allCourses.push({
               id: prog.id,
-              title: prog.name || 'Untitled Program',
+              title: prog?.name || 'Untitled Program',
               code: prog.code || `PRG-${prog.id}X`,
               description: prog.description || 'A comprehensive academic program designed to build future leaders and provide world-class instruction in this discipline.',
               credits: prog.credits || 120,
               duration: prog.duration || '4 Years',
-              slug: prog.slug || `prog-${prog.id}`,
-              faculty: { name: faculty.name },
-              department: { name: dept.name }
+              slug: prog?.slug || `prog-${prog.id}`,
+              faculty: { name: faculty?.name },
+              department: { name: dept?.name }
             });
           });
         });
@@ -104,7 +104,7 @@ export function CourseCatalogWidget() {
   };
 
   const filteredCourses = courses.filter((c: any) => {
-    const title = c.title || (c as any).name || '';
+    const title = c?.title || (c as any)?.name || '';
     const code = c.code || '';
     const facultyName = c.faculty?.name || '';
     const term = searchTerm.toLowerCase();
@@ -215,7 +215,7 @@ export function CourseCatalogWidget() {
               
               <div className="p-8 md:p-12 flex flex-col grow group-hover:bg-offwhite/30 transition-all duration-500">
                 <div className="flex items-center gap-3 mb-4 md:mb-6">
-                   <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest opacity-60">Faculty: {course.faculty.name}</p>
+                   <p className="text-[8px] md:text-[9px] font-black text-gray-300 uppercase tracking-widest opacity-60">Faculty: {course.faculty?.name}</p>
                 </div>
                 
                 <h2 className="text-xl md:text-2xl font-black text-text-main mb-4 md:mb-6 leading-tight group-hover:text-mylms-purple transition-colors tracking-tighter h-14 md:h-16 line-clamp-2 italic">

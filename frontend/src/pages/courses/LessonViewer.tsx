@@ -62,7 +62,7 @@ export default function LessonViewer() {
         fetchLessonContent(lesson.id);
       }
     } else if (lessons.length > 0 && !lessonSlug) {
-      navigate(`/courses/${slug}/lessons/${lessons[0].slug}`);
+      navigate(`/courses/${slug}/lessons/${lessons[0]?.slug}`);
     }
   }, [lessons, lessonSlug]);
 
@@ -212,14 +212,14 @@ export default function LessonViewer() {
             <h3 className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">Unit Registry</h3>
           </div>
           <div className="space-y-1">
-            {lessons.filter(l => l && l.title).map((lesson, idx) => (
+            {lessons.filter(l => l && l?.title).map((lesson, idx) => (
               <Link 
                 key={lesson.id} 
-                to={`/courses/${slug}/lessons/${lesson.slug}`}
+                to={`/courses/${slug}/lessons/${lesson?.slug}`}
                 onClick={() => setIsRegistryMobileOpen(false)}
-                className={`flex items-start gap-4 px-8 py-5 transition-all relative group ${lessonSlug === lesson.slug ? 'bg-white text-text-main border-l-4 border-mylms-purple shadow-sm' : 'text-gray-400 hover:text-mylms-purple border-l-4 border-transparent'}`}
+                className={`flex items-start gap-4 px-8 py-5 transition-all relative group ${lessonSlug === lesson?.slug ? 'bg-white text-text-main border-l-4 border-mylms-purple shadow-sm' : 'text-gray-400 hover:text-mylms-purple border-l-4 border-transparent'}`}
               >
-                <div className={`mt-0.5 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 transition-all ${lessonSlug === lesson.slug ? 'bg-mylms-purple text-white shadow-xl' : 'bg-white border border-border-soft text-gray-300 shadow-sm'}`}>
+                <div className={`mt-0.5 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 transition-all ${lessonSlug === lesson?.slug ? 'bg-mylms-purple text-white shadow-xl' : 'bg-white border border-border-soft text-gray-300 shadow-sm'}`}>
                   {idx + 1}
                 </div>
                 <span className={`text-[11px] font-black leading-tight uppercase group-hover:translate-x-1 transition-transform`}>{lesson?.title}</span>
@@ -243,7 +243,7 @@ export default function LessonViewer() {
                 <h3 className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">Assessments & Tasks</h3>
               </div>
               <div className="space-y-1">
-                {assessments.filter(a => a && a.title).map((assessment) => (
+                {assessments.filter(a => a && a?.title).map((assessment) => (
                   <Link 
                     key={assessment.id} 
                     to={`/assessments/${assessment.id}`}
@@ -333,7 +333,7 @@ export default function LessonViewer() {
                       {showNotes ? 'Close Notes' : 'Open Notes'}
                     </button>
                   </div>
-                  <h1 className="text-2xl md:text-4xl font-black text-text-main tracking-tighter leading-none uppercase">{currentLesson.title}</h1>
+                  <h1 className="text-2xl md:text-4xl font-black text-text-main tracking-tighter leading-none uppercase">{currentLesson?.title}</h1>
                </header>
 
                <div className="prose prose-slate max-w-none">
@@ -364,7 +364,7 @@ export default function LessonViewer() {
                   <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6">
                      <button 
                        disabled={lessons.findIndex(l => l.id === currentLesson.id) === 0}
-                       onClick={() => navigate(`/courses/${slug}/lessons/${lessons[lessons.findIndex(l => l.id === currentLesson.id) - 1].slug}`)}
+                       onClick={() => navigate(`/courses/${slug}/lessons/${lessons[lessons.findIndex(l => l.id === currentLesson.id) - 1]?.slug}`)}
                        className="flex-1 md:flex-none px-6 md:px-8 py-3 md:py-4 bg-white border border-border-soft text-mylms-purple font-black rounded-xl hover:bg-offwhite transition-all text-[9px] uppercase tracking-[0.2em] shadow-sm disabled:opacity-30 active:scale-95 flex items-center justify-center gap-3"
                      >
                        <ChevronLeft size={14} />
@@ -372,7 +372,7 @@ export default function LessonViewer() {
                      </button>
                      <button 
                        disabled={lessons.findIndex(l => l.id === currentLesson.id) === lessons.length - 1}
-                       onClick={() => navigate(`/courses/${slug}/lessons/${lessons[lessons.findIndex(l => l.id === currentLesson.id) + 1].slug}`)}
+                       onClick={() => navigate(`/courses/${slug}/lessons/${lessons[lessons.findIndex(l => l.id === currentLesson.id) + 1]?.slug}`)}
                        className="flex-1 md:flex-none px-6 md:px-10 py-3 md:py-4 bg-mylms-purple text-white font-black rounded-xl hover:bg-mylms-purple/90 transition-all text-[9px] uppercase tracking-[0.2em] shadow-xl disabled:opacity-30 active:scale-95 flex items-center justify-center gap-3"
                      >
                        Next

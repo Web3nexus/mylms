@@ -180,7 +180,7 @@ export default function AcademicCalendarManager() {
             <div className={`p-10 flex flex-col md:flex-row justify-between items-center gap-8 ${session.is_active ? 'bg-offwhite border-b border-border-soft' : 'bg-white border-b border-border-soft'}`}>
               <div className="relative overflow-hidden">
                 <div className="flex items-center gap-4 mb-3">
-                   <h2 className="text-2xl font-black text-text-main tracking-tighter uppercase">{session.name}</h2>
+                   <h2 className="text-2xl font-black text-text-main tracking-tighter uppercase">{session?.name}</h2>
                    {session.is_active && <span className="bg-mylms-rose/5 text-mylms-rose text-[9px] font-black uppercase px-3 py-1 rounded-lg border border-mylms-rose/10">Active Session</span>}
                 </div>
                 <div className="flex items-center gap-3 text-text-secondary font-bold text-[10px] uppercase tracking-widest opacity-60">
@@ -204,7 +204,7 @@ export default function AcademicCalendarManager() {
                    <div className="absolute top-0 right-0 w-16 h-16 bg-offwhite rounded-bl-full group-hover/term:bg-mylms-purple/5 transition-all"></div>
                    <div className="flex justify-between items-start mb-8 pb-6 border-b border-offwhite relative z-10">
                       <div>
-                        <h3 className="text-xl font-black text-text-main tracking-tighter uppercase">{semester.name} Semester</h3>
+                        <h3 className="text-xl font-black text-text-main tracking-tighter uppercase">{semester?.name} Semester</h3>
                         <p className="text-text-secondary font-bold text-[10px] uppercase mt-2 tracking-widest opacity-60">
                            {new Date(semester.start_date).toLocaleDateString()} — {new Date(semester.end_date).toLocaleDateString()}
                         </p>
@@ -229,7 +229,7 @@ export default function AcademicCalendarManager() {
                      {semester.events.map(event => (
                        <div key={event.id} className="bg-offwhite px-4 py-3 border border-border-soft rounded-xl flex justify-between items-center group/event hover:bg-white transition-all shadow-sm">
                           <div>
-                            <p className="text-[11px] font-black text-text-main uppercase leading-none">{event.title}</p>
+                            <p className="text-[11px] font-black text-text-main uppercase leading-none">{event?.title}</p>
                             <p className="text-[8px] font-black text-text-secondary uppercase tracking-widest mt-2 opacity-50">{event.event_type}</p>
                           </div>
                           <div className="text-right">
@@ -289,7 +289,7 @@ export default function AcademicCalendarManager() {
               <form onSubmit={handleCreateSession} className="p-10 space-y-8 relative z-10">
                 <div>
                   <label className="block text-[9px] font-black text-gray-400 uppercase mb-4 tracking-widest">Internal Registry Title (e.g. 2026/27)</label>
-                  <input required value={sessionForm.name} onChange={e => setSessionForm({...sessionForm, name: e.target.value})} className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner transition-all uppercase placeholder:text-gray-200" placeholder="e.g. 2026/2027 Academic Year" />
+                  <input required value={sessionForm?.name} onChange={e => setSessionForm({...sessionForm, name: e.target.value})} className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner transition-all uppercase placeholder:text-gray-200" placeholder="e.g. 2026/2027 Academic Year" />
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                    <div>
@@ -325,7 +325,7 @@ export default function AcademicCalendarManager() {
               <form onSubmit={(e) => handleCreateSemester(e, showSemesterModal)} className="p-10 space-y-8 relative z-10">
                 <div>
                   <label className="block text-[9px] font-black text-gray-400 uppercase mb-4 tracking-widest">Term Designation (Fall / Spring / Summer)</label>
-                  <input required value={semesterForm.name} onChange={e => setSemesterForm({...semesterForm, name: e.target.value})} className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner transition-all uppercase" placeholder="e.g. Fall 2026" />
+                  <input required value={semesterForm?.name} onChange={e => setSemesterForm({...semesterForm, name: e.target.value})} className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner transition-all uppercase" placeholder="e.g. Fall 2026" />
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                    <div>
@@ -361,7 +361,7 @@ export default function AcademicCalendarManager() {
               <form onSubmit={(e) => handleCreateEvent(e, showEventModal)} className="p-10 space-y-8 relative z-10">
                 <div>
                   <label className="block text-[9px] font-black text-gray-400 uppercase mb-4 tracking-widest">Event Subject</label>
-                  <input required value={eventForm.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner transition-all uppercase" placeholder="e.g. End of Semester Examinations" />
+                  <input required value={eventForm?.title} onChange={e => setEventForm({...eventForm, title: e.target.value})} className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-inner transition-all uppercase" placeholder="e.g. End of Semester Examinations" />
                 </div>
                 <div>
                   <label className="block text-[9px] font-black text-gray-400 uppercase mb-4 tracking-widest">Classification</label>
@@ -396,7 +396,7 @@ export default function AcademicCalendarManager() {
               <div className={`w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-8 shadow-inner ${notification.type === 'success' ? 'bg-green-50 text-green-500' : 'bg-mylms-rose/10 text-mylms-rose'}`}>
                  {notification.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
               </div>
-              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification.title}</h3>
+              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification?.title}</h3>
               <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">{notification.message}</p>
               <button 
                 onClick={() => setNotification({ ...notification, isOpen: false })}

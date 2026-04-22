@@ -153,8 +153,8 @@ export default function CMSPageManager() {
                 )}
               </div>
 
-              <h3 className="text-2xl font-black text-text-main mb-2 tracking-tight uppercase group-hover:text-mylms-purple transition-colors">{page.title}</h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-10 opacity-70">URL SLUG: /{page.slug}</p>
+              <h3 className="text-2xl font-black text-text-main mb-2 tracking-tight uppercase group-hover:text-mylms-purple transition-colors">{page?.title}</h3>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-10 opacity-70">URL SLUG: /{page?.slug}</p>
               
               <div className="flex items-center gap-3 mb-8 text-[9px] font-black text-gray-300 uppercase tracking-widest">
                  <Clock size={12} />
@@ -163,7 +163,7 @@ export default function CMSPageManager() {
 
               <div className="mt-auto pt-8 border-t border-offwhite flex gap-4">
                 <Link 
-                  to={page.is_core ? `/admin/cms/guided/${page.slug}` : `/admin/cms/edit/${page.slug}`}
+                  to={page.is_core ? `/admin/cms/guided/${page?.slug}` : `/admin/cms/edit/${page?.slug}`}
                   className={`flex-1 py-4 text-white rounded-xl font-black uppercase tracking-widest text-[9px] text-center shadow-lg transition-all flex items-center justify-center gap-2 ${
                     page.is_core ? 'bg-mylms-rose hover:bg-[#C01F4F]' : 'bg-mylms-purple hover:bg-mylms-purple/90'
                   }`}
@@ -172,7 +172,7 @@ export default function CMSPageManager() {
                   {page.is_core ? "Guided Editor" : "Visual Builder"}
                 </Link>
                 <a 
-                  href={`/${page.slug}`}
+                  href={`/${page?.slug}`}
                   target="_blank"
                   className="px-6 py-4 bg-white border border-border-soft text-text-main rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-gray-50 transition-all flex items-center justify-center"
                 >
@@ -194,7 +194,7 @@ export default function CMSPageManager() {
                 <input 
                   required
                   type="text" 
-                  value={newPage.title}
+                  value={newPage?.title}
                   onChange={e => setNewPage({...newPage, title: e.target.value})}
                   className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-bold text-sm tracking-tight transition-all"
                   placeholder="e.g. Undergraduate Programs"
@@ -205,7 +205,7 @@ export default function CMSPageManager() {
                 <input 
                   required
                   type="text" 
-                  value={newPage.slug}
+                  value={newPage?.slug}
                   onChange={e => setNewPage({...newPage, slug: e.target.value.toLowerCase().replace(/ /g, '-')})}
                   className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-bold text-sm tracking-tight transition-all"
                   placeholder="e.g. programs"

@@ -93,7 +93,7 @@ export default function ResetPassword() {
                   id="reset-email"
                   type="email"
                   required
-                  value={form.email}
+                  value={form?.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="you@example.com"
                   className="w-full px-4 py-3 border border-border-soft rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-mylms-purple/30 focus:border-mylms-purple transition-all"

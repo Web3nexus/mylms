@@ -51,7 +51,7 @@ export function AboutInner() {
           </div>
           
           <h1 className="text-6xl md:text-8xl font-black text-text-main tracking-tighter mb-10 leading-[0.9] italic text-mylms-purple">
-            {hero.title || 'Innovation in Education.'}
+            {hero?.title || 'Innovation in Education.'}
           </h1>
           
           <p className="max-w-2xl text-text-secondary font-medium text-lg mb-12 opacity-80 leading-relaxed font-sans italic">
@@ -141,9 +141,9 @@ export function AboutInner() {
               ].filter(Boolean).map((member, i) => (
                 <div key={i} className="group/member text-center">
                   <div className="aspect-square rounded-[50px] overflow-hidden mb-8 shadow-xl border-4 border-white group-hover/member:border-mylms-rose/20 transition-all duration-500">
-                    <img src={member.img} className="w-full h-full object-cover group-hover/member:scale-105 transition-all duration-700" alt={member.name} />
+                    <img src={member.img} className="w-full h-full object-cover group-hover/member:scale-105 transition-all duration-700" alt={member?.name} />
                   </div>
-                  <h4 className="text-xl font-black text-text-main tracking-tight uppercase italic mb-1 group-hover/member:text-mylms-purple transition-colors">{member.name}</h4>
+                  <h4 className="text-xl font-black text-text-main tracking-tight uppercase italic mb-1 group-hover/member:text-mylms-purple transition-colors">{member?.name}</h4>
                   <p className="text-[10px] font-black text-mylms-rose uppercase tracking-widest">{member.role}</p>
                 </div>
               ))}

@@ -457,7 +457,7 @@ export default function AdmissionWizard() {
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest mb-0.5">Section {idx + 1}</p>
-                    <p className={`text-[11px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-text-main'}`}>{s.title}</p>
+                    <p className={`text-[11px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-text-main'}`}>{s?.title}</p>
                   </div>
                 </button>
               );
@@ -474,7 +474,7 @@ export default function AdmissionWizard() {
                 Current Protocol Stage
               </div>
               <h2 className="text-4xl md:text-6xl font-black text-mylms-purple tracking-tighter uppercase italic leading-[0.9]">
-                {steps[currentIndex].title}
+                {steps[currentIndex]?.title}
               </h2>
             </div>
 
@@ -609,7 +609,7 @@ export default function AdmissionWizard() {
                         >
                           <option value="">-- {selectedLevel ? 'SELECT PROGRAM' : 'SELECT LEVEL FIRST'} --</option>
                           {availablePrograms.map(p => (
-                            <option key={p.id} value={p.id}>{p.name}</option>
+                            <option key={p.id} value={p.id}>{p?.name}</option>
                           ))}
                         </select>
                       </div>
@@ -721,7 +721,7 @@ export default function AdmissionWizard() {
                     className="w-full md:w-auto px-12 py-6 bg-white border-2 border-border-soft text-mylms-purple font-black rounded-xl hover:bg-offwhite transition-all uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-4 group"
                   >
                     <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                    Back: {prevStep.title}
+                    Back: {prevStep?.title}
                   </button>
                 )}
                 {nextStep && (
@@ -737,7 +737,7 @@ export default function AdmissionWizard() {
                       </>
                     ) : (
                       <>
-                        Proceed to {nextStep.title}
+                        Proceed to {nextStep?.title}
                         <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
                       </>
                     )}

@@ -128,7 +128,7 @@ export default function AdmissionDashboard() {
               </div>
 
               <div className="relative z-10">
-                <h3 className="text-xl font-black text-text-main mb-4 uppercase tracking-tight">{section.title}</h3>
+                <h3 className="text-xl font-black text-text-main mb-4 uppercase tracking-tight">{section?.title}</h3>
                 <p className="text-[13px] font-bold text-text-secondary opacity-60 mb-10 leading-relaxed italic font-sans">{section.desc}</p>
                 
                 <Link 

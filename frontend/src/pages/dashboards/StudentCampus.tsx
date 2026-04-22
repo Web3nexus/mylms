@@ -91,7 +91,7 @@ export default function StudentCampus() {
             <div className="space-y-6">
                 <h3 className="text-[11px] font-black uppercase text-mylms-purple tracking-[0.4em] px-2">Registered Courses</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
-                   {courses.filter(Boolean).filter((c: any) => c && c.title).map(course => (
+                   {courses.filter(Boolean).filter((c: any) => c && c?.title).map(course => (
                       <div key={course.id} className="bg-white border border-border-soft rounded-xl hover:border-mylms-rose shadow-sm overflow-hidden group transition-all">
                          <div className="h-4 bg-mylms-purple"></div>
                          <div className="p-6 md:p-8">
@@ -139,7 +139,7 @@ export default function StudentCampus() {
                   ].map((ann, i) => (
                     <div key={i} className="group cursor-pointer">
                        <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">{ann.date}</p>
-                       <p className={`text-[10px] font-bold uppercase tracking-tight transition-colors leading-tight ${ann.color}`}>{ann.title}</p>
+                       <p className={`text-[10px] font-bold uppercase tracking-tight transition-colors leading-tight ${ann.color}`}>{ann?.title}</p>
                     </div>
                   ))}
                </div>

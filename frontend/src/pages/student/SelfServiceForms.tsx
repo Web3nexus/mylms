@@ -64,7 +64,7 @@ export default function SelfServiceForms() {
                         {form.icon}
                      </div>
                      <div className="grow">
-                        <h4 className="text-xl font-black text-text-main uppercase tracking-tight leading-none mb-3 group-hover:text-mylms-purple transition-colors">{form.title}</h4>
+                        <h4 className="text-xl font-black text-text-main uppercase tracking-tight leading-none mb-3 group-hover:text-mylms-purple transition-colors">{form?.title}</h4>
                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest leading-relaxed">{form.description}</p>
                      </div>
                      <div className="shrink-0 text-gray-200 group-hover:text-mylms-rose transition-all">

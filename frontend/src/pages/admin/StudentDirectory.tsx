@@ -312,11 +312,11 @@ export default function StudentDirectory() {
                      />
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center text-mylms-purple font-black text-sm shrink-0 group-hover:bg-mylms-purple group-hover:text-white transition-all shadow-sm">
-                    {student.name.charAt(0)}
+                    {student?.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-black text-text-main text-[11px] uppercase tracking-tight truncate group-hover:text-mylms-purple transition-colors">{student.name}</p>
-                    <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest mt-0.5 truncate">{student.email}</p>
+                    <p className="font-black text-text-main text-[11px] uppercase tracking-tight truncate group-hover:text-mylms-purple transition-colors">{student?.name}</p>
+                    <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest mt-0.5 truncate">{student?.email}</p>
                   </div>
                 </div>
 
@@ -332,7 +332,7 @@ export default function StudentDirectory() {
                         {student.program.department?.code && (
                           <span className="text-mylms-purple font-black mr-1">[{student.program.department.code}]</span>
                         )}
-                        {student.program.name}
+                        {student.program?.name}
                       </p>
                     </div>
                   ) : (
@@ -441,11 +441,11 @@ export default function StudentDirectory() {
                        {/* Identity */}
                        <div className="flex items-center gap-6">
                           <div className="w-20 h-20 bg-mylms-purple rounded-[2rem] flex items-center justify-center text-white font-black text-4xl shadow-xl">
-                             {detailedStudent.name.charAt(0)}
+                             {detailedStudent?.name.charAt(0)}
                           </div>
                           <div>
-                             <h4 className="text-3xl font-black text-text-main tracking-tighter uppercase mb-2">{detailedStudent.name}</h4>
-                             <p className="text-sm font-bold text-gray-300 uppercase tracking-widest">{detailedStudent.email}</p>
+                             <h4 className="text-3xl font-black text-text-main tracking-tighter uppercase mb-2">{detailedStudent?.name}</h4>
+                             <p className="text-sm font-bold text-gray-300 uppercase tracking-widest">{detailedStudent?.email}</p>
                           </div>
                        </div>
 

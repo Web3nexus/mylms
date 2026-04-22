@@ -127,7 +127,7 @@ export default function AdmissionsReview() {
               >
                 <div className="relative z-10">
                   <p className="font-black text-sm uppercase tracking-tight text-text-main group-hover:text-mylms-purple transition-colors">{app.user?.name}</p>
-                  <p className={`text-[11px] font-black uppercase mt-2 tracking-widest ${selectedApp?.id === app.id ? 'text-mylms-rose' : 'text-gray-300'}`}>{app.program.name}</p>
+                  <p className={`text-[11px] font-black uppercase mt-2 tracking-widest ${selectedApp?.id === app.id ? 'text-mylms-rose' : 'text-gray-300'}`}>{app.program?.name}</p>
                   {app.user.student_id && <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mt-2 font-mono">ID: {app.user.student_id}</p>}
                 </div>
                 <div className="flex items-center gap-4 relative z-10">
@@ -194,7 +194,7 @@ export default function AdmissionsReview() {
                   </div>
                   <div className="p-6 bg-offwhite rounded-xl border border-border-soft">
                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Target Program</p>
-                     <p className="text-sm font-black text-text-main uppercase">{selectedApp.program.name}</p>
+                     <p className="text-sm font-black text-text-main uppercase">{selectedApp.program?.name}</p>
                   </div>
                </div>
 

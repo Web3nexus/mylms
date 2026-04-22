@@ -333,7 +333,7 @@ export default function AdmissionRegistryManager() {
               <div className={`w-20 h-20 mx-auto rounded-[28px] flex items-center justify-center mb-8 shadow-inner ${notification.type === 'success' ? 'bg-green-50 text-green-500' : 'bg-mylms-rose/10 text-mylms-rose'}`}>
                  {notification.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
               </div>
-              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification.title}</h3>
+              <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4">{notification?.title}</h3>
               <p className="text-sm font-medium text-gray-500 leading-relaxed mb-10">{notification.message}</p>
               <button 
                 onClick={() => setNotification({ ...notification, isOpen: false })}

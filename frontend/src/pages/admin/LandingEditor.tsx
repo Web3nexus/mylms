@@ -26,7 +26,7 @@ export default function LandingEditor() {
         });
         const puckData = res.data.puck_json;
         // Ensure the data structure is exactly what Puck expects to prevent white-screens
-        setData(puckData && typeof puckData === 'object' && puckData.content ? puckData : { content: [], root: { props: { title: res.data.title } } });
+        setData(puckData && typeof puckData === 'object' && puckData.content ? puckData : { content: [], root: { props: { title: res.data?.title } } });
         setPageId(res.data.id);
       } catch (err) {
         console.error("Error fetching CMS page:", err);

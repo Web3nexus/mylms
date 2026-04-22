@@ -88,7 +88,7 @@ export default function GuidedPageEditor() {
               <ArrowLeft size={18} />
            </button>
            <div>
-              <h1 className="text-xl font-black text-text-main tracking-tighter uppercase leading-none">{page.title}</h1>
+              <h1 className="text-xl font-black text-text-main tracking-tighter uppercase leading-none">{page?.title}</h1>
               <p className="text-[10px] font-black text-mylms-rose tracking-[0.2em] uppercase mt-2">Guided Institutional Editor</p>
            </div>
         </div>

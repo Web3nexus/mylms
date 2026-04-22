@@ -357,7 +357,7 @@ export default function AssessmentPlayer() {
                               <Inbox size={32} />
                            </div>
                            <p className="text-[11px] md:text-[12px] font-black text-text-main uppercase tracking-tighter mb-2 px-4 line-clamp-1">
-                             {file ? file.name : "Drag instructional artifacts here"}
+                             {file ? file?.name : "Drag instructional artifacts here"}
                            </p>
                            <p className="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase tracking-widest px-4">Supports PDF, DOCX, ZIP (Max 10MB)</p>
                         </div>
@@ -388,7 +388,7 @@ export default function AssessmentPlayer() {
                        {assessment.rubric.criteria.map(criterion => (
                          <div key={criterion.id} className="group/crit">
                             <div className="flex justify-between items-start mb-3 gap-4">
-                               <p className="text-[11px] font-black text-text-main uppercase tracking-tight group-hover/crit:text-mylms-purple transition-colors">{criterion.name}</p>
+                               <p className="text-[11px] font-black text-text-main uppercase tracking-tight group-hover/crit:text-mylms-purple transition-colors">{criterion?.name}</p>
                                <span className="text-[9px] font-black text-mylms-rose bg-mylms-rose/5 px-2 py-0.5 rounded border border-mylms-rose/10 shrink-0">{criterion.max_score} pts</span>
                             </div>
                             <p className="text-[9px] font-bold text-gray-400 leading-relaxed uppercase tracking-widest">{criterion.description}</p>

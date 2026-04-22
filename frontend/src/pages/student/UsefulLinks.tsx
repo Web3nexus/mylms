@@ -76,7 +76,7 @@ export default function UsefulLinks() {
                               {link.icon}
                            </div>
                            <div className="grow">
-                              <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight leading-none mb-3 group-hover:text-[#4B345E] transition-colors">{link.name}</h4>
+                              <h4 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight leading-none mb-3 group-hover:text-[#4B345E] transition-colors">{link?.name}</h4>
                               <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-6">{link.description}</p>
                               <div className="flex items-center gap-2 text-[8px] font-black text-[#E90171] uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">
                                  Navigate Portal

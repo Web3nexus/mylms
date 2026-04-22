@@ -54,7 +54,7 @@ export default function CourseCreate() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target?.name]: e.target.value });
   };
 
   return (
@@ -88,7 +88,7 @@ export default function CourseCreate() {
                 name="title"
                 type="text" 
                 required
-                value={formData.title}
+                value={formData?.title}
                 onChange={handleChange}
                 className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-blue-900 focus:border-blue-900 transition-colors outline-none font-medium" 
                 placeholder="e.g., Advanced Calculus II"
@@ -105,7 +105,7 @@ export default function CourseCreate() {
                 className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-blue-900 focus:border-blue-900 transition-colors outline-none font-medium text-gray-700 cursor-pointer"
               >
                 <option value="">Select a department...</option>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat?.name}</option>)}
               </select>
             </div>
 

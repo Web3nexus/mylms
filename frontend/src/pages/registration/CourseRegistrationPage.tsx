@@ -170,7 +170,7 @@ export default function CourseRegistrationPage() {
            >
              {semesters.map(s => (
                <option key={s.id} value={s.id} className="font-sans text-sm">
-                 {s.name} — {s.academic_session?.name}
+                 {s?.name} — {s.academic_session?.name}
                  {s.is_current ? ' ★' : ''}
                </option>
              ))}
@@ -234,7 +234,7 @@ export default function CourseRegistrationPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              {catalog.filter(Boolean).filter(c => c && c.title).map(course => (
+              {catalog.filter(Boolean).filter(c => c && c?.title).map(course => (
                 <div key={course.id} className={`bg-white rounded-2xl border transition-all hover:shadow-xl group relative overflow-hidden flex flex-col ${course.is_registered ? 'border-mylms-rose/20 bg-offwhite/50' : 'border-border-soft hover:border-mylms-purple/20'}`}>
                   {/* Accent Header */}
                   <div className={`p-8 border-b ${course.is_registered ? 'bg-white/50 border-mylms-rose/10' : 'bg-offwhite border-border-soft group-hover:bg-white'} transition-all`}>

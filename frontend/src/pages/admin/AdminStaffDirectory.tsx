@@ -130,10 +130,10 @@ export default function AdminStaffDirectory() {
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner border ${
                   member.role === 'admin' ? 'bg-mylms-rose/5 border-mylms-rose/10 text-mylms-rose' : 'bg-mylms-purple/5 border-mylms-purple/10 text-mylms-purple'
                 }`}>
-                  {member.name.charAt(0)}
+                  {member?.name.charAt(0)}
                 </div>
                 <div>
-                   <h4 className="text-xl font-black text-text-main tracking-tighter uppercase mb-1">{member.name}</h4>
+                   <h4 className="text-xl font-black text-text-main tracking-tighter uppercase mb-1">{member?.name}</h4>
                    <p className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${
                      member.role === 'admin' ? 'text-mylms-rose' : 'text-mylms-purple opacity-60'
                    }`}>
@@ -146,7 +146,7 @@ export default function AdminStaffDirectory() {
              <div className="space-y-4 mb-10 relative z-10">
                 <div className="flex items-center gap-3 text-text-secondary text-[11px] font-bold py-3 px-4 bg-offwhite rounded-xl border border-gray-50">
                    <Mail size={14} className="text-gray-300" />
-                   {member.email}
+                   {member?.email}
                 </div>
                 <div className="flex items-center gap-3 text-text-secondary text-[10px] font-bold px-4">
                    <Clock size={14} className="text-gray-300" />
@@ -185,7 +185,7 @@ export default function AdminStaffDirectory() {
                        <input 
                          type="text"
                          required
-                         value={formData.name}
+                         value={formData?.name}
                          onChange={e => setFormData({...formData, name: e.target.value})}
                          className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
                          placeholder="e.g. Professor X"
@@ -196,7 +196,7 @@ export default function AdminStaffDirectory() {
                        <input 
                          type="email"
                          required
-                         value={formData.email}
+                         value={formData?.email}
                          onChange={e => setFormData({...formData, email: e.target.value})}
                          className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
                          placeholder="staff@mylms.edu"

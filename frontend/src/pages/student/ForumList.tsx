@@ -144,7 +144,7 @@ export default function ForumList() {
                     {forum.type === 'announcement' ? <Volume2 size={16} /> : <MessageSquare size={16} />}
                   </div>
                   <div>
-                    <p className="text-[11px] font-black uppercase tracking-tight leading-none mb-1">{forum.name}</p>
+                    <p className="text-[11px] font-black uppercase tracking-tight leading-none mb-1">{forum?.name}</p>
                     <p className={`text-[8px] font-bold uppercase tracking-widest ${activeForum?.id === forum.id ? 'text-white/50' : 'text-gray-400'}`}>{forum.type}</p>
                   </div>
                 </button>
@@ -235,7 +235,7 @@ export default function ForumList() {
                     <div>
                       <div className="flex items-center gap-4 mb-2">
                         {topic.is_pinned && <Pin size={12} className="text-mylms-rose rotate-12" />}
-                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight group-hover:text-mylms-purple transition-all">{topic.title}</h4>
+                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight group-hover:text-mylms-purple transition-all">{topic?.title}</h4>
                         {topic.is_locked && <Lock size={12} className="text-gray-300" />}
                       </div>
                       <div className="flex items-center gap-8 text-[9px] font-bold text-gray-400 uppercase tracking-widest">

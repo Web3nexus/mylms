@@ -157,7 +157,7 @@ export default function RubricCreator() {
                     <input 
                       type="text" 
                       required
-                      value={newRubric.title}
+                      value={newRubric?.title}
                       onChange={e => setNewRubric({...newRubric, title: e.target.value})}
                       className="w-full p-4 bg-offwhite border border-gray-100 rounded-2xl focus:ring-2 focus:ring-mylms-purple/10 focus:border-mylms-purple outline-none font-bold text-sm transition-all"
                       placeholder="e.g. Standard Creative Writing Rubric"
@@ -200,7 +200,7 @@ export default function RubricCreator() {
                                 <input 
                                   type="text" 
                                   required
-                                  value={crit.name}
+                                  value={crit?.name}
                                   onChange={e => handleCriterionChange(idx, 'name', e.target.value)}
                                   className="w-full p-3 bg-white border border-gray-100 rounded-xl focus:border-mylms-purple outline-none font-black text-[10px] uppercase tracking-tight"
                                   placeholder="e.g. Grammar"
@@ -279,7 +279,7 @@ export default function RubricCreator() {
                </div>
 
                <h3 className="text-[13px] font-black text-text-main uppercase tracking-tighter leading-tight mb-2 group-hover:text-mylms-purple transition-colors">
-                  {rubric.title}
+                  {rubric?.title}
                </h3>
                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-loose mb-10 opacity-70">
                   {rubric.description || 'Global academic grading standard.'}
@@ -288,7 +288,7 @@ export default function RubricCreator() {
                <div className="space-y-3 mb-10">
                   {rubric.criteria?.slice(0, 3).map((c: any) => (
                     <div key={c.id} className="flex justify-between items-center text-[10px] font-black text-text-main/60 uppercase tracking-tighter border-b border-offwhite/50 pb-2">
-                       <span>{c.name}</span>
+                       <span>{c?.name}</span>
                        <span className="text-mylms-rose">{c.max_score} MAX</span>
                     </div>
                   ))}

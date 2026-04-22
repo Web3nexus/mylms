@@ -70,7 +70,7 @@ export default function EmailTemplateManager() {
   };
 
   const filteredTemplates = templates.filter(t => 
-    t.slug.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    t?.slug.toLowerCase().includes(searchQuery.toLowerCase()) || 
     t.subject.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -149,7 +149,7 @@ export default function EmailTemplateManager() {
                       </span>
                       <Mail size={14} className={selectedTemplate?.id === t.id ? 'text-white/40' : 'text-mylms-purple/40'} />
                     </div>
-                    <h4 className="text-xs font-black uppercase tracking-tight mb-1">{t.slug.replace('_', ' ')}</h4>
+                    <h4 className="text-xs font-black uppercase tracking-tight mb-1">{t?.slug.replace('_', ' ')}</h4>
                     <p className={`text-[9px] font-bold truncate ${selectedTemplate?.id === t.id ? 'text-white/60' : 'text-gray-400'}`}>
                       {t.subject}
                     </p>
@@ -169,7 +169,7 @@ export default function EmailTemplateManager() {
                          <Layout size={24} />
                       </div>
                       <div>
-                         <h3 className="text-xl font-black text-mylms-purple uppercase tracking-tight">{selectedTemplate.slug.replace('_', ' ')}</h3>
+                         <h3 className="text-xl font-black text-mylms-purple uppercase tracking-tight">{selectedTemplate?.slug.replace('_', ' ')}</h3>
                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">Institutional Layout Protocol</p>
                       </div>
                    </div>

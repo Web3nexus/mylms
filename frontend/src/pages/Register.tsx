@@ -62,7 +62,7 @@ export default function Register() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target?.name]: e.target.value });
   };
 
   return (
@@ -171,7 +171,7 @@ export default function Register() {
                           name="name"
                           type="text"
                           required
-                          value={formData.name}
+                          value={formData?.name}
                           onChange={handleChange}
                           className="premium-input"
                           placeholder="e.g. Ade Okoro"
@@ -186,7 +186,7 @@ export default function Register() {
                           name="email"
                           type="email"
                           required
-                          value={formData.email}
+                          value={formData?.email}
                           onChange={handleChange}
                           className="premium-input"
                           placeholder="name@email.com"
