@@ -14,6 +14,8 @@ class CommunicationService
      */
     public static function send(string $recipientEmail, string $templateSlug, array $data = [], string $category = 'general')
     {
+        \Illuminate\Support\Facades\Log::info("📨 Initializing email transmission protocol: [{$templateSlug}] to [{$recipientEmail}]");
+
         $template = EmailTemplate::where('slug', $templateSlug)->first();
 
         if (!$template) {
@@ -44,7 +46,7 @@ class CommunicationService
             }
         }
 
-        // Determine Category (favor provided category, fallback to template's category)
+        // Determine Category
         $actualCategory = $category !== 'general' ? $category : ($template->category ?? 'general');
 
         // Configure Mailer Category
@@ -66,7 +68,16 @@ class CommunicationService
         }
 
         try {
-            Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content));
+            // Pro-active detection: If the new Mailable class didn't pull correctly to live, 
+            // we use a temporary fallback to prevent a fatal application crash.
+            if (class_exists(\App\Mail\DynamicTemplateMail::class)) {
+                Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content));
+            } else {
+                \Illuminate\Support\Facades\Log::warning("⚠️ DynamicTemplateMail class missing. Falling back to legacy transmission mode.");
+                Mail::html($content, function ($message) use ($recipientEmail, $subject) {
+                    $message->to($recipientEmail)->subject($subject);
+                });
+            }
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Failed to send email [{$templateSlug}] via primary SMTP ({$actualCategory}): " . $e->getMessage() . ". Reverting to default platform SMTP.");
@@ -75,7 +86,13 @@ class CommunicationService
             self::configureMailer('system_fallback_override');
             
             try {
-                Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content));
+                if (class_exists(\App\Mail\DynamicTemplateMail::class)) {
+                    Mail::to($recipientEmail)->send(new DynamicTemplateMail($subject, $content));
+                } else {
+                    Mail::html($content, function ($message) use ($recipientEmail, $subject) {
+                        $message->to($recipientEmail)->subject($subject);
+                    });
+                }
                 return true;
             } catch (\Exception $fallbackException) {
                 \Illuminate\Support\Facades\Log::error("Failed to send email [{$templateSlug}] via fallback SMTP: " . $fallbackException->getMessage());
