@@ -4,7 +4,6 @@ import {
   ChevronRight,
   ChevronLeft,
   User,
-  MapPin,
   GraduationCap,
   FileText,
   Upload,
@@ -53,7 +52,6 @@ export default function AdmissionWizard() {
   const [registryFields, setRegistryFields] = useState<any[]>([]);
 
   const token = useAuthStore(state => state.token);
-  const phase1Done = application?.step_data?.identity_verification;
   const feeCleared = application?.application_fee_status === 'waived' || application?.application_fee_status === 'paid';
 
   const steps = [
@@ -93,11 +91,8 @@ export default function AdmissionWizard() {
     try {
       const res = await client.get('/my-application');
       setApplication(res.data);
-      const currentData = res.data.step_data?.[currentStepId] || {};
-      setFormData(currentData);
       if (res.data.program?.degree_level) setSelectedLevel(res.data.program.degree_level);
       
-      // Sync Waiver Protocols
       if (res.data.admission_fee_waiver_delay_minutes) {
         setWaiverDelayMinutes(res.data.admission_fee_waiver_delay_minutes);
       }
@@ -117,6 +112,13 @@ export default function AdmissionWizard() {
     const diff = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
     setRemainingSeconds(diff);
   };
+
+  // Persistency Sync: Load step data when step changes
+  useEffect(() => {
+    if (application?.step_data) {
+      setFormData(application.step_data[currentStepId] || {});
+    }
+  }, [currentStepId, application?.step_data]);
 
   useEffect(() => {
     let timer: any;
@@ -182,7 +184,6 @@ export default function AdmissionWizard() {
       setTimeout(() => setShowSaved(false), 3000);
       if (nextStepId) {
         setSearchParams({ step: nextStepId });
-        setFormData(res.data.application?.step_data?.[nextStepId] || {});
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save progress.');
@@ -258,54 +259,97 @@ export default function AdmissionWizard() {
     </div>
   );
 
-  const now = new Date();
-  const isDateWindowOpen = enrollmentProtocol 
-    ? (!enrollmentProtocol.startDate || now >= new Date(enrollmentProtocol.startDate)) && 
-      (!enrollmentProtocol.endDate || now <= new Date(enrollmentProtocol.endDate))
-    : true;
-  
-  const isGateOpen = enrollmentProtocol?.isOpen && isDateWindowOpen;
+  const isGateOpen = enrollmentProtocol?.isOpen;
 
   // Enrollment Guard Screen
   if (!isGateOpen && enrollmentProtocol) {
     return (
       <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-20">
         <div className="w-full max-w-2xl">
-          <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-10 md:p-20 text-center relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-purple/5 rounded-bl-full group-hover:bg-mylms-purple/10 transition-all duration-1000" />
-            
+          <div className="bg-white rounded-3xl border border-border-soft shadow-2xl p-10 md:p-14 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-purple/5 rounded-bl-full" />
             <div className="relative z-10">
-              <div className="w-24 h-24 bg-mylms-rose/10 text-mylms-rose rounded-[32px] flex items-center justify-center mx-auto mb-12 shadow-inner">
-                <Lock size={48} />
+              <div className="w-20 h-20 bg-mylms-rose/10 text-mylms-rose rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <Lock size={40} />
               </div>
+              <h1 className="text-3xl font-black text-mylms-purple uppercase tracking-tight mb-4 italic">Enrollment Suspended</h1>
+              <p className="text-text-secondary font-medium leading-relaxed mb-10 max-w-md mx-auto text-sm opacity-80">
+                The academic registry has temporarily closed the enrollment gate.
+              </p>
+              <button onClick={() => navigate('/apply/dashboard')} className="px-10 py-4 bg-mylms-purple text-white font-black rounded-xl shadow-xl uppercase tracking-widest text-[10px]">
+                Return to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-              <div className="inline-flex items-center gap-3 text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px] mb-8 bg-mylms-rose/8 px-6 py-2 rounded-full border border-mylms-rose/20">
-                Institutional Protocol: Closed
+  // ─── STATUS SCREENS (Auto-Redirection Logic) ────────────────────────────────
+  if (application?.status === 'approved' || application?.user?.student_id) {
+    return (
+      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-2xl animate-in fade-in zoom-in-95 duration-700">
+          <div className="bg-white rounded-3xl border border-border-soft shadow-2xl p-10 md:p-14 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-mylms-purple/5 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="w-20 h-20 bg-green-500 rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-2xl border-4 border-white">
+                <CheckCircle size={40} className="text-white" />
               </div>
-
-              <h1 className="text-4xl md:text-6xl font-black text-mylms-purple uppercase tracking-tighter leading-none mb-8 italic">
-                Enrollment<br /><span className="text-mylms-rose">Suspended</span>
-              </h1>
-              
-              <p className="text-text-secondary font-medium leading-relaxed mb-12 max-w-md mx-auto">
-                The academic registry has temporarily closed the enrollment gate. This usually happens between sessions or when the quota quorum has been reached.
+              <h1 className="text-3xl font-black text-mylms-purple uppercase tracking-tight mb-4 italic">Admission Offer Approved</h1>
+              <p className="text-text-secondary font-medium leading-relaxed mb-8 text-sm opacity-80">
+                The Academic Registry has confirmed your candidacy. Congratulations, you are now officially a student of the university.
               </p>
 
-              {enrollmentProtocol.startDate && new Date(enrollmentProtocol.startDate) > now && (
-                <div className="p-8 bg-offwhite rounded-3xl border border-border-soft mb-12 inline-block">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 italic">Scheduled Re-opening</p>
-                  <div className="flex items-center gap-4 text-mylms-purple">
-                    <Calendar size={20} />
-                    <span className="text-xl font-black">{new Date(enrollmentProtocol.startDate).toLocaleDateString()}</span>
-                  </div>
+              <div className="p-8 bg-offwhite rounded-2xl border border-border-soft mb-8 grid grid-cols-2 gap-6 text-left shadow-inner">
+                <div>
+                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 italic">Matric Number</p>
+                   <p className="text-lg font-black text-mylms-purple font-mono uppercase">{application?.user?.student_id || 'PROVISIONING...'}</p>
                 </div>
-              )}
+                <div>
+                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 italic">Major Pursuit</p>
+                   <p className="text-sm font-black text-text-main uppercase leading-tight">{application?.program?.name || 'Academic Core'}</p>
+                </div>
+              </div>
 
-              <div>
-                <button 
-                  onClick={() => navigate('/apply/dashboard')}
-                  className="px-12 py-5 bg-mylms-purple text-white font-black rounded-2xl shadow-xl uppercase tracking-[0.4em] text-[11px] hover:translate-y-[-2px] transition-all active:scale-[0.98]"
-                >
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button onClick={() => navigate('/billing')} className="flex-1 bg-mylms-purple text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-3">
+                  <CreditCard size={16} /> Pay Tuition & Synchronize
+                </button>
+                <button onClick={() => navigate('/apply/dashboard')} className="flex-1 bg-white border border-border-soft text-mylms-purple py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-offwhite transition-all shadow-sm active:scale-95">
+                  Go to Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (application?.status === 'submitted' || application?.status === 'pending') {
+    return (
+      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="bg-white rounded-3xl border border-border-soft shadow-2xl p-10 md:p-14 text-center relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-mylms-purple/3 to-mylms-rose/3 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="w-20 h-20 bg-mylms-purple/10 rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <Clock size={40} className="text-mylms-purple animate-pulse" />
+              </div>
+              <h1 className="text-3xl font-black text-mylms-purple uppercase tracking-tight mb-4 italic leading-tight">Registry Review<br />In Progress</h1>
+              <p className="text-text-secondary font-medium leading-relaxed mb-8 text-sm opacity-80">
+                Your application has been received and is currently passing through the institutional evaluation protocol.
+              </p>
+
+              <div className="inline-flex items-center gap-4 bg-offwhite px-8 py-3 rounded-full border border-border-soft mb-12">
+                <div className="w-2 h-2 bg-amber-500 rounded-full animate-ping" />
+                <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest">Awaiting Quorum Decision</span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <button onClick={() => navigate('/apply/dashboard')} className="bg-mylms-purple text-white px-12 py-5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:opacity-90 transition-all active:scale-95">
                   Return to Dashboard
                 </button>
               </div>
@@ -316,143 +360,21 @@ export default function AdmissionWizard() {
     );
   }
 
-    // Phase barrier logic below
-
-
-  // ─── FEE GATE ───────────────────────────────────────────────────────────────
-  // ─── FEE GATE LOGIC (Phase Barrier) ─────────────────────────────────────────
-  const isAfterPhase1 = currentIndex > 0;
-  if (isAfterPhase1 && !feeCleared && currentStepId !== 'identity_verification') {
-    return (
-      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-20">
-        <div className="w-full max-w-2xl animate-in fade-in zoom-in duration-700">
-          <button onClick={() => setSearchParams({ step: 'identity_verification' })} className="flex items-center gap-3 text-gray-400 hover:text-mylms-purple transition-colors mb-12 font-black text-xs uppercase tracking-widest">
-            <ArrowLeft size={16} /> Edit Phase 1 Details
-          </button>
-
-          <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-10 md:p-16 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/5 rounded-bl-full pointer-events-none group-hover:bg-mylms-rose/10 transition-all duration-1000" />
-
-            <div className="relative z-10">
-              <div className="w-20 h-20 bg-mylms-purple/10 text-mylms-purple rounded-[28px] flex items-center justify-center mb-10 shadow-inner">
-                <CreditCard size={40} />
-              </div>
-
-              <div className="inline-flex items-center gap-3 text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px] mb-6 bg-mylms-rose/8 px-5 py-2 rounded-full border border-mylms-rose/20">
-                <Sparkles size={12} /> Fee Protocol Activation
-              </div>
-
-              <h1 className="text-4xl md:text-5xl font-black text-mylms-purple uppercase tracking-tighter leading-none mb-6 italic">
-                Application<br /><span className="text-mylms-rose">Gate</span> Lockdown
-              </h1>
-              <p className="text-text-secondary font-medium leading-relaxed mb-10 max-w-lg italic opacity-70">
-                Your Phase 1 Bio-Data has been secured. To proceed with the Scholastic Registry and Document Bunker, the application fee protocol must be satisfied.
-              </p>
-
-              {error && (
-                <div className="mb-8 p-5 bg-mylms-rose/5 border border-mylms-rose/20 rounded-2xl flex items-center gap-4 text-mylms-rose text-xs font-black uppercase tracking-widest">
-                  <AlertCircle size={18} />{error}
-                  <button onClick={() => setError(null)} className="ml-auto"><X size={14} /></button>
-                </div>
-              )}
-
-              {waiverRequested ? (
-                <div className="p-8 bg-offwhite border-2 border-border-soft rounded-[32px] text-center max-w-md mx-auto animate-in zoom-in-95 duration-500">
-                  <div className="relative w-20 h-20 mx-auto mb-6">
-                    <div className="absolute inset-0 border-4 border-mylms-rose/10 rounded-full"></div>
-                    <div 
-                      className="absolute inset-0 border-4 border-mylms-rose rounded-full transition-all duration-1000"
-                      style={{ 
-                        clipPath: `inset(0 0 0 0)`, // Simplified for build safety
-                        opacity: 0.8
-                      }}
-                    ></div>
-                    <Clock size={32} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-mylms-rose animate-pulse" />
-                  </div>
-                  
-                  <h3 className="text-lg font-black text-mylms-purple uppercase tracking-tight mb-2 italic">Wait Period Active</h3>
-                  
-                  <div className="flex flex-col items-center justify-center gap-1 mb-6">
-                    <p className="text-2xl font-black text-mylms-purple tabular-nums">
-                      {remainingSeconds !== null ? 
-                        `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60).toString().padStart(2, '0')}` 
-                        : '--:--'}
-                    </p>
-                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Security Transmission Time Remaining</p>
-                  </div>
-
-                  <p className="text-text-secondary font-medium text-[11px] leading-relaxed mb-8 opacity-70">
-                    Institutional protocols require a short verification window. Access will unlock automatically.
-                  </p>
-                  
-                  <button onClick={() => fetchApplication()} className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm active:scale-95">
-                    Refresh Protocol Status
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-6">
-                  <button
-                    onClick={handlePayFee}
-                    disabled={saving}
-                    className="flex-1 py-6 bg-mylms-purple text-white font-black rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,34,85,0.4)] uppercase tracking-[0.3em] text-[11px] hover:translate-y-[-2px] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-4"
-                  >
-                    <CreditCard size={20} />
-                    {saving ? 'Processing...' : 'Pay Protocol Fee'}
-                  </button>
-                  <button
-                    onClick={handleRequestWaiver}
-                    disabled={saving}
-                    className="flex-1 py-6 bg-white border-2 border-border-soft text-mylms-purple font-black rounded-2xl uppercase tracking-[0.3em] text-[11px] hover:border-mylms-purple/30 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-4"
-                  >
-                    <Heart size={20} />
-                    Request Waiver Wait
-                  </button>
-                </div>
-              )}
-
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center mt-10 opacity-50 italic">
-                Fee waivers are reviewed in real-time. Document Phase follows this gateway.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── SUBMISSION SUCCESS ─────────────────────────────────────────────────────
   if (submissionResult) {
-    const scholarshipApproved = submissionResult.scholarship_status === 'approved';
     return (
-      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-20">
+      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-2xl">
-          <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-10 md:p-16 text-center relative overflow-hidden">
+          <div className="bg-white rounded-3xl border border-border-soft shadow-2xl p-10 md:p-14 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-mylms-purple/3 to-mylms-rose/3 pointer-events-none" />
             <div className="relative z-10">
-              <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-10 shadow-2xl">
-                <CheckCircle size={48} className="text-white" />
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl border-4 border-white">
+                <CheckCircle size={40} className="text-white" />
               </div>
-              <h1 className="text-4xl font-black text-mylms-purple uppercase tracking-tighter mb-4">Application Submitted!</h1>
-              <p className="text-text-secondary font-medium leading-relaxed mb-10">
-                Your application is now under review. Our admissions team will contact you soon.
+              <h1 className="text-3xl font-black text-mylms-purple uppercase tracking-tight mb-4 italic">Application Transmitted!</h1>
+              <p className="text-text-secondary font-medium leading-relaxed mb-10 text-sm opacity-80">
+                Your scholastic profile is now in the registry. Our admissions team will notify you via the institutional mail protocol once reviewed.
               </p>
-
-              {scholarshipApproved && submissionResult.scholarship_provider && (
-                <div className="p-8 bg-amber-50 border-2 border-amber-200 rounded-[28px] mb-10 text-left">
-                  <div className="flex items-center gap-4 mb-4">
-                    <Sparkles size={24} className="text-amber-500" />
-                    <h3 className="font-black text-amber-800 uppercase tracking-tight text-sm">Scholarship Approved!</h3>
-                  </div>
-                  <p className="text-amber-700 font-medium text-sm leading-relaxed">
-                    Based on your scholarship application, you have been identified as eligible for funding. Your scholarship is sponsored by:
-                  </p>
-                  <p className="text-2xl font-black text-amber-800 uppercase tracking-tighter mt-4">
-                    {submissionResult.scholarship_provider}
-                  </p>
-                </div>
-              )}
-
-              <button onClick={() => navigate('/apply/dashboard')} className="bg-mylms-purple text-white px-12 py-5 rounded-xl font-black uppercase tracking-widest text-xs shadow-xl hover:opacity-90 transition-all active:scale-95">
+              <button onClick={() => navigate('/apply/dashboard')} className="bg-mylms-purple text-white px-12 py-5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:opacity-90 transition-all active:scale-95">
                 Go to Dashboard
               </button>
             </div>
@@ -462,8 +384,64 @@ export default function AdmissionWizard() {
     );
   }
 
+  // ─── FEE GATE LOCKDOWN ─────────────────────────────────────────────────────
+  const isAfterPhase1 = currentIndex > 0;
+  if (isAfterPhase1 && !feeCleared && currentStepId !== 'identity_verification') {
+    return (
+      <div className="min-h-screen bg-offwhite flex flex-col items-center justify-center px-6 py-20">
+        <div className="w-full max-w-2xl animate-in fade-in zoom-in duration-700">
+          <button onClick={() => setSearchParams({ step: 'identity_verification' })} className="flex items-center gap-3 text-gray-400 hover:text-mylms-purple transition-colors mb-12 font-black text-xs uppercase tracking-widest">
+            <ArrowLeft size={16} /> Edit Phase 1 Details
+          </button>
+          <div className="bg-white rounded-3xl border border-border-soft shadow-2xl p-10 md:p-14 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/5 rounded-bl-full pointer-events-none" />
+            <div className="relative z-10">
+              <div className="w-20 h-20 bg-mylms-purple/10 text-mylms-purple rounded-[28px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+                <CreditCard size={40} />
+              </div>
+              <h1 className="text-3xl font-black text-mylms-purple uppercase tracking-tight mb-4 italic leading-tight">Application Gate Lockdown</h1>
+              <p className="text-text-secondary font-medium leading-relaxed mb-10 text-sm opacity-70">
+                Your Phase 1 data has been secured. To proceed, the application fee protocol must be satisfied.
+              </p>
+              {error && (
+                <div className="mb-8 p-5 bg-mylms-rose/5 border border-mylms-rose/20 rounded-2xl flex items-center gap-4 text-mylms-rose text-xs font-black uppercase tracking-widest">
+                  <AlertCircle size={18} />{error}
+                  <button onClick={() => setError(null)} className="ml-auto"><X size={14} /></button>
+                </div>
+              )}
+              {waiverRequested ? (
+                <div className="p-8 bg-offwhite border-2 border-border-soft rounded-3xl text-center max-w-md mx-auto">
+                  <div className="relative w-16 h-16 mx-auto mb-4">
+                    <Clock size={32} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-mylms-rose animate-pulse" />
+                  </div>
+                  <h3 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4 italic">Wait Period Active</h3>
+                  <div className="flex flex-col items-center justify-center gap-1 mb-6">
+                    <p className="text-2xl font-black text-mylms-purple tabular-nums">
+                      {remainingSeconds !== null ? `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60).toString().padStart(2, '0')}` : '--:--'}
+                    </p>
+                  </div>
+                  <button onClick={() => fetchApplication()} className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm">
+                    Refresh Status
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button onClick={handlePayFee} disabled={saving} className="flex-1 py-5 bg-mylms-purple text-white font-black rounded-xl shadow-lg uppercase tracking-widest text-[10px] active:scale-95">
+                    Pay Fee
+                  </button>
+                  <button onClick={handleRequestWaiver} disabled={saving} className="flex-1 py-5 bg-white border-2 border-border-soft text-mylms-purple font-black rounded-xl uppercase tracking-widest text-[10px] active:scale-95">
+                    Request Waiver
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-
+  // ─── MAIN WIZARD ───────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-offwhite flex flex-col">
       {/* Mini Header */}
@@ -474,36 +452,22 @@ export default function AdmissionWizard() {
           </button>
           <h1 className="text-xl font-black text-mylms-purple uppercase tracking-tight italic">My Application</h1>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-3 bg-offwhite px-4 py-2 rounded-full border border-border-soft">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Auto-save Active</span>
-          </div>
-          <div className="hidden md:flex items-center gap-3 bg-green-50 px-5 py-2.5 rounded-full border border-green-200 shadow-sm">
-            <ShieldCheck size={14} className="text-green-600" />
-            <span className="text-[9px] font-black text-green-700 uppercase tracking-widest">
-              Security Protocol: Active
-            </span>
-          </div>
+        <div className="flex items-center gap-3 bg-offwhite px-4 py-2 rounded-full border border-border-soft">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <span className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Auto-save Active</span>
         </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar Nav */}
         <aside className="hidden lg:flex w-80 bg-white border-r border-border-soft flex-col p-10 overflow-y-auto">
-          <div className="mb-10">
-            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-4">Application Progress</p>
-            <div className="h-1.5 w-full bg-offwhite rounded-full overflow-hidden">
-              <div className="h-full bg-mylms-rose transition-all duration-1000" style={{ width: `${((currentIndex + 1) / steps.length) * 100}%` }}></div>
-            </div>
-          </div>
           <nav className="space-y-4">
             {steps.map((s, idx) => {
               const isActive = s.id === currentStepId;
               const isDone = application?.step_data?.[s.id];
               return (
                 <button
-                  key={s.id}
+                  key={idx}
                   onClick={() => { if (isDone || isActive || idx <= currentIndex) saveStep(s.id); }}
                   className={`w-full text-left p-5 rounded-2xl border transition-all flex items-center gap-4 group ${
                     isActive ? 'bg-mylms-purple text-white border-mylms-purple shadow-xl' :
@@ -519,7 +483,6 @@ export default function AdmissionWizard() {
                     {isDone && !isActive ? <CheckCircle size={16} /> : s.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest mb-0.5">Section {idx + 1}</p>
                     <p className={`text-[11px] font-black uppercase tracking-tight italic ${isActive ? 'text-white' : 'text-text-main'}`}>{s?.title}</p>
                   </div>
                 </button>
@@ -531,33 +494,27 @@ export default function AdmissionWizard() {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-8 md:p-16 selection:bg-mylms-rose/10">
           <div className="max-w-3xl mx-auto">
-            <div className="mb-16">
-              <div className="inline-flex items-center gap-4 text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px] mb-6">
-                <span className="w-10 h-px bg-mylms-rose"></span>
-                Current Protocol Stage
-              </div>
-              <h2 className="text-4xl md:text-6xl font-black text-mylms-purple tracking-tighter uppercase italic leading-[0.9]">
+            <div className="mb-12">
+              <h2 className="text-3xl md:text-5xl font-black text-mylms-purple tracking-tight uppercase italic leading-none">
                 {steps[currentIndex]?.title}
               </h2>
             </div>
 
             {error && (
-              <div className="mb-10 p-6 bg-mylms-rose/5 border border-mylms-rose/20 rounded-2xl flex items-center gap-4 text-mylms-rose text-sm font-black uppercase tracking-widest animate-in slide-in-from-top-4">
+              <div className="mb-10 p-6 bg-mylms-rose/5 border border-mylms-rose/20 rounded-2xl flex items-center gap-4 text-mylms-rose text-sm font-black uppercase tracking-widest">
                 <AlertCircle size={20} />
                 {error}
                 <button onClick={() => setError(null)} className="ml-auto"><X size={16} /></button>
               </div>
             )}
 
-            <div className="bg-white p-10 md:p-16 rounded-[40px] border border-border-soft shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-offwhite rounded-bl-full group-hover:bg-mylms-rose/5 transition-all duration-1000"></div>
-
+            <div className="bg-white p-8 md:p-12 rounded-3xl border border-border-soft shadow-xl relative overflow-hidden">
               <div className="relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   {registryFields
                     .filter(f => currentStep?.categories?.includes(f.category))
-                    .map(field => (
-                      <div key={field.id} className={`${field.type === 'textarea' || field.category === 'documents' ? 'md:col-span-2' : ''}`}>
+                    .map((field, fidx) => (
+                      <div key={fidx} className={`${field.type === 'textarea' || field.category === 'documents' ? 'md:col-span-2' : ''}`}>
                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">
                           {field.label} {field.is_required && <span className="text-mylms-rose">*</span>}
                         </label>
@@ -568,8 +525,7 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase tracking-tight placeholder:text-gray-300 placeholder:italic" 
-                            placeholder={`Official ${field.label}...`}
+                            className="w-full p-5 bg-offwhite border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase" 
                           />
                         )}
 
@@ -578,7 +534,7 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase tracking-tight shadow-sm appearance-none"
+                            className="w-full p-5 bg-offwhite border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-mylms-purple text-xs uppercase"
                           >
                             <option value="">Select {field.label}</option>
                             {field.options?.map((o: string) => <option key={o} value={o}>{o.toUpperCase()}</option>)}
@@ -586,23 +542,11 @@ export default function AdmissionWizard() {
                         )}
 
                         {field.type === 'date' && (
-                          <input 
-                            type="date" 
-                            name={field.field_key} 
-                            value={formData[field.field_key] || ''} 
-                            onChange={handleInputChange} 
-                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase shadow-sm"
-                          />
+                          <input type="date" name={field.field_key} value={formData[field.field_key] || ''} onChange={handleInputChange} className="w-full p-5 bg-offwhite border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-black text-mylms-purple text-xs uppercase" />
                         )}
 
                         {field.type === 'number' && (
-                          <input 
-                            type="number" 
-                            name={field.field_key} 
-                            value={formData[field.field_key] || ''} 
-                            onChange={handleInputChange} 
-                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase shadow-sm"
-                          />
+                          <input type="number" name={field.field_key} value={formData[field.field_key] || ''} onChange={handleInputChange} className="w-full p-5 bg-offwhite border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-black text-mylms-purple text-xs uppercase" />
                         )}
 
                         {field.type === 'textarea' && (
@@ -610,52 +554,41 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            rows={4}
-                            className="w-full p-8 bg-offwhite border-2 border-border-soft rounded-[32px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-medium text-text-main text-sm shadow-sm leading-relaxed"
-                            placeholder={`Institutional details regarding ${field.label.toLowerCase()}...`}
+                            rows={3}
+                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-medium text-text-main text-xs" 
                           />
                         )}
 
                         {field.type === 'file' && (
-                          <div className={`p-10 bg-offwhite rounded-[40px] border-2 transition-all group/file shadow-inner relative overflow-hidden ${application?.documents?.[field.field_key] ? 'border-green-200' : 'border-border-soft hover:border-mylms-rose'}`}>
-                            <div className="relative z-10">
-                              {application?.documents?.[field.field_key] ? (
-                                <div className="flex items-center gap-6 bg-green-50/50 p-4 rounded-2xl">
-                                  <CheckCircle size={20} className="text-green-600" />
-                                  <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">{field.label} Secured</span>
-                                  <input type="file" onChange={(e) => handleFileChange(e, field.field_key)} className="hidden" id={`file-${field.field_key}`} />
-                                  <label htmlFor={`file-${field.field_key}`} className="ml-auto text-[9px] font-black text-mylms-purple uppercase tracking-widest cursor-pointer underline hover:text-mylms-rose">Replace</label>
-                                </div>
-                              ) : (
-                                <div className="flex flex-col items-center py-4">
-                                  <FileUp size={32} className="text-gray-300 mb-6 group-hover/file:text-mylms-rose transition-colors" />
-                                  <input type="file" onChange={(e) => handleFileChange(e, field.field_key)} className="w-full text-[10px] font-black uppercase tracking-widest file:bg-mylms-purple file:text-white file:px-8 file:py-3 file:rounded-xl file:border-0 file:mr-6 cursor-pointer" />
-                                </div>
-                              )}
-                            </div>
+                          <div className={`p-8 bg-offwhite rounded-3xl border-2 transition-all ${application?.documents?.[field.field_key] ? 'border-green-200' : 'border-border-soft'}`}>
+                            {application?.documents?.[field.field_key] ? (
+                              <div className="flex items-center gap-4 bg-green-50/50 p-3 rounded-xl">
+                                <CheckCircle size={16} className="text-green-600" />
+                                <span className="text-[9px] font-black text-green-700 uppercase tracking-widest">Secured</span>
+                                <input type="file" onChange={(e) => handleFileChange(e, field.field_key)} className="hidden" id={`file-${field.field_key}`} />
+                                <label htmlFor={`file-${field.field_key}`} className="ml-auto text-[8px] font-black text-mylms-purple uppercase underline cursor-pointer">Update</label>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center py-2">
+                                <FileUp size={24} className="text-gray-300 mb-3" />
+                                <input type="file" onChange={(e) => handleFileChange(e, field.field_key)} className="w-full text-[9px] font-black uppercase tracking-widest file:bg-mylms-purple/10 file:text-mylms-purple file:px-4 file:py-2 file:rounded-lg file:border-0 cursor-pointer" />
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
                     ))}
                 </div>
 
-                {/* PROGRAM SELECTION - Special Logic Override */}
                 {currentStepId === 'program_selection' && (
-                  <div className="space-y-12 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/10 rounded-[32px] flex items-center gap-8">
-                      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-mylms-purple shadow-sm"><GraduationCap size={32}/></div>
-                      <div>
-                        <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight italic">Enrollment Pursuit</h4>
-                        <p className="text-[10px] font-medium text-text-secondary opacity-60 uppercase tracking-widest mt-1">Authorized Phase 2: Select your academic destination.</p>
-                      </div>
-                    </div>
+                  <div className="space-y-10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                       <div>
                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">Degree Level</label>
                         <select
                           value={selectedLevel}
                           onChange={(e) => { setSelectedLevel(e.target.value); setFormData({...formData, program_id: ''}); }}
-                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                          className="w-full p-5 bg-offwhite border-2 border-border-soft rounded-2xl font-black text-mylms-purple text-xs uppercase"
                         >
                           <option value="">-- SELECT LEVEL --</option>
                           {levels.map(l => <option key={l} value={l}>{l}</option>)}
@@ -668,7 +601,7 @@ export default function AdmissionWizard() {
                           value={formData.program_id || ''}
                           onChange={handleInputChange}
                           disabled={!selectedLevel}
-                          className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase shadow-sm disabled:opacity-30 appearance-none"
+                          className="w-full p-5 bg-offwhite border-2 border-border-soft rounded-2xl font-black text-mylms-purple text-xs uppercase disabled:opacity-30"
                         >
                           <option value="">-- {selectedLevel ? 'SELECT PROGRAM' : 'SELECT LEVEL FIRST'} --</option>
                           {availablePrograms.map(p => (
@@ -677,39 +610,13 @@ export default function AdmissionWizard() {
                         </select>
                       </div>
                     </div>
-                    {formData.program_id && (
-                      <div className="p-10 bg-offwhite rounded-[40px] border border-border-soft flex items-center justify-between border-l-8 border-l-mylms-rose animate-in slide-in-from-left duration-700 shadow-inner">
-                        <div>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 italic">Institutional Context</p>
-                          <p className="text-sm font-black text-text-main uppercase tracking-tight">
-                            {availablePrograms.find(p => p.id.toString() === formData.program_id.toString())?.department?.faculty?.name || 'Loading Faculty...'}
-                          </p>
-                        </div>
-                        <ShieldCheck className="text-mylms-rose opacity-40" size={32} />
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {/* FINAL REVIEW + SCHOLARSHIP */}
                 {currentStepId === 'final_review' && (
-                  <div className="space-y-12">
-                    {/* Summary */}
-                    <div>
-                      <div className="w-20 h-20 bg-mylms-rose/10 text-mylms-rose rounded-[32px] flex items-center justify-center mb-8 shadow-inner">
-                        <ShieldCheck size={40} />
-                      </div>
-                      <h3 className="text-2xl font-black text-text-main uppercase tracking-tighter mb-4 italic">Submission Protocol Readiness</h3>
-                      <p className="text-text-secondary font-medium leading-relaxed max-w-lg opacity-60 italic font-sans">
-                        Review your candidacy profile before final transmission.
-                      </p>
-                    </div>
-
-                    <div className="p-8 bg-offwhite rounded-[28px] border border-border-soft text-left shadow-inner">
-                      <div className="flex justify-between items-center mb-6">
-                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Protocol Metadata</p>
-                        <span className="bg-green-100 text-green-700 text-[8px] font-black px-3 py-1 rounded-full uppercase">Valid</span>
-                      </div>
+                  <div className="space-y-10">
+                    <div className="p-8 bg-offwhite rounded-3xl border border-border-soft">
+                      <h3 className="text-xl font-black text-text-main uppercase tracking-tight mb-6 italic">Submission Protocol Readiness</h3>
                       <div className="space-y-4">
                         <div className="flex justify-between text-[11px] font-black uppercase tracking-tight">
                           <span className="text-text-secondary opacity-40">Candidate</span>
@@ -719,93 +626,50 @@ export default function AdmissionWizard() {
                           <span className="text-text-secondary opacity-40">Target Degree</span>
                           <span className="text-mylms-purple">{application?.program?.name || 'Not selected'}</span>
                         </div>
-                        <div className="flex justify-between text-[11px] font-black uppercase tracking-tight">
-                          <span className="text-text-secondary opacity-40">Fee Status</span>
-                          <span className="text-green-600">{application?.application_fee_status === 'waived' ? '✓ Waived' : '✓ Paid'}</span>
-                        </div>
                       </div>
                     </div>
 
-                    {/* SCHOLARSHIP REASON - Key Feature */}
-                    <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/15 rounded-[28px]">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-mylms-purple rounded-2xl flex items-center justify-center shrink-0 shadow-lg">
-                          <Heart size={22} className="text-white" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight">Scholarship Application</h4>
-                          <p className="text-[10px] font-medium text-text-secondary opacity-60 uppercase tracking-widest mt-1">Optional — but strongly encouraged</p>
-                        </div>
-                      </div>
-                      <p className="text-text-secondary font-medium text-sm leading-relaxed mb-8">
-                        Tell us why you need financial support. A compelling statement (50+ words mentioning your personal goals, challenges, and community impact) is <strong className="text-mylms-purple">automatically evaluated</strong> by our scholarship engine. Approved applicants are sponsored by our partners:
-                        <strong className="text-mylms-purple"> Hudorian Trust</strong> &amp; <strong className="text-mylms-purple">The Maart</strong>.
-                      </p>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Why do you need a scholarship?</label>
+                    <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/15 rounded-3xl">
+                      <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4">Scholarship Application (Optional)</h4>
                       <textarea
                         value={scholarshipReason}
                         onChange={(e) => setScholarshipReason(e.target.value)}
-                        rows={6}
-                        placeholder="Describe your financial situation, academic goals, and how this scholarship would transform your future and community..."
-                        className="w-full p-6 bg-white border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-purple transition-all font-medium text-text-main text-sm leading-relaxed resize-none"
+                        rows={5}
+                        placeholder="Why do you need financial support?..."
+                        className="w-full p-6 bg-white border-2 border-border-soft rounded-2xl font-medium text-text-main text-sm"
                       />
-                      <div className="flex justify-between items-center mt-3">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                          Word count: {scholarshipReason.trim() ? scholarshipReason.trim().split(/\s+/).length : 0}
-                          {scholarshipReason.trim().split(/\s+/).length >= 50 && <span className="text-green-600 ml-2">✓ Strong</span>}
-                        </p>
-                        <p className="text-[9px] font-medium text-gray-400">Leaving blank skips the scholarship evaluation</p>
-                      </div>
                     </div>
 
                     <button
                       onClick={submitApplication}
                       disabled={saving}
-                      className="w-full py-8 bg-gradient-to-r from-mylms-purple to-mylms-rose text-white font-black rounded-full shadow-[0_20px_50px_-15px_rgba(186,22,70,0.4)] uppercase tracking-[0.5em] text-[12px] active:scale-95 transition-all flex items-center justify-center gap-6 group hover:brightness-110 disabled:opacity-50"
+                      className="w-full py-6 bg-mylms-purple text-white font-black rounded-full shadow-lg uppercase tracking-widest text-[12px] active:scale-95 transition-all"
                     >
-                      {saving ? 'Transmitting Data...' : (
-                        <>
-                          Transmit Official Application
-                          <ChevronRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                        </>
-                      )}
+                      {saving ? 'Transmitting...' : 'Transmit Official Application'}
                     </button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* NAV BUTTONS */}
             {currentStepId !== 'final_review' && (
-              <div className="mt-16 flex flex-col md:flex-row gap-8">
+              <div className="mt-12 flex flex-col md:flex-row gap-6">
                 {prevStep && (
                   <button
                     onClick={() => { saveStep(prevStep.id); }}
-                    className="w-full md:w-auto px-12 py-6 bg-white border-2 border-border-soft text-mylms-purple font-black rounded-xl hover:bg-offwhite transition-all uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-4 group"
+                    className="w-full md:w-auto px-10 py-5 bg-white border-2 border-border-soft text-mylms-purple font-black rounded-xl hover:bg-offwhite transition-all uppercase tracking-widest text-[10px] flex items-center justify-center gap-4"
                   >
-                    <ChevronLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
-                    Back: {prevStep?.title}
+                    <ChevronLeft size={16} /> Back
                   </button>
                 )}
                 {nextStep && (
                   <button
                     onClick={() => { saveStep(nextStep.id); }}
                     disabled={saving}
-                    className="w-full flex-1 py-10 bg-mylms-purple text-white font-black rounded-3xl hover:bg-mylms-purple/95 transition-all shadow-[0_30px_60px_-15px_rgba(0,34,85,0.4)] uppercase tracking-[0.5em] text-[12px] flex items-center justify-center gap-8 group active:scale-[0.98] disabled:opacity-50 border border-white/10"
+                    className="w-full flex-1 py-6 bg-mylms-purple text-white font-black rounded-2xl hover:brightness-110 transition-all shadow-xl uppercase tracking-widest text-[11px] flex items-center justify-center gap-6"
                   >
-                    {saving ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Securing Protocol Data...
-                      </>
-                    ) : (
-                      <>
-                        Save & Proceed to next section
-                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:translate-x-2 transition-transform">
-                          <ChevronRight size={20} />
-                        </div>
-                      </>
-                    )}
+                    {saving ? 'Saving...' : `Proceed to ${nextStep?.title}`}
+                    <ChevronRight size={18} />
                   </button>
                 )}
               </div>
