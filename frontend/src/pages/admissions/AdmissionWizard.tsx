@@ -144,6 +144,20 @@ export default function AdmissionWizard() {
     }
   }, [feeCleared, currentStepId]);
 
+  // Proactive Status Polling for Automated Redirection (Registry Review Phase)
+  useEffect(() => {
+    let pollingTimer: any;
+    const isStationaryStatus = application?.status === 'submitted' || application?.status === 'pending' || application?.status === 'review';
+    
+    if (isStationaryStatus) {
+      pollingTimer = setInterval(() => {
+        fetchApplication();
+      }, 60000); // Re-validate status every 60 seconds
+    }
+    
+    return () => clearInterval(pollingTimer);
+  }, [application?.status]);
+
   const fetchProtocol = async () => {
     try {
       const res = await client.get('/admin/admissions/settings');

@@ -23,20 +23,19 @@ class SendAdmissionEmailJob implements ShouldQueue
 
     public function handle()
     {
-        $app = AdmissionApplication::with('user')->find($this->applicationId);
+        $app = AdmissionApplication::with(['user', 'program', 'program.department.faculty'])->find($this->applicationId);
         
-        if ($app && $app->status === 'under_review') {
-            // Update status if auto-approved by scholarship engine
-            if ($app->scholarship_status === 'auto_approved') {
-                $app->update(['status' => 'approved']);
-                
-                // TODO: Actual mail logic here
-                // Mail::to($app->user->email)->send(new \App\Mail\AdmissionApproved($app));
-            } else if ($app->scholarship_status === 'rejected') {
-                $app->update(['status' => 'rejected']);
-                // Mail::to($app->user->email)->send(new \App\Mail\AdmissionRejected($app));
-            }
-            // If it's pending review, it stays 'under_review'
+        if (!$app) return;
+
+        // If approved by admin or auto-evaluator
+        if ($app->status === 'approved') {
+            \Illuminate\Support\Facades\Mail::to($app->user->email)
+                ->send(new \App\Mail\AdmissionApproved($app));
+        } 
+        
+        if ($app->status === 'rejected') {
+            \Illuminate\Support\Facades\Mail::to($app->user->email)
+                ->send(new \App\Mail\AdmissionRejected($app));
         }
     }
 }

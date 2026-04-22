@@ -243,6 +243,14 @@ class AdmissionController extends Controller
             'scholarship_provider'=> $scholarshipProvider,
         ]);
 
+        // Dispatch Confirmation Mail
+        try {
+            \Illuminate\Support\Facades\Mail::to($application->user->email)
+                ->send(new \App\Mail\AdmissionSubmitted($application->load(['user', 'program'])));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Admission Mail Failed', ['error' => $e->getMessage()]);
+        }
+
         return response()->json([
             'message'              => 'Application submitted successfully.',
             'scholarship_status'   => $scholarshipStatus,
