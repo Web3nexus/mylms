@@ -12,22 +12,26 @@ class EmailTemplateSeeder extends Seeder
         $templates = [
             [
                 'slug' => 'otp_verification',
-                'subject' => '👋 Welcome to {{campus_name}}! Here is your login code',
+                'subject' => 'Verify your identity: Security code for {{campus_name}}',
                 'category' => 'system',
                 'placeholders' => '["student_name", "otp_code", "campus_name"]',
                 'content_html' => '
                     <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 40px; background: #fff;">
                         <div style="text-align: center; margin-bottom: 40px;">
-                            <h1 style="color: #4c1d95; font-size: 24px; font-weight: 900; margin: 0;">We\'re so glad you\'re here!</h1>
-                            <p style="color: #707070; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;">Just one quick step to get you started</p>
+                            <h1 style="color: #4b345d; font-size: 24px; font-weight: 800; margin: 0;">Identity Verification</h1>
+                            <p style="color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px;">Institutional Security Protocol</p>
                         </div>
-                        <p style="color: #333; font-size: 16px; line-height: 1.6;">Hi <strong>{{student_name}}</strong>,</p>
-                        <p style="color: #333; font-size: 16px; line-height: 1.6;">Welcome to the <strong>{{campus_name}}</strong> family! To keep your account safe and finalize your registration, please use the 6-digit code below.</p>
-                        <div style="background: #f8fafc; padding: 40px; border-radius: 24px; text-align: center; margin: 40px 0; border: 1px solid #e2e8f0;">
-                            <p style="color: #707070; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Your verification code</p>
-                            <h2 style="font-family: monospace; font-size: 48px; color: #4c1d95; margin: 0; letter-spacing: 8px;">{{otp_code}}</h2>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Hi {{student_name}},</p>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">To finalize your secure access to the <strong>{{campus_name}}</strong> portal, please use the following institutional verification code.</p>
+                        <div style="background: #f8fafc; padding: 32px; border-radius: 20px; text-align: center; margin: 32px 0; border: 1px solid #e2e8f0;">
+                            <p style="color: #64748b; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Your Security Code</p>
+                            <h2 style="font-family: sans-serif; font-size: 42px; color: #4b345d; margin: 0; font-weight: 800;">{{otp_code}}</h2>
                         </div>
-                        <p style="color: #94a3b8; font-size: 12px; text-align: center;">This code will expire in 15 minutes. If you didn\'t request this, no worries—you can just ignore this email.</p>
+                        <p style="color: #94a3b8; font-size: 12px; line-height: 1.6;">This code will expire in 15 minutes. If you did not request this verification, please notify the IT Service Desk immediately.</p>
+                        <hr style="border: 0; border-top: 1px solid #f0f0f0; margin: 40px 0;">
+                        <p style="color: #cbd5e1; font-size: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.1em;">
+                            {{campus_name}} Institutional Registry &bull; Secure Systems Division
+                        </p>
                     </div>'
             ],
             [

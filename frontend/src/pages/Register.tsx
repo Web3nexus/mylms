@@ -197,7 +197,7 @@ export default function Register() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="premium-input-wrapper group/input">
-                      <label className="premium-label text-white">Security Protocol</label>
+                      <label className="premium-label !text-white !text-[8px] tracking-widest !mb-0">Security Protocol</label>
                       <div className="relative">
                         <Lock className="premium-input-icon" size={20} />
                         <input
@@ -212,7 +212,7 @@ export default function Register() {
                       </div>
                     </div>
                     <div className="premium-input-wrapper group/input">
-                      <label className="premium-label">Verify Protocol</label>
+                      <label className="premium-label !text-white !text-[8px] tracking-widest !mb-0">Verify Protocol</label>
                       <div className="relative">
                         <ShieldCheck className="premium-input-icon" size={20} />
                         <input

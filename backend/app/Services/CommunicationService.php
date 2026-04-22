@@ -23,18 +23,26 @@ class CommunicationService
             if ($templateSlug === 'otp_verification') {
                 $template = EmailTemplate::create([
                     'slug' => 'otp_verification',
-                    'subject' => 'Security Protocol: Your Verification Code',
+                    'subject' => 'Verify your identity: Security code for {{campus_name}}',
                     'category' => 'system',
                     'placeholders' => '["student_name", "otp_code", "campus_name"]',
                     'content_html' => '
-                        <div style="font-family: sans-serif; padding: 40px; color: #333; max-width: 600px; margin: auto; border: 1px solid #f0f0f0; border-radius: 30px;">
-                            <h2 style="color: #4c1d95;">Security Verification</h2>
-                            <p>Hello {{student_name}},</p>
-                            <p>To finalize your access to the <strong>{{campus_name}}</strong> institutional portal, please use the following security code:</p>
-                            <div style="font-size: 42px; font-weight: bold; margin: 30px 0; color: #4c1d95; letter-spacing: 10px; text-align: center; background: #f8fafc; padding: 30px; border-radius: 20px;">
-                                {{otp_code}}
+                        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 40px; background: #fff;">
+                            <div style="text-align: center; margin-bottom: 40px;">
+                                <h1 style="color: #4b345d; font-size: 24px; font-weight: 800; margin: 0;">Identity Verification</h1>
+                                <p style="color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px;">Institutional Security Protocol</p>
                             </div>
-                            <p style="font-size: 12px; color: #777; text-align: center;">This code is valid for 15 minutes. If you did not request this code, please contact the IT Service Desk.</p>
+                            <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Hi {{student_name}},</p>
+                            <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">To finalize your secure access to the <strong>{{campus_name}}</strong> portal, please use the following institutional verification code.</p>
+                            <div style="background: #f8fafc; padding: 32px; border-radius: 20px; text-align: center; margin: 32px 0; border: 1px solid #e2e8f0;">
+                                <p style="color: #64748b; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Your Security Code</p>
+                                <h2 style="font-family: sans-serif; font-size: 42px; color: #4b345d; margin: 0; font-weight: 800;">{{otp_code}}</h2>
+                            </div>
+                            <p style="color: #94a3b8; font-size: 12px; line-height: 1.6;">This code will expire in 15 minutes. If you did not request this verification, please notify the IT Service Desk immediately.</p>
+                            <hr style="border: 0; border-top: 1px solid #f0f0f0; margin: 40px 0;">
+                            <p style="color: #cbd5e1; font-size: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{campus_name}} Institutional Registry &bull; Secure Systems Division
+                            </p>
                         </div>'
                 ]);
             } else {
