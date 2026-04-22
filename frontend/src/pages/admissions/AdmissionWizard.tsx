@@ -492,7 +492,7 @@ export default function AdmissionWizard() {
               <div className="relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   {registryFields
-                    .filter(f => steps[currentIndex].categories?.includes(f.category))
+                    .filter(f => currentStep?.categories?.includes(f.category))
                     .map(field => (
                       <div key={field.id} className={`${field.type === 'textarea' || field.category === 'documents' ? 'md:col-span-2' : ''}`}>
                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-2">

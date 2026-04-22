@@ -186,14 +186,14 @@ export const config: Config<Props> = {
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {categories.map((cat, i) => (
+              {categories?.map((cat, i) => (
                 <div key={i} className="bg-white p-10 rounded-2xl shadow-sm border border-border-soft group overflow-hidden relative transition-all hover:shadow-xl hover:-translate-y-1">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-mylms-rose/5 rounded-bl-full group-hover:scale-150 transition-duration-500"></div>
-                  <h3 className="text-xl font-serif font-black text-mylms-purple border-b border-border-soft pb-6 mb-8 uppercase tracking-tight">{cat.name}</h3>
+                  <h3 className="text-xl font-serif font-black text-mylms-purple border-b border-border-soft pb-6 mb-8 uppercase tracking-tight">{cat?.name}</h3>
                   <ul className="space-y-4 relative z-10">
-                    {cat.programs.map((p, j) => (
+                    {cat?.programs?.map((p, j) => (
                       <li key={j}>
-                        <a href={p.link} className="text-xs font-bold text-gray-500 hover:text-mylms-rose transition-colors flex items-center justify-between group/link uppercase tracking-widest">{p.name}<ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-mylms-rose" /></a>
+                        <a href={p?.link} className="text-xs font-bold text-gray-500 hover:text-mylms-rose transition-colors flex items-center justify-between group/link uppercase tracking-widest">{p?.name}<ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-mylms-rose" /></a>
                       </li>
                     ))}
                   </ul>
