@@ -75,8 +75,8 @@ export default function InstructorGradebook() {
   };
 
   const filteredSubmissions = submissions.filter(s => 
-    s.user.name.toLowerCase().includes(search.toLowerCase()) || 
-    s.assessment.title.toLowerCase().includes(search.toLowerCase())
+    s?.user?.name?.toLowerCase().includes(search.toLowerCase()) || 
+    s?.assessment?.title?.toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) return (
@@ -167,7 +167,7 @@ export default function InstructorGradebook() {
                          <td className="px-10 py-6">
                             <div className="flex items-center gap-4">
                                <div className="w-10 h-10 bg-offwhite rounded-xl flex items-center justify-center text-mylms-purple font-black text-xs border border-mylms-purple/10">
-                                  {submission.user.name.charAt(0)}
+                                  {submission?.user?.name?.charAt(0)}
                                </div>
                                <div>
                                   <p className="text-[12px] font-black text-text-main uppercase tracking-tighter">{submission.user.name}</p>

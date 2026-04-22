@@ -212,7 +212,7 @@ export default function LessonViewer() {
             <h3 className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">Unit Registry</h3>
           </div>
           <div className="space-y-1">
-            {lessons.map((lesson, idx) => (
+            {lessons.filter(l => l && l.title).map((lesson, idx) => (
               <Link 
                 key={lesson.id} 
                 to={`/courses/${slug}/lessons/${lesson.slug}`}
@@ -243,7 +243,7 @@ export default function LessonViewer() {
                 <h3 className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">Assessments & Tasks</h3>
               </div>
               <div className="space-y-1">
-                {assessments.map((assessment) => (
+                {assessments.filter(a => a && a.title).map((assessment) => (
                   <Link 
                     key={assessment.id} 
                     to={`/assessments/${assessment.id}`}

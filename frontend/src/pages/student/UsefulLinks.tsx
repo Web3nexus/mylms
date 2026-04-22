@@ -65,7 +65,7 @@ export default function UsefulLinks() {
                <div key={idx} className="space-y-10">
                   <h3 className="text-[10px] font-black uppercase text-gray-400 tracking-[0.4em] flex items-center gap-2">
                      <PlusCircle size={14} className="text-[#E90171] opacity-50" />
-                     {category.title}
+                     {category?.title}
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

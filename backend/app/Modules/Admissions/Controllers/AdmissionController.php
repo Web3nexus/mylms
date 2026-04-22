@@ -32,6 +32,9 @@ class AdmissionController extends Controller
 
     /**
      * Get user's current application (or create a blank one).
+     * program_id is intentionally omitted on creation — the user selects
+     * it in step 2 of the wizard. We handle the DB constraint gracefully
+     * in case the nullable migration has not yet been run on this server.
      */
     public function myApplication()
     {
@@ -43,17 +46,49 @@ class AdmissionController extends Controller
 
         // Auto-create a blank application shell on first visit
         if (!$application) {
-            $application = AdmissionApplication::create([
-                'user_id'               => $user->id,
-                'status'                => AdmissionApplication::STATUS_INCOMPLETE,
-                'application_fee_status'=> AdmissionApplication::FEE_PENDING,
-                'scholarship_status'    => AdmissionApplication::SCHOLARSHIP_NOT_APPLIED,
-                'current_step'          => AdmissionApplication::STEP_PERSONAL,
-                'step_data'             => [],
-            ]);
+            try {
+                // First try: attempt the insert without program_id.
+                // This succeeds once the nullable migration has been applied.
+                $application = new AdmissionApplication();
+                $application->user_id                = $user->id;
+                $application->status                 = AdmissionApplication::STATUS_INCOMPLETE;
+                $application->application_fee_status = AdmissionApplication::FEE_PENDING;
+                $application->scholarship_status     = AdmissionApplication::SCHOLARSHIP_NOT_APPLIED;
+                $application->current_step           = AdmissionApplication::STEP_PERSONAL;
+                $application->step_data              = [];
+                $application->save();
+
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Fallback: if program_id column is still NOT NULL (migration not yet run),
+                // alter the column inline then retry.
+                if ($e->getCode() === '23502') {
+                    try {
+                        \Illuminate\Support\Facades\DB::statement(
+                            'ALTER TABLE admission_applications ALTER COLUMN program_id DROP NOT NULL'
+                        );
+                        $application = new AdmissionApplication();
+                        $application->user_id                = $user->id;
+                        $application->status                 = AdmissionApplication::STATUS_INCOMPLETE;
+                        $application->application_fee_status = AdmissionApplication::FEE_PENDING;
+                        $application->scholarship_status     = AdmissionApplication::SCHOLARSHIP_NOT_APPLIED;
+                        $application->current_step           = AdmissionApplication::STEP_PERSONAL;
+                        $application->step_data              = [];
+                        $application->save();
+                    } catch (\Exception $inner) {
+                        \Illuminate\Support\Facades\Log::error('Failed to auto-fix program_id constraint', [
+                            'error' => $inner->getMessage()
+                        ]);
+                        return response()->json([
+                            'message' => 'Application setup failed. Please contact support.'
+                        ], 500);
+                    }
+                } else {
+                    throw $e;
+                }
+            }
         }
 
-        return response()->json($application);
+        return response()->json($application->load(['program', 'offer', 'user', 'faculty', 'instructor']));
     }
 
     // ─────────────────────────────────────────────────────────────

@@ -120,7 +120,7 @@ export default function PeerReviewPlayer() {
               <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none mb-2">Audit Session</h1>
               <p className="text-mylms-purple font-bold uppercase tracking-[0.3em] text-[8px] flex items-center gap-3">
                  <ShieldCheck size={12} />
-                 Instructional Evaluation Protocol: {review.submission.assessment.title}
+                 Instructional Evaluation Protocol: {review.submission?.assessment?.title ?? 'Unknown Protocol'}
               </p>
            </div>
            
@@ -145,7 +145,7 @@ export default function PeerReviewPlayer() {
                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-loose">Instructional artifact to be audited against the rubric registry.</p>
                     </div>
                     <a 
-                      href={`${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/storage/${review.submission.file_path}`} 
+                      href={`${import.meta.env.VITE_API_BASE_URL.replace('/api', '')}/storage/${review.submission?.file_path}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="p-4 bg-mylms-purple text-white rounded-xl shadow-lg hover:bg-mylms-purple/90 transition-all active:scale-90"
@@ -157,7 +157,7 @@ export default function PeerReviewPlayer() {
                  <div className="space-y-4">
                     <p className="text-[10px] font-black text-text-main uppercase tracking-[0.2em] opacity-40">Contextual Parameters</p>
                     <p className="text-[12px] font-bold text-text-main leading-relaxed italic opacity-80 border-l-4 border-mylms-purple/20 pl-6">
-                       {review.submission.assessment.description}
+                       {review.submission?.assessment?.description ?? ""}
                     </p>
                  </div>
               </section>
@@ -187,7 +187,7 @@ export default function PeerReviewPlayer() {
               <div className="flex-1 p-10 space-y-12">
                  {/* Rubric Display */}
                  <div className="space-y-8">
-                    {review.submission.assessment.rubric.criteria.map(criterion => (
+                    {(review.submission?.assessment?.rubric?.criteria ?? []).map(criterion => (
                       <div key={criterion.id} className="p-6 rounded-2xl border border-gray-50 bg-offwhite/30 hover:border-mylms-purple/20 transition-all group/crit">
                          <div className="flex justify-between items-start mb-4">
                             <h5 className="text-[11px] font-black text-text-main uppercase tracking-tight group-hover/crit:text-mylms-purple transition-colors">{criterion.name}</h5>

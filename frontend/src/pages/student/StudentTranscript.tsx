@@ -225,7 +225,7 @@ export default function StudentTranscript() {
                      {term.courses.map((course, j) => (
                         <div key={j} className="p-6 border border-border-soft rounded-xl flex justify-between items-center group hover:border-mylms-purple/20 transition-all">
                            <div>
-                              <h4 className="text-sm font-black text-text-main uppercase tracking-tight">{course.title}</h4>
+                              <h4 className="text-sm font-black text-text-main uppercase tracking-tight">{course?.title}</h4>
                               <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">CRS-ID: {course.course_id}</p>
                            </div>
                            <div className="flex items-center gap-10">

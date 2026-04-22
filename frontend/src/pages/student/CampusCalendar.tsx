@@ -102,7 +102,7 @@ export default function CampusCalendar() {
                            <p className="text-[9px] font-black text-mylms-rose uppercase tracking-widest">{event.type}</p>
                            <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">{event.date}</p>
                         </div>
-                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight mb-4 group-hover:text-mylms-purple transition-colors">{event.title}</h4>
+                        <h4 className="text-sm font-black text-text-main uppercase tracking-tight mb-4 group-hover:text-mylms-purple transition-colors">{event?.title}</h4>
                         <p className="text-[9px] font-bold text-text-secondary uppercase tracking-widest leading-relaxed mb-6">{event.description}</p>
                         <div className="flex items-center gap-2 text-[8px] font-black text-mylms-purple uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">
                            Registry View
