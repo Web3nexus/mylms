@@ -33,6 +33,13 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_STUDENT,
         ]);
 
+        User::updateOrCreate(['email' => 'staff@smartuni.edu'], [
+            'name' => 'Grace Adama (Registrar)',
+            'password' => Hash::make('password'),
+            'role' => User::ROLE_STAFF,
+            'permissions' => ['admissions_portal', 'student_registry']
+        ]);
+
         // 2. Create Initial Academic Structure
         $faculty = Faculty::firstOrCreate(['name' => 'Faculty of Engineering & Technology'], [
             'description' => 'The leading faculty for digital innovation and software engineering.'
