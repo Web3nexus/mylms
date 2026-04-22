@@ -87,7 +87,7 @@ export default function PeerReviewList() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {reviews.filter(r => r && r.submission && r.submission.assessment && r.submission.assessment.title).map((review) => (
+            {reviews.filter(r => r && r.submission && r.submission.assessment && r.submission?.assessment?.title).map((review) => (
               <Link 
                 key={review.id}
                 to={`/peer-reviews/${review.id}`}
@@ -105,7 +105,7 @@ export default function PeerReviewList() {
                 </div>
 
                 <h3 className="text-[13px] font-black text-text-main uppercase tracking-tighter leading-tight mb-4 group-hover:text-mylms-purple transition-colors">
-                   {review.submission.assessment.title}
+                   {review.submission?.assessment?.title}
                 </h3>
                 
                 <div className="flex items-center gap-2 mb-8 text-[9px] font-bold text-gray-400 uppercase tracking-widest">

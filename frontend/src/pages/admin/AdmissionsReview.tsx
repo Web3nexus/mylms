@@ -126,7 +126,7 @@ export default function AdmissionsReview() {
                 className={`w-full text-left p-6 rounded-xl border transition-all flex justify-between items-center group relative overflow-hidden ${selectedApp?.id === app.id ? 'bg-offwhite border-mylms-purple shadow-md translate-x-2' : 'bg-white border-border-soft hover:border-mylms-purple/20 text-text-secondary shadow-sm'}`}
               >
                 <div className="relative z-10">
-                  <p className="font-black text-sm uppercase tracking-tight text-text-main group-hover:text-mylms-purple transition-colors">{app.user.name}</p>
+                  <p className="font-black text-sm uppercase tracking-tight text-text-main group-hover:text-mylms-purple transition-colors">{app.user?.name}</p>
                   <p className={`text-[11px] font-black uppercase mt-2 tracking-widest ${selectedApp?.id === app.id ? 'text-mylms-rose' : 'text-gray-300'}`}>{app.program.name}</p>
                   {app.user.student_id && <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mt-2 font-mono">ID: {app.user.student_id}</p>}
                 </div>
@@ -159,17 +159,17 @@ export default function AdmissionsReview() {
                <div className="flex justify-between items-start mb-12 border-b border-border-soft pb-10 relative z-10">
                   <div className="flex items-start gap-8">
                      <div className="w-20 h-20 bg-offwhite rounded-2xl flex items-center justify-center border border-border-soft shadow-inner font-display font-black text-3xl text-mylms-purple">
-                        {selectedApp.user.name.charAt(0)}
+                        {selectedApp.user?.name.charAt(0)}
                      </div>
                      <div>
-                        <h2 className="text-4xl font-black text-text-main tracking-tighter uppercase mb-4 leading-none">{selectedApp.user.name}</h2>
+                        <h2 className="text-4xl font-black text-text-main tracking-tighter uppercase mb-4 leading-none">{selectedApp.user?.name}</h2>
                          <div className="flex items-center gap-4 flex-wrap">
                             <span className={`text-[11px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-lg border shadow-sm ${
                               selectedApp.status === 'approved' ? 'bg-green-50 text-green-700 border-green-100' :
                               selectedApp.status === 'rejected' ? 'bg-mylms-rose/5 text-mylms-rose border-mylms-rose/20' :
                               'bg-amber-50 text-amber-600 border-amber-100'
                             }`}>{selectedApp.status.toUpperCase()}</span>
-                            <p className="text-xs font-bold text-gray-300 uppercase tracking-widest pl-2">{selectedApp.user.email}</p>
+                            <p className="text-xs font-bold text-gray-300 uppercase tracking-widest pl-2">{selectedApp.user?.email}</p>
                          </div>
                      </div>
                   </div>

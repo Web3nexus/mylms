@@ -245,9 +245,9 @@ export function AdmissionsInner() {
             ]).filter(Boolean).map((item, i) => (
               <div key={i} className="p-10 rounded-3xl border border-border-soft hover:border-mylms-purple/30 transition-all group hover:shadow-xl">
                 <div className="w-16 h-16 bg-mylms-purple/5 text-mylms-purple rounded-2xl flex items-center justify-center mb-8 group-hover:bg-mylms-purple group-hover:text-white transition-all">
-                  {getIcon(item.title)}
+                  {getIcon(item?.title)}
                 </div>
-                <h3 className="text-xl font-black text-text-main mb-4 uppercase tracking-tight">{item.title}</h3>
+                <h3 className="text-xl font-black text-text-main mb-4 uppercase tracking-tight">{item?.title}</h3>
                 <p className="text-text-secondary text-sm font-medium leading-relaxed opacity-70 italic">{item.desc}</p>
               </div>
             ))}

@@ -203,7 +203,7 @@ export function CourseCatalogWidget() {
               {/* Visual Identifier - Abstract and Modern */}
               <div className="h-48 md:h-64 bg-offwhite relative overflow-hidden flex items-center justify-center border-b border-border-soft">
                   <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                  <div className="text-mylms-purple opacity-[0.03] text-[180px] md:text-[240px] font-black select-none pointer-events-none group-hover:scale-125 transition-transform duration-[2s]">{(course.title || 'C').charAt(0)}</div>
+                  <div className="text-mylms-purple opacity-[0.03] text-[180px] md:text-[240px] font-black select-none pointer-events-none group-hover:scale-125 transition-transform duration-[2s]">{(course?.title || 'C').charAt(0)}</div>
                   
                   {/* Category Pill */}
                   <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8">
@@ -219,7 +219,7 @@ export function CourseCatalogWidget() {
                 </div>
                 
                 <h2 className="text-xl md:text-2xl font-black text-text-main mb-4 md:mb-6 leading-tight group-hover:text-mylms-purple transition-colors tracking-tighter h-14 md:h-16 line-clamp-2 italic">
-                  {course.title}
+                  {course?.title}
                 </h2>
                 
                 <p className="text-text-secondary text-[13px] md:text-[14px] line-clamp-3 mb-8 md:mb-12 leading-loose grow font-sans font-medium opacity-60 italic">
@@ -246,7 +246,7 @@ export function CourseCatalogWidget() {
                 
                 <div className="flex gap-4 mt-auto">
                    <button 
-                     onClick={() => handleEnroll(course.id, course.slug)}
+                     onClick={() => handleEnroll(course.id, course?.slug)}
                      className="flex-1 py-4 bg-mylms-purple text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#001D4A] transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-3 md:gap-4 group/btn"
                    >
                      Enroll Now

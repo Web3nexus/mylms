@@ -240,7 +240,7 @@ export default function AdminFinanceDashboard() {
                      data?.recent_invoices.map(inv => (
                         <tr key={inv.id} className="hover:bg-offwhite/50 transition-all group/row border-l-8 border-transparent hover:border-mylms-purple">
                            <td className="px-10 py-8">
-                              <p className="font-black text-text-main text-[12px] leading-tight uppercase group-hover/row:text-mylms-purple transition-colors">{inv.user.name}</p>
+                              <p className="font-black text-text-main text-[12px] leading-tight uppercase group-hover/row:text-mylms-purple transition-colors">{inv.user?.name}</p>
                               <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-2">{inv.semester?.name}</p>
                            </td>
                            <td className="px-10 py-8">

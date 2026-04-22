@@ -90,7 +90,7 @@ export default function SelfServiceForms() {
                            {item.icon}
                         </div>
                         <div className="grow">
-                           <p className="text-[9px] font-black text-text-main uppercase leading-none mb-2">{item.title}</p>
+                           <p className="text-[9px] font-black text-text-main uppercase leading-none mb-2">{item?.title}</p>
                            <div className="flex items-center gap-4">
                               <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest">{item.id}</p>
                               <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest border-l border-gray-100 pl-4">{item.date}</p>

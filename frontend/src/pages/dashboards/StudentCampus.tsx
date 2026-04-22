@@ -97,11 +97,11 @@ export default function StudentCampus() {
                          <div className="p-6 md:p-8">
                             <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-3">Academic Session: 2026</p>
                             <h4 className="text-base md:text-lg font-black text-text-main group-hover:text-mylms-purple transition-colors tracking-tight uppercase line-clamp-2 h-10 md:h-12 leading-tight">
-                               {course.title}
+                               {course?.title}
                             </h4>
                             <div className="mt-8 flex justify-between items-center border-t border-border-soft pt-6">
                                <span className="text-[9px] font-black text-mylms-rose uppercase tracking-widest">Active Curriculum</span>
-                               <Link to={`/courses/${course.slug}/lessons`} className="text-[9px] font-black text-text-main uppercase tracking-widest flex items-center gap-2 group-hover:text-mylms-rose transition-all">
+                               <Link to={`/courses/${course?.slug}/lessons`} className="text-[9px] font-black text-text-main uppercase tracking-widest flex items-center gap-2 group-hover:text-mylms-rose transition-all">
                                   Enter <ArrowRight size={14} />
                                </Link>
                             </div>

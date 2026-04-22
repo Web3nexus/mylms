@@ -60,7 +60,7 @@ export default function InstructorGradebook() {
             assessment.submissions.forEach((sub: any) => {
                allSubmissions.push({
                   ...sub,
-                  assessment: { title: assessment.title, type: assessment.type }
+                  assessment: { title: assessment?.title, type: assessment.type }
                });
             });
          }
@@ -170,16 +170,16 @@ export default function InstructorGradebook() {
                                   {submission?.user?.name?.charAt(0)}
                                </div>
                                <div>
-                                  <p className="text-[12px] font-black text-text-main uppercase tracking-tighter">{submission.user.name}</p>
-                                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{submission.user.email}</p>
+                                  <p className="text-[12px] font-black text-text-main uppercase tracking-tighter">{submission?.user?.name}</p>
+                                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{submission?.user?.email}</p>
                                </div>
                             </div>
                          </td>
                          <td className="px-10 py-6">
                             <div className="flex items-center gap-3 mb-1">
-                               <p className="text-[11px] font-black text-text-main uppercase tracking-tight">{submission.assessment.title}</p>
-                               <span className={`text-[8px] font-black px-2 py-0.5 rounded border uppercase tracking-widest ${submission.assessment.type === 'quiz' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
-                                  {submission.assessment.type}
+                               <p className="text-[11px] font-black text-text-main uppercase tracking-tight">{submission?.assessment?.title}</p>
+                               <span className={`text-[8px] font-black px-2 py-0.5 rounded border uppercase tracking-widest ${submission?.assessment?.type === 'quiz' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
+                                  {submission?.assessment?.type}
                                </span>
                             </div>
                          </td>

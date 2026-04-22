@@ -239,7 +239,7 @@ export default function ForumList() {
                         {topic.is_locked && <Lock size={12} className="text-gray-300" />}
                       </div>
                       <div className="flex items-center gap-8 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                         <span className="flex items-center gap-2"><User size={10} /> {topic.user.name}</span>
+                         <span className="flex items-center gap-2"><User size={10} /> {topic.user?.name}</span>
                          <span className="flex items-center gap-2"><Clock size={10} /> {new Date(topic.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>

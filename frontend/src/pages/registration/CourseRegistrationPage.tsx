@@ -244,7 +244,7 @@ export default function CourseRegistrationPage() {
                         {course.is_registered ? '✓ VERIFIED' : `${course.credit_hours ?? 3} Units`}
                       </span>
                     </div>
-                    <h3 className="text-xl font-black text-text-main leading-tight tracking-tight uppercase group-hover:text-mylms-purple transition-colors line-clamp-2 h-14">{course.title}</h3>
+                    <h3 className="text-xl font-black text-text-main leading-tight tracking-tight uppercase group-hover:text-mylms-purple transition-colors line-clamp-2 h-14">{course?.title}</h3>
                     <div className="mt-4 flex items-center gap-3">
                        <div className="w-8 h-8 rounded-lg bg-white border border-border-soft flex items-center justify-center text-mylms-purple font-black text-[10px] shadow-sm">
                           {course.instructor?.name.charAt(0)}
@@ -277,7 +277,7 @@ export default function CourseRegistrationPage() {
                       )}
                       {course.is_registered && (
                         <Link
-                          to={`/courses/${course.slug}/lessons`}
+                          to={`/courses/${course?.slug}/lessons`}
                           className="w-12 h-12 bg-white border border-border-soft rounded-xl flex items-center justify-center text-mylms-purple hover:bg-offwhite transition-all shadow-sm group-hover:border-mylms-rose/20"
                         >
                           <ArrowRight size={16} />
@@ -316,22 +316,22 @@ export default function CourseRegistrationPage() {
                 </div>
               </div>
 
-              {myRegistrations.filter(Boolean).filter(r => r && r.course && r.course.title).map(reg => (
+              {myRegistrations.filter(Boolean).filter(r => r && r.course && r.course?.title).map(reg => (
                 <div key={reg.id} className="bg-white rounded-2xl border border-border-soft p-8 flex flex-col md:flex-row items-start md:items-center gap-10 shadow-sm hover:shadow-md transition-all group border-t-4 border-t-white hover:border-t-mylms-rose">
                   <div className="w-16 h-16 bg-offwhite border border-border-soft rounded-xl flex items-center justify-center text-2xl font-black text-mylms-purple shrink-0 group-hover:bg-mylms-purple group-hover:text-white transition-all shadow-sm font-display">
-                    {reg.course.title?.charAt(0) ?? '?'}
+                    {reg?.course?.title?.charAt(0) ?? '?'}
                   </div>
                   <div className="grow">
                     <div className="flex items-center gap-4 mb-3">
                       <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{reg.course.category?.name}</span>
                       <span className="text-[9px] font-black text-mylms-rose uppercase tracking-[0.2em] bg-mylms-rose/5 px-3 py-1 rounded-lg">Verified Session</span>
                     </div>
-                    <h3 className="text-2xl font-black text-text-main tracking-tight group-hover:text-mylms-purple transition-colors uppercase">{reg.course.title}</h3>
+                    <h3 className="text-2xl font-black text-text-main tracking-tight group-hover:text-mylms-purple transition-colors uppercase">{reg?.course?.title}</h3>
                     <p className="text-[9px] font-black text-text-secondary mt-2 uppercase tracking-widest">Lead Instructor: {reg.course.instructor?.name}</p>
                   </div>
                   <div className="flex gap-4 shrink-0 w-full md:w-auto">
                     <Link
-                      to={`/courses/${reg.course.slug}/lessons`}
+                      to={`/courses/${reg?.course?.slug}/lessons`}
                       className="btn-purple px-10 py-3.5 grow md:grow-0"
                     >
                       Classroom

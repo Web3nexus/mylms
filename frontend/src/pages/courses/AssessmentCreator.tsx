@@ -382,7 +382,7 @@ export default function AssessmentCreator() {
                     </div>
                     <div>
                        <div className="flex items-center gap-4 mb-2">
-                          <h3 className="text-lg font-black text-gray-900 tracking-tighter uppercase leading-none">{assessment.title}</h3>
+                          <h3 className="text-lg font-black text-gray-900 tracking-tighter uppercase leading-none">{assessment?.title}</h3>
                           <span className={`text-[8px] font-black px-2 py-0.5 rounded border uppercase tracking-widest ${assessment.type === 'quiz' ? 'bg-blue-50 text-blue-700 border-blue-100' : assessment.type === 'peer_assignment' ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
                              {assessment.type.replace('_', ' ')}
                           </span>

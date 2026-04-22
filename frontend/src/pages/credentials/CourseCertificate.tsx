@@ -138,19 +138,19 @@ export default function CourseCertificate() {
             </div>
 
             <h2 className="text-4xl md:text-6xl font-black text-[#4B345E] mx-auto border-b-8 border-[#F8F9FA] pb-6 inline-block mb-16 px-12 uppercase tracking-tighter">
-               {cert.user.name}
+               {cert.user?.name}
             </h2>
 
             <p className="text-gray-400 font-black tracking-[0.4em] text-[10px] mb-6 uppercase">Successfully Verified Requirements for the Completion of</p>
             <h3 className="text-3xl md:text-5xl font-black text-[#1A1A1A] mb-24 max-w-3xl mx-auto uppercase tracking-tighter leading-tight">
-               {cert.course.title}
+               {cert?.course?.title}
             </h3>
 
             {/* Verification & Signatures */}
             <div className="grid grid-cols-3 gap-16 w-full px-12 items-end">
                <div className="text-left">
                   <div className="border-b-2 border-[#E9ECEF] pb-4 mb-4 relative">
-                     <p className="font-display text-4xl text-[#1A1A1A] group-hover:translate-x-1 transition-transform">{cert.course.instructor.name}</p>
+                     <p className="font-display text-4xl text-[#1A1A1A] group-hover:translate-x-1 transition-transform">{cert.course.instructor?.name}</p>
                   </div>
                   <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-300">MyLMS Faculty Lead</p>
                </div>

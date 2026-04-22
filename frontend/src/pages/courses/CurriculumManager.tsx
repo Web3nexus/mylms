@@ -172,7 +172,7 @@ export default function CurriculumManager() {
                        {index + 1}
                     </div>
                     <div>
-                       <h3 className="font-bold text-gray-900 text-sm">{lesson.title}</h3>
+                       <h3 className="font-bold text-gray-900 text-sm">{lesson?.title}</h3>
                        <div className="flex items-center gap-2 mt-1">
                           <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 border border-gray-200 px-1.5 py-0.5 rounded bg-white">
                             {lesson.content_type}

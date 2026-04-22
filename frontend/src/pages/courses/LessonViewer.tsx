@@ -150,13 +150,13 @@ export default function LessonViewer() {
   const handleClaimCertificate = async () => {
     setClaimingCert(true);
     try {
-      await client.post(`/courses/${course.slug}/certificate`, {}, {
+      await client.post(`/courses/${course?.slug}/certificate`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      navigate(`/courses/${course.slug}/certificate`);
+      navigate(`/courses/${course?.slug}/certificate`);
     } catch (err: any) {
       if (err.response?.status === 409) {
-        navigate(`/courses/${course.slug}/certificate`);
+        navigate(`/courses/${course?.slug}/certificate`);
       } else {
         notify(err.response?.data?.message || 'Academic Registry: Failed to claim unit credential.', 'error');
       }
@@ -222,7 +222,7 @@ export default function LessonViewer() {
                 <div className={`mt-0.5 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 transition-all ${lessonSlug === lesson.slug ? 'bg-mylms-purple text-white shadow-xl' : 'bg-white border border-border-soft text-gray-300 shadow-sm'}`}>
                   {idx + 1}
                 </div>
-                <span className={`text-[11px] font-black leading-tight uppercase group-hover:translate-x-1 transition-transform`}>{lesson.title}</span>
+                <span className={`text-[11px] font-black leading-tight uppercase group-hover:translate-x-1 transition-transform`}>{lesson?.title}</span>
               </Link>
             ))}
           </div>
@@ -252,7 +252,7 @@ export default function LessonViewer() {
                     <div className={`mt-0.5 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 shadow-lg group-hover:scale-110 transition-transform ${assessment.type === 'quiz' ? 'bg-mylms-rose text-white' : 'bg-mylms-purple text-white'}`}>
                       {assessment.type === 'quiz' ? 'Q' : 'A'}
                     </div>
-                    <span className="text-[11px] font-black leading-tight uppercase group-hover:translate-x-1 transition-transform">{assessment.title}</span>
+                    <span className="text-[11px] font-black leading-tight uppercase group-hover:translate-x-1 transition-transform">{assessment?.title}</span>
                   </Link>
                 ))}
               </div>

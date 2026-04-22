@@ -151,14 +151,14 @@ export default function InstructorRegistry() {
             courses.filter(Boolean).filter(c => c && c.title).map((course: any) => (
               <div key={course.id} className="p-10 flex flex-col md:flex-row items-center gap-12 group/row transition-all hover:bg-offwhite/50 relative border-l-8 border-transparent hover:border-l-mylms-purple">
                  <div className="w-16 h-16 bg-white border border-border-soft rounded-2xl flex items-center justify-center text-2xl font-black text-mylms-purple shadow-sm relative z-10 font-display group-hover/row:bg-mylms-purple group-hover/row:text-white transition-all duration-500">
-                   {course.title?.charAt(0) ?? '?'}
+                   {course?.title?.charAt(0) ?? '?'}
                  </div>
                  <div className="flex-1 relative z-10">
                    <div className="flex items-center gap-6 mb-4">
                       <span className="text-[8px] font-black uppercase tracking-widest text-gray-300">REG_ID: ML-CRS-{course.id.toString().padStart(6, '0')}</span>
                    </div>
                    <h2 className="text-3xl font-black text-text-main leading-tight group-hover/row:text-mylms-purple transition-colors tracking-tighter uppercase">
-                    {course.title}
+                    {course?.title}
                    </h2>
                    <div className="mt-8 flex items-center gap-12">
                       <div className="flex flex-col gap-2">
@@ -183,14 +183,14 @@ export default function InstructorRegistry() {
                  </div>
                  <div className="flex gap-4 w-full md:w-auto mt-8 md:mt-0 relative z-10">
                    <Link 
-                     to={`/courses/${course.slug}/curriculum`}
+                     to={`/courses/${course?.slug}/curriculum`}
                      className="btn-purple px-10 py-3.5 shadow-xl flex items-center gap-3"
                    >
                      Curriculum
                      <ArrowRight size={14} />
                    </Link>
                    <Link 
-                     to={`/courses/${course.slug}/gradebook`}
+                     to={`/courses/${course?.slug}/gradebook`}
                      className="btn-minimal px-10 py-3.5 shadow-sm flex items-center gap-3 uppercase tracking-[0.2em] font-black text-[9px]"
                    >
                      <Award size={16} className="text-mylms-rose" />

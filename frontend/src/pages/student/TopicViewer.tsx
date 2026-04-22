@@ -131,7 +131,7 @@ export default function TopicViewer() {
                 <User size={18} />
               </div>
               <div>
-                 <p className="text-[11px] font-black uppercase text-mylms-purple tracking-tight">{post.user.name}</p>
+                 <p className="text-[11px] font-black uppercase text-mylms-purple tracking-tight">{post.user?.name}</p>
                  <p className="text-[8px] font-bold uppercase text-gray-300 tracking-widest mt-0.5">{new Date(post.created_at).toLocaleString()}</p>
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function TopicViewer() {
   return (
     <div className="max-w-5xl mx-auto py-16 px-12 min-h-screen transition-all">
       <div className="mb-12">
-        <Link to={`/courses/${topic.forum.course.slug}/forums`} className="text-[9px] font-black uppercase text-gray-400 mb-6 hover:text-mylms-purple transition-all flex items-center gap-2">
+        <Link to={`/courses/${topic.forum.course?.slug}/forums`} className="text-[9px] font-black uppercase text-gray-400 mb-6 hover:text-mylms-purple transition-all flex items-center gap-2">
           <ArrowLeft size={10} /> Back to {topic.forum.name}
         </Link>
         <div className="flex justify-between items-start">
@@ -222,7 +222,7 @@ export default function TopicViewer() {
                <User size={24} />
             </div>
             <div>
-               <p className="text-[12px] font-black uppercase text-text-main tracking-tight leading-none mb-1">{topic.user.name}</p>
+               <p className="text-[12px] font-black uppercase text-text-main tracking-tight leading-none mb-1">{topic.user?.name}</p>
                <p className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">{new Date(topic.created_at).toLocaleString()}</p>
             </div>
          </div>
