@@ -408,28 +408,19 @@ export default function AdmissionWizard() {
           <button onClick={() => navigate('/apply/dashboard')} className="p-3 rounded-full hover:bg-offwhite transition-all text-gray-400">
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-xl font-black text-mylms-purple uppercase tracking-tight">Admission Wizard</h1>
+          <h1 className="text-xl font-black text-mylms-purple uppercase tracking-tight italic">My Application</h1>
         </div>
         <div className="flex items-center gap-6">
           <div className="hidden md:flex items-center gap-3 bg-offwhite px-4 py-2 rounded-full border border-border-soft">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
             <span className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Auto-save Active</span>
           </div>
-          {/* Fee cleared badge */}
-          <div className="hidden md:flex items-center gap-3 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+          <div className="hidden md:flex items-center gap-3 bg-green-50 px-5 py-2.5 rounded-full border border-green-200 shadow-sm">
             <ShieldCheck size={14} className="text-green-600" />
             <span className="text-[9px] font-black text-green-700 uppercase tracking-widest">
-              Fee {application?.application_fee_status === 'waived' ? 'Waived' : 'Paid'}
+              Security Protocol: Active
             </span>
           </div>
-          <button onClick={() => saveStep()} disabled={saving} className={`p-3 rounded-xl transition-all flex items-center gap-3 ${showSaved ? 'bg-green-500 text-white' : 'bg-mylms-purple/5 text-mylms-purple hover:bg-mylms-purple/10'}`}>
-            {showSaved ? (
-              <>
-                <CheckCircle size={18} />
-                <span className="text-[9px] font-black uppercase tracking-widest pr-1">Secured</span>
-              </>
-            ) : <Save size={18} />}
-          </button>
         </div>
       </div>
 
@@ -465,7 +456,7 @@ export default function AdmissionWizard() {
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest mb-0.5">Section {idx + 1}</p>
-                    <p className={`text-[11px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-text-main'}`}>{s?.title}</p>
+                    <p className={`text-[11px] font-black uppercase tracking-tight italic ${isActive ? 'text-white' : 'text-text-main'}`}>{s?.title}</p>
                   </div>
                 </button>
               );
@@ -513,8 +504,8 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase" 
-                            placeholder={`Enter ${field.label.toLowerCase()}`}
+                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase tracking-tight placeholder:text-gray-300 placeholder:italic" 
+                            placeholder={`Official ${field.label}...`}
                           />
                         )}
 
@@ -523,9 +514,9 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase tracking-tight shadow-sm appearance-none"
                           >
-                            <option value="">-- Select {field.label} --</option>
+                            <option value="">Select {field.label}</option>
                             {field.options?.map((o: string) => <option key={o} value={o}>{o.toUpperCase()}</option>)}
                           </select>
                         )}
@@ -536,7 +527,7 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase shadow-sm"
                           />
                         )}
 
@@ -546,7 +537,7 @@ export default function AdmissionWizard() {
                             name={field.field_key} 
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
-                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner"
+                            className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase shadow-sm"
                           />
                         )}
 
@@ -556,8 +547,8 @@ export default function AdmissionWizard() {
                             value={formData[field.field_key] || ''} 
                             onChange={handleInputChange} 
                             rows={4}
-                            className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-medium text-text-main text-sm shadow-inner"
-                            placeholder={`Describe ${field.label.toLowerCase()}...`}
+                            className="w-full p-8 bg-offwhite border-2 border-border-soft rounded-[32px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-medium text-text-main text-sm shadow-sm leading-relaxed"
+                            placeholder={`Institutional details regarding ${field.label.toLowerCase()}...`}
                           />
                         )}
 
@@ -613,11 +604,11 @@ export default function AdmissionWizard() {
                           value={formData.program_id || ''}
                           onChange={handleInputChange}
                           disabled={!selectedLevel}
-                          className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[20px] outline-none focus:border-mylms-rose transition-all font-black text-mylms-purple text-xs uppercase shadow-inner disabled:opacity-30"
+                          className="w-full p-7 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple focus:ring-4 focus:ring-mylms-purple/5 transition-all font-black text-mylms-purple text-[13px] uppercase shadow-sm disabled:opacity-30 appearance-none"
                         >
                           <option value="">-- {selectedLevel ? 'SELECT PROGRAM' : 'SELECT LEVEL FIRST'} --</option>
                           {availablePrograms.map(p => (
-                            <option key={p.id} value={p.id}>{p?.name}</option>
+                            <option key={p.id} value={p.id}>{p?.name.toUpperCase()}</option>
                           ))}
                         </select>
                       </div>
@@ -736,17 +727,19 @@ export default function AdmissionWizard() {
                   <button
                     onClick={() => { saveStep(nextStep.id); }}
                     disabled={saving}
-                    className="w-full flex-1 py-8 bg-mylms-purple text-white font-black rounded-xl hover:bg-mylms-purple/90 transition-all shadow-[0_20px_50px_-10px_rgba(0,34,85,0.4)] uppercase tracking-[0.4em] text-[10px] flex items-center justify-center gap-6 group active:scale-95 disabled:opacity-50"
+                    className="w-full flex-1 py-10 bg-mylms-purple text-white font-black rounded-3xl hover:bg-mylms-purple/95 transition-all shadow-[0_30px_60px_-15px_rgba(0,34,85,0.4)] uppercase tracking-[0.5em] text-[12px] flex items-center justify-center gap-8 group active:scale-[0.98] disabled:opacity-50 border border-white/10"
                   >
                     {saving ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Securing Data...
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Securing Protocol Data...
                       </>
                     ) : (
                       <>
-                        Proceed to {nextStep?.title}
-                        <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                        Save & Proceed to next section
+                        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:translate-x-2 transition-transform">
+                          <ChevronRight size={20} />
+                        </div>
                       </>
                     )}
                   </button>
