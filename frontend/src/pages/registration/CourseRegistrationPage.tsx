@@ -234,7 +234,7 @@ export default function CourseRegistrationPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              {catalog.map(course => (
+              {catalog.filter(Boolean).filter(c => c && c.title).map(course => (
                 <div key={course.id} className={`bg-white rounded-2xl border transition-all hover:shadow-xl group relative overflow-hidden flex flex-col ${course.is_registered ? 'border-mylms-rose/20 bg-offwhite/50' : 'border-border-soft hover:border-mylms-purple/20'}`}>
                   {/* Accent Header */}
                   <div className={`p-8 border-b ${course.is_registered ? 'bg-white/50 border-mylms-rose/10' : 'bg-offwhite border-border-soft group-hover:bg-white'} transition-all`}>
@@ -316,10 +316,10 @@ export default function CourseRegistrationPage() {
                 </div>
               </div>
 
-              {myRegistrations.map(reg => (
+              {myRegistrations.filter(Boolean).filter(r => r && r.course && r.course.title).map(reg => (
                 <div key={reg.id} className="bg-white rounded-2xl border border-border-soft p-8 flex flex-col md:flex-row items-start md:items-center gap-10 shadow-sm hover:shadow-md transition-all group border-t-4 border-t-white hover:border-t-mylms-rose">
                   <div className="w-16 h-16 bg-offwhite border border-border-soft rounded-xl flex items-center justify-center text-2xl font-black text-mylms-purple shrink-0 group-hover:bg-mylms-purple group-hover:text-white transition-all shadow-sm font-display">
-                    {reg.course.title.charAt(0)}
+                    {reg.course.title?.charAt(0) ?? '?'}
                   </div>
                   <div className="grow">
                     <div className="flex items-center gap-4 mb-3">

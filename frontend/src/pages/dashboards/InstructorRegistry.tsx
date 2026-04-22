@@ -148,10 +148,10 @@ export default function InstructorRegistry() {
                <button className="btn-minimal px-12 py-3.5 shadow-md uppercase tracking-widest text-[9px] font-black">Initiate Proposal</button>
             </div>
           ) : (
-            courses.map((course: any) => (
+            courses.filter(Boolean).filter(c => c && c.title).map((course: any) => (
               <div key={course.id} className="p-10 flex flex-col md:flex-row items-center gap-12 group/row transition-all hover:bg-offwhite/50 relative border-l-8 border-transparent hover:border-l-mylms-purple">
                  <div className="w-16 h-16 bg-white border border-border-soft rounded-2xl flex items-center justify-center text-2xl font-black text-mylms-purple shadow-sm relative z-10 font-display group-hover/row:bg-mylms-purple group-hover/row:text-white transition-all duration-500">
-                   {course.title.charAt(0)}
+                   {course.title?.charAt(0) ?? '?'}
                  </div>
                  <div className="flex-1 relative z-10">
                    <div className="flex items-center gap-6 mb-4">
@@ -200,6 +200,7 @@ export default function InstructorRegistry() {
               </div>
             ))
           )}
+
         </div>
       </div>
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Modules\Academic\Models\Program;
+use App\Modules\Admissions\Models\AdmissionOffer;
 
 class AdmissionApplication extends Model
 {
@@ -25,6 +26,8 @@ class AdmissionApplication extends Model
     const SCHOLARSHIP_PENDING     = 'pending';
     const SCHOLARSHIP_APPROVED    = 'approved';
     const SCHOLARSHIP_REJECTED    = 'rejected';
+    const SCHOLARSHIP_RENEWED     = 'renewed';
+    const SCHOLARSHIP_REVOKED     = 'revoked';
 
     const STEP_PERSONAL = 'identity_verification';
     const STEP_PROGRAM  = 'program_selection';
@@ -64,5 +67,10 @@ class AdmissionApplication extends Model
     public function instructor()
     {
         return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    public function offer()
+    {
+        return $this->hasOne(AdmissionOffer::class, 'application_id');
     }
 }

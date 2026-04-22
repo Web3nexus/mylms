@@ -139,7 +139,7 @@ class AdmissionController extends Controller
         ]);
 
         // Handle program selection and auto-resolve faculty
-        if ($validated['step'] === self::STEP_PROGRAM && !empty($validated['step_data']['program_id'])) {
+        if ($validated['step'] === AdmissionApplication::STEP_PROGRAM && !empty($validated['step_data']['program_id'])) {
             $program = \App\Modules\Academic\Models\Program::with('department.faculty')->find($validated['step_data']['program_id']);
             
             $application->update([
