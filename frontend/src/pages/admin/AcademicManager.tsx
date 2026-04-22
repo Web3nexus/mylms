@@ -57,6 +57,7 @@ interface Department {
 interface Faculty {
   id: number;
   name: string;
+  code: string;
   description: string;
   departments: Department[];
 }
@@ -65,7 +66,7 @@ export default function AcademicManager() {
   const { appName } = useAppConfig();
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newFaculty, setNewFaculty] = useState({ name: '', description: '' });
+  const [newFaculty, setNewFaculty] = useState({ name: '', description: '', code: '' });
   const [newDept, setNewDept] = useState({ name: '', code: '' });
   const [newProg, setNewProg] = useState({ 
     name: '', 
@@ -184,7 +185,7 @@ export default function AcademicManager() {
       await client.post('/admin/academic/faculties', newFaculty, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNewFaculty({ name: '', description: '' });
+      setNewFaculty({ name: '', description: '', code: '' });
       setModal({ isOpen: false, mode: null });
       fetchStructure();
       setNotification({
@@ -210,7 +211,7 @@ export default function AcademicManager() {
       await client.put(`/admin/academic/faculties/${modal.targetId}`, newFaculty, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNewFaculty({ name: '', description: '' });
+      setNewFaculty({ name: '', description: '', code: '' });
       setModal({ isOpen: false, mode: null });
       fetchStructure();
       setNotification({
@@ -495,7 +496,7 @@ export default function AcademicManager() {
         {activeTab === 'hierarchy' && (
           <button 
             onClick={() => {
-              setNewFaculty({ name: '', description: '' });
+              setNewFaculty({ name: '', description: '', code: '' });
               setModal({ isOpen: true, mode: 'add_faculty' });
             }}
             className="btn-purple flex items-center gap-3 px-10 py-4 text-xs"
@@ -658,7 +659,7 @@ export default function AcademicManager() {
                        <div className="flex gap-4 z-10">
                           <button 
                              onClick={() => {
-                               setNewFaculty({ name: faculty.name, description: faculty.description });
+                               setNewFaculty({ name: faculty.name, description: faculty.description, code: faculty.code });
                                setModal({ isOpen: true, mode: 'edit_faculty', targetId: faculty.id, targetName: faculty?.name });
                              }}
                              className="p-3 bg-white border border-border-soft text-gray-200 hover:text-mylms-purple transition-all rounded-lg shadow-sm"
@@ -867,6 +868,10 @@ export default function AcademicManager() {
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Official Designation</label>
                           <input required value={newFaculty?.name} onChange={e => setNewFaculty({...newFaculty, name: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-sm uppercase tracking-tight" placeholder="Faculty of Humanities..." />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Registry Code (e.g. FHS)</label>
+                          <input required maxLength={5} value={newFaculty.code} onChange={e => setNewFaculty({...newFaculty, code: e.target.value.toUpperCase()})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-rose shadow-inner font-black text-sm uppercase tracking-[0.2em]" placeholder="FHS" />
                         </div>
                         <div>
                           <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Administrative Summary</label>

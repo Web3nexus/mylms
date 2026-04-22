@@ -58,12 +58,12 @@ const DualLogosStripInner = ({ leftTitle, leftLogos, rightTitle, rightLogos }: a
 };
 
 export type Props = {
-  Hero: { title: string; titleColor?: string; description: string; buttonText: string; buttonLink: string; bgImage?: string; variant: "default" | "split-gradient" };
+  Hero: { title: string; titleColor?: string; description: string; buttonText: string; buttonLink: string; bgImage?: string; variant: "default" | "split-gradient"; showOverlay?: boolean; overlayColor?: string; overlayOpacity?: number };
   DualLogosStrip: { leftTitle: string; leftLogos: { src: string; alt: string }[]; rightTitle: string; rightLogos: { src: string; alt: string }[] };
   ProgramGrid: { title: string; description: string; categories: { name: string; programs: { name: string; link: string }[] }[] };
   FeaturedHighlights: { title: string; items: { category: string; title: string; image: string; link: string }[] };
   FeatureGrid: { items: { title: string; description: string; icon: string }[] };
-  CTAStrip: { text: string; buttonText: string; buttonLink: string; variant: "primary" | "secondary" };
+  CTAStrip: { text: string; buttonText: string; buttonLink: string; variant: "primary" | "secondary" | "white" };
   FlexColumns: { layout: "50-50" | "70-30" | "30-70" };
   RichText: { content: string; align: "left" | "center" };
   DirectorLetter: { title: string; message: string; directorName: string; directorRole: string; directorImage: string; signatureImage?: string };
@@ -103,21 +103,33 @@ export const config: Config<Props> = {
         variant: {
           type: "radio",
           options: [{ label: "Modern Purple", value: "default" }, { label: "Split Gradient Overlay", value: "split-gradient" }]
-        }
+        },
+        showOverlay: { type: "radio", options: [{ label: "Enabled", value: true }, { label: "Disabled", value: false }] },
+        overlayColor: { type: "text" },
+        overlayOpacity: { type: "number" }
       },
-      render: ({ title, titleColor, description, buttonText, buttonLink, bgImage, variant }) => {
+      render: ({ title, titleColor, description, buttonText, buttonLink, bgImage, variant, showOverlay = true, overlayColor, overlayOpacity = 0.8 }) => {
+        const titleStyle = { fontSize: '42px', color: titleColor || "#C6C09A" };
+        const overlayStyle = showOverlay ? { 
+           backgroundColor: overlayColor || 'transparent', 
+           opacity: overlayOpacity 
+        } : { display: 'none' };
+
         if (variant === "split-gradient") {
           return (
             <div className="relative min-h-[85vh] flex items-center pt-20">
               {bgImage && (
                 <div className="absolute inset-0 z-0">
                   <img src={bgImage} className="w-full h-full object-cover" alt="" />
-                  <div className="absolute inset-0 bg-linear-to-r from-mylms-purple via-mylms-purple/80 to-transparent"></div>
+                  <div 
+                    className="absolute inset-0 bg-linear-to-r from-mylms-purple via-mylms-purple/80 to-transparent"
+                    style={overlayStyle}
+                  ></div>
                 </div>
               )}
               <div className="relative z-10 px-6 md:px-20 max-w-7xl mx-auto w-full flex items-center">
                 <div className="max-w-2xl bg-white/5 backdrop-blur-sm p-10 md:p-16 border-l-8 border-mylms-rose rounded-r-3xl shadow-2xl">
-                  <h1 className="font-serif font-black leading-tight mb-8 drop-shadow-xl" style={{ fontSize: '42px', color: titleColor || "#edaa16" }}>{title}</h1>
+                  <h1 className="font-serif font-black leading-tight mb-8 drop-shadow-xl" style={titleStyle}>{title}</h1>
                   <p className="text-base font-medium text-white/90 mb-12 drop-shadow-md">{description}</p>
                   <a href={buttonLink} className="bg-mylms-rose text-white px-10 py-5 rounded-lg font-black uppercase tracking-widest text-xs hover:bg-[#A00E26] shadow-xl inline-flex items-center gap-3 active:scale-95 transition-all">{buttonText}<ArrowRight size={16} /></a>
                 </div>
@@ -130,11 +142,14 @@ export const config: Config<Props> = {
             {bgImage && (
               <div className="absolute inset-0 opacity-40">
                 <img src={bgImage} className="w-full h-full object-cover" alt="" />
-                <div className="absolute inset-0 bg-linear-to-b from-transparent to-mylms-purple"></div>
+                <div 
+                  className="absolute inset-0 bg-linear-to-b from-transparent to-mylms-purple"
+                  style={overlayStyle}
+                ></div>
               </div>
             )}
             <div className="relative z-10 max-w-4xl px-6 py-20">
-              <h1 className="font-serif font-black tracking-tight mb-8 leading-tight uppercase" style={{ fontSize: '42px', color: titleColor || "#edaa16" }}>{title}</h1>
+              <h1 className="font-serif font-black tracking-tight mb-8 leading-tight uppercase" style={titleStyle}>{title}</h1>
               <p className="text-base text-white/80 font-medium mb-12 max-w-2xl mx-auto leading-relaxed">{description}</p>
               <a href={buttonLink} className="bg-mylms-rose text-white px-10 py-5 rounded-lg font-black uppercase tracking-widest text-xs hover:bg-[#A00E26] shadow-xl inline-flex items-center gap-3 active:scale-95 transition-all">{buttonText}<ArrowRight size={16} /></a>
             </div>
@@ -177,7 +192,7 @@ export const config: Config<Props> = {
         }
       },
       render: ({ title, description, categories }) => (
-        <div className="py-32 px-10 bg-offwhite">
+        <div className="py-32 px-10 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-end gap-10 mb-20 border-l-4 border-mylms-rose pl-10">
               <div className="max-w-2xl">
@@ -253,12 +268,13 @@ export const config: Config<Props> = {
         <div className="py-32 px-10 bg-white">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
             {items.map((item, i) => (
-              <div key={i} className="group p-10 rounded-2xl bg-offwhite border border-border-soft hover:shadow-2xl transition-all hover:-translate-y-2">
-                <div className="w-14 h-14 bg-mylms-purple rounded-xl flex items-center justify-center text-white mb-10 shadow-lg group-hover:bg-mylms-rose transition-colors">
+              <div key={i} className="group p-10 rounded-2xl bg-white border border-border-soft hover:shadow-2xl transition-all hover:-translate-y-2 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-mylms-purple/5 rounded-bl-full group-hover:scale-150 transition-duration-700"></div>
+                <div className="w-14 h-14 bg-mylms-purple rounded-xl flex items-center justify-center text-white mb-10 shadow-lg group-hover:bg-mylms-rose transition-colors relative z-10">
                   <Layers size={28} />
                 </div>
-                <h3 className="text-2xl font-serif font-black text-mylms-purple mb-6 tracking-tight uppercase">{item.title}</h3>
-                <p className="text-text-secondary font-medium leading-relaxed">{item.description}</p>
+                <h3 className="text-2xl font-serif font-black text-mylms-purple mb-6 tracking-tight uppercase relative z-10">{item.title}</h3>
+                <p className="text-text-secondary font-medium leading-relaxed relative z-10">{item.description}</p>
               </div>
             ))}
           </div>
@@ -270,16 +286,19 @@ export const config: Config<Props> = {
         text: { type: "text" },
         buttonText: { type: "text" },
         buttonLink: { type: "text" },
-        variant: { type: "select", options: [{ label: "Navy (Primary)", value: "primary" }, { label: "Crimson (Accent)", value: "secondary" }] },
+        variant: { type: "select", options: [{ label: "Navy (Primary)", value: "primary" }, { label: "Crimson (Accent)", value: "secondary" }, { label: "Global White (Soft)", value: "white" }] },
       },
-      render: ({ text, buttonText, buttonLink, variant }) => (
-        <div className={`py-24 px-10 text-center ${variant === "primary" ? "bg-mylms-purple" : "bg-mylms-rose"}`}>
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-16">
-            <h2 className="text-4xl md:text-5xl font-serif font-black text-white tracking-tight uppercase text-left max-w-2xl leading-tight">{text}</h2>
-            <a href={buttonLink} className="bg-white text-mylms-purple px-14 py-6 rounded-lg font-black uppercase tracking-widest text-[11px] hover:bg-gray-50 shadow-2xl active:scale-95 transition-all">{buttonText}</a>
+      render: ({ text, buttonText, buttonLink, variant }) => {
+        const isWhite = variant === "white";
+        return (
+          <div className={`py-24 px-10 text-center ${variant === "primary" ? "bg-mylms-purple" : variant === "secondary" ? "bg-mylms-rose" : "bg-white border-y border-border-soft"}`}>
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-16">
+              <h2 className={`text-4xl md:text-5xl font-serif font-black tracking-tight uppercase text-left max-w-2xl leading-tight ${isWhite ? 'text-mylms-purple' : 'text-white'}`}>{text}</h2>
+              <a href={buttonLink} className={`${isWhite ? 'bg-mylms-purple text-white hover:bg-mylms-rose' : 'bg-white text-mylms-purple hover:bg-gray-50'} px-14 py-6 rounded-lg font-black uppercase tracking-widest text-[11px] shadow-2xl active:scale-95 transition-all`}>{buttonText}</a>
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     TestimonialMosaic: {
       fields: {
