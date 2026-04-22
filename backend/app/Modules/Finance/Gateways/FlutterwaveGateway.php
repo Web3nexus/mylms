@@ -28,7 +28,7 @@ class FlutterwaveGateway implements PaymentGatewayInterface
                     'user_id' => $invoice->user_id,
                 ],
                 'customizations' => [
-                    'title' => 'MyLMS Academic Portal',
+                    'title' => config('app.name', 'MyLMS') . ' Academic Portal',
                     'description' => 'Tuition and Assessment Fees Payment',
                 ],
             ]);

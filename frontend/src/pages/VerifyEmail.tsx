@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, ShieldCheck, ArrowRight, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
+import { useAppConfig } from '../hooks/useAppConfig';
 
 export default function VerifyEmail() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -14,6 +15,7 @@ export default function VerifyEmail() {
 
   const navigate = useNavigate();
   const { user, setAuth } = useAuthStore();
+  const { appName } = useAppConfig();
 
   useEffect(() => {
     if (cooldown > 0) {
@@ -170,7 +172,7 @@ export default function VerifyEmail() {
         </div>
 
         <p className="mt-8 text-center text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">
-          Learnforth Unified Security Framework v4.0
+          {appName} Unified Security Framework v4.0
         </p>
       </div>
     </div>

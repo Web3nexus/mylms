@@ -15,9 +15,11 @@ import {
   Globe
 } from 'lucide-react';
 import { useBranding } from '../hooks/useBranding';
+import { useAppConfig } from '../hooks/useAppConfig';
 
 export default function Login() {
   const { branding } = useBranding();
+  const { appName } = useAppConfig();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -100,7 +102,7 @@ export default function Login() {
                   <GraduationCap size={36} />
                 </div>
                 <div>
-                   <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{branding?.institutional_name || 'MyLMS'}</h1>
+                   <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{branding?.institutional_name || appName}</h1>
                    <p className="text-[10px] font-black text-white/80 uppercase tracking-[0.4em] mt-2">{branding?.institutional_motto || 'University Network Authority'}</p>
                 </div>
               </div>
@@ -215,7 +217,7 @@ export default function Login() {
                 disabled={loading}
                 className={`w-full py-5 mt-6 rounded-2xl font-black text-white uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 disabled:opacity-50 relative overflow-hidden group/btn shadow-2xl active:scale-95 transition-all ${isSecurityGate ? 'bg-mylms-rose shadow-mylms-rose/20' : 'bg-mylms-purple shadow-mylms-purple/20'}`}
               >
-                {loading ? 'Validating Unified Protocol...' : gateName === 'Student Registry' ? 'Enter MyLMS Campus' : 'Authorize Security Gateway'}
+                {loading ? 'Validating Unified Protocol...' : gateName === 'Student Registry' ? `Enter ${appName} Campus` : 'Authorize Security Gateway'}
                 <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </form>

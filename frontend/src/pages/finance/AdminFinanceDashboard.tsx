@@ -12,6 +12,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import { useNotificationStore } from '../../store/useNotificationStore';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface User {
   id: number;
@@ -54,6 +55,7 @@ interface FinanceData {
 }
 
 export default function AdminFinanceDashboard() {
+  const { appName } = useAppConfig();
   const { token } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -126,7 +128,7 @@ export default function AdminFinanceDashboard() {
          <div>
             <div className="flex items-center gap-3 mb-4 text-mylms-purple font-black uppercase tracking-[0.4em] text-[10px]">
                <CreditCard className="opacity-50" size={16} />
-               MyLMS Bursar Records
+               {appName} Bursar Records
             </div>
             <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none">Finance Control</h1>
             <p className="text-text-secondary font-bold text-[10px] uppercase tracking-widest mt-4">Official revenue lifecycle and assessment management.</p>
@@ -206,7 +208,7 @@ export default function AdminFinanceDashboard() {
       <div className="flex justify-between items-center mb-10">
         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-text-secondary flex items-center gap-3">
            <Layers size={14} className="text-mylms-purple" />
-           MyLMS Billing Registry
+           {appName} Billing Registry
         </h3>
         <button className="text-[9px] font-black text-gray-300 uppercase tracking-widest hover:text-mylms-purple transition-colors flex items-center gap-2">
            Full Export

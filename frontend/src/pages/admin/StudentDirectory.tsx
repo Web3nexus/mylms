@@ -17,6 +17,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
 import client from '../../api/client';
 import { Link } from 'react-router-dom';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface Student {
   id: number;
@@ -41,6 +42,7 @@ interface DirectoryStats {
 }
 
 export default function StudentDirectory() {
+  const { appName } = useAppConfig();
   const { token } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -166,7 +168,7 @@ export default function StudentDirectory() {
         <div>
           <div className="flex items-center gap-3 mb-4 text-mylms-purple font-black uppercase tracking-[0.4em] text-[10px]">
             <Users className="opacity-50" size={16} />
-            MyLMS Admin — Student Registry
+            {appName} Admin — Student Registry
           </div>
           <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none">Student Directory</h1>
           <p className="text-text-secondary font-bold text-[10px] uppercase tracking-widest mt-4">
@@ -284,7 +286,7 @@ export default function StudentDirectory() {
         ) : students.length === 0 ? (
           <div className="py-32 text-center">
             <Users size={40} className="text-gray-100 mx-auto mb-6" />
-            <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.4em]">No students match the current filter.</p>
+            <p className="text-gray-400 font-black text-[11px] uppercase tracking-[0.4em] leading-loose">{appName} registry is currently empty.</p>
             {search && (
               <button onClick={clearSearch} className="mt-6 text-mylms-purple text-[9px] font-black uppercase tracking-widest hover:underline">
                 Clear Search

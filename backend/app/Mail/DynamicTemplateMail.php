@@ -35,7 +35,6 @@ class DynamicTemplateMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address($this->fromAddress, $this->fromName),
             subject: $this->subjectString,
         );
     }

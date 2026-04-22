@@ -18,6 +18,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useBranding } from '../../hooks/useBranding';
 import NotificationDropdown from '../NotificationDropdown';
 import client from '../../api/client';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface NavbarProps {
   isMenuOpen: boolean;
@@ -26,6 +27,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: NavbarProps) {
+  const { appName } = useAppConfig();
   const { branding } = useBranding();
   const { isAuthenticated, user, logout, token } = useAuthStore();
   const location = useLocation();
@@ -47,8 +49,8 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
       <div className="bg-gray-100 py-3 px-6 md:px-12 border-b border-border-soft">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-mylms-purple/50">
           <div className="flex items-center gap-8">
-            <a href="mailto:support@mylms.edu" className="flex items-center gap-2 hover:text-mylms-rose transition-colors">
-              <Mail size={12} /> Support@mylms.edu
+            <a href={`mailto:support@${appName.toLowerCase()}.edu`} className="flex items-center gap-2 hover:text-mylms-rose transition-colors">
+              <Mail size={12} /> Support@{appName.toLowerCase()}.edu
             </a>
             <a href="https://portal.office.com" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-mylms-rose transition-colors">
               <Globe size={12} /> Student Email (Office 360)
@@ -212,7 +214,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
              ))}
              
              <div className="pt-8 border-t border-border-soft flex flex-col gap-6">
-                <a href="mailto:support@mylms.edu" className="flex items-center gap-3 text-sm font-bold text-mylms-purple/60">
+                <a href={`mailto:support@${appName.toLowerCase()}.edu`} className="flex items-center gap-3 text-sm font-bold text-mylms-purple/60">
                   <Mail size={18} /> Support Registry
                 </a>
                 <a href="https://portal.office.com" target="_blank" rel="noreferrer" className="flex items-center gap-3 text-sm font-bold text-mylms-purple/60">

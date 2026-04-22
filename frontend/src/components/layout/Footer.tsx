@@ -9,9 +9,11 @@ import {
   Server
 } from 'lucide-react';
 import { useBranding } from '../../hooks/useBranding';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 export default function Footer() {
   const { branding } = useBranding();
+  const { appName } = useAppConfig();
 
   const defaultColumns = [
     { 
@@ -64,7 +66,7 @@ export default function Footer() {
                   </div>
                   <div>
                     <span className="text-3xl font-serif font-black tracking-tight uppercase leading-none block">
-                      {branding?.institutional_name || "MyLMS"}
+                      {branding?.institutional_name || appName}
                     </span>
                     <span className="text-[10px] font-black text-mylms-rose uppercase tracking-[0.4em] mt-2 block">
                       {branding?.institutional_motto || "University Network Authority"}
@@ -116,7 +118,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
-            <span>&copy; {new Date().getFullYear()} {branding?.institutional_name || 'MyLMS'} Global</span>
+            <span>&copy; {new Date().getFullYear()} {branding?.institutional_name || appName} Global</span>
             <span className="w-1.5 h-1.5 bg-white/10 rounded-full"></span>
             <Link to="/privacy" className="hover:text-mylms-rose transition-colors">Privacy Policy</Link>
             <span className="w-1.5 h-1.5 bg-white/10 rounded-full"></span>

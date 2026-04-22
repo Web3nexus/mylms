@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface Application {
   id: number;
@@ -37,6 +38,7 @@ interface Application {
 }
 
 export default function AdmissionsReview() {
+  const { appName } = useAppConfig();
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
@@ -142,7 +144,7 @@ export default function AdmissionsReview() {
             {applications.length === 0 && (
               <div className="p-20 text-center bg-white border-2 border-dashed border-border-soft rounded-2xl opacity-60">
                  <Search size={40} className="mx-auto text-gray-100 mb-8" />
-                 <p className="text-gray-400 font-black text-[11px] uppercase tracking-[0.4em] leading-loose">MyLMS registry is currently empty.</p>
+                 <p className="text-gray-400 font-black text-[11px] uppercase tracking-[0.4em] leading-loose">{appName} registry is currently empty.</p>
               </div>
             )}
           </div>

@@ -24,7 +24,7 @@ class StripeGateway implements PaymentGatewayInterface
                 'price_data' => [
                     'currency' => 'usd',
                     'product_data' => [
-                        'name' => "MyLMS Invoice #{$invoice->id}",
+                        'name' => config('app.name', 'MyLMS') . " Invoice #{$invoice->id}",
                         'description' => "Academic Fees for " . ($invoice->semester->name ?? 'Current Term'),
                     ],
                     'unit_amount' => (int)($invoice->total_amount * 100), // Stripe uses cents

@@ -49,16 +49,17 @@ class CommunicationService
         // Configure Mailer Category
         self::configureMailer($actualCategory);
 
-        $subject = $template->subject;
+        // Parse Placeholders
+        $appName = config('app.name', 'MyLMS');
+        $subject = "{$appName}: " . $template->subject;
         $content = $template->content_html;
 
         // Add Global Defaults
-        $data['campus_name'] = SystemSetting::getVal('institutional_name', 'Learnforth University');
-        $data['rector_name'] = SystemSetting::getVal('rector_name', 'HRM En Omogehne Uzih');
+        $data['campus_name'] = SystemSetting::getVal('institutional_name', config('app.name', 'Institutional Campus'));
+        $data['rector_name'] = SystemSetting::getVal('rector_name', 'The Institutional Rector');
         $data['facebook_url'] = SystemSetting::getVal('facebook_url', '#');
         $data['instagram_url'] = SystemSetting::getVal('instagram_url', '#');
 
-        // Parse Placeholders
         foreach ($data as $key => $value) {
             $subject = str_replace("{{{$key}}}", $value, $subject);
             $content = str_replace("{{{$key}}}", $value, $content);
@@ -168,7 +169,6 @@ class CommunicationService
                 'mail.mailers.smtp.password' => \App\Models\SystemSetting::getVal('mail_password', env('MAIL_PASSWORD')),
                 'mail.mailers.smtp.scheme' => null,
                 'mail.mailers.smtp.url' => null,
-                'mail.mailers.smtp.local_domain' => parse_url(SystemSetting::getVal('institutional_url', 'learnforthuniversity.com'), PHP_URL_HOST) ?? 'learnforthuniversity.com',
                 'mail.from.address' => $fromAddress,
                 'mail.from.name' => \App\Models\SystemSetting::getVal('mail_from_name', env('MAIL_FROM_NAME', 'MyLMS')),
             ]);

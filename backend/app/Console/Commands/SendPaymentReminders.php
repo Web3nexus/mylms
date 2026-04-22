@@ -21,7 +21,7 @@ class SendPaymentReminders extends Command
      *
      * @var string
      */
-    protected $description = 'Automate dispatch of institutional payment arrears reminders to students via MyLMS notification channels.';
+    protected $description = 'Automate dispatch of institutional payment arrears reminders to students via dynamic notification channels.';
 
     /**
      * Execute the console command.

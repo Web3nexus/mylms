@@ -78,8 +78,9 @@ class AuthController extends Controller
             // Check if this email belongs to a student
             $tempUser = User::where('email', $identifier)->first();
             if ($tempUser && $tempUser->isStudent() && $tempUser->student_id) {
+                $appName = config('app.name', 'MyLMS');
                 return response()->json([
-                    'message' => 'Please use your Student ID (Matric Number) to access the MyLMS Campus.',
+                    'message' => "Please use your Student ID (Matric Number) to access the {$appName} Campus.",
                 ], 422);
             }
         }

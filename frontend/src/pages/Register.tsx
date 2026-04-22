@@ -16,9 +16,11 @@ import {
   Clock
 } from 'lucide-react';
 import { useBranding } from '../hooks/useBranding';
+import { useAppConfig } from '../hooks/useAppConfig';
 
 export default function Register() {
   const { branding } = useBranding();
+  const { appName } = useAppConfig();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -87,7 +89,7 @@ export default function Register() {
                   <GraduationCap size={36} />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{branding?.institutional_name || 'MyLMS'}</h1>
+                  <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{branding?.institutional_name || appName}</h1>
                   <p className="text-[10px] font-black text-white/80 uppercase tracking-[0.4em] mt-2">{branding?.institutional_motto || 'University Network Authority'}</p>
                 </div>
               </div>
@@ -136,7 +138,7 @@ export default function Register() {
               <h2 className="text-3xl font-black text-text-main tracking-tighter uppercase leading-none relative z-10">
                 {branding?.admissions_enabled ? 'Student Enrollment' : 'Enrollment Protocol Paused'}
               </h2>
-              <p className="text-mylms-purple text-[9px] font-black uppercase tracking-[0.4em] mt-4 relative z-10 opacity-60">MyLMS Unified Academic Network</p>
+              <p className="text-mylms-purple text-[9px] font-black uppercase tracking-[0.4em] mt-4 relative z-10 opacity-60">{appName} Unified Academic Network</p>
             </div>
 
             {!branding?.admissions_enabled ? (
@@ -261,7 +263,7 @@ export default function Register() {
       <div className="fixed bottom-10 left-10 right-10 flex justify-center transition-opacity opacity-40 hover:opacity-100">
         <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 flex items-center justify-center gap-3">
           <Sparkles size={12} className="text-mylms-purple animate-pulse" />
-          Official MyLMS Global Admissions Framework Active
+          Official {appName} Global Admissions Framework Active
         </p>
       </div>
     </div>

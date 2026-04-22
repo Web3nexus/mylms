@@ -17,6 +17,7 @@ import {
   Loader2,
   Layout
 } from 'lucide-react';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface CommunicationSettings {
   mail_host: string;
@@ -30,6 +31,7 @@ interface CommunicationSettings {
 
 export default function CommunicationManager() {
   const navigate = useNavigate();
+  const { appName } = useAppConfig();
   const [settings, setSettings] = useState<CommunicationSettings>({
     mail_host: '',
     mail_port: 587,
@@ -268,7 +270,7 @@ export default function CommunicationManager() {
                         type="text" 
                         value={settings.mail_from_name}
                         onChange={e => setSettings({...settings, mail_from_name: e.target.value})}
-                        placeholder="MyLMS Admissions"
+                        placeholder={`${appName} Admissions`}
                         className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-rose font-black text-text-main text-xs uppercase"
                       />
                    </div>

@@ -10,8 +10,10 @@ import {
   BookOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAppConfig } from '../hooks/useAppConfig';
 
 export function AboutInner() {
+  const { appName } = useAppConfig();
   const [pageData, setPageData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +88,7 @@ export function AboutInner() {
                     Institutional <span className="text-mylms-purple">Heritage</span>
                  </h2>
                  <p className="text-lg text-text-secondary font-medium mb-8 leading-relaxed opacity-70 font-sans italic whitespace-pre-wrap">
-                    {richText.content || "Established in the digital era, MyLMS has grown from a visionary project into a global academic authority, serving thousands of students across every continent. We are built on the foundations of innovation, accessibility, and academic excellence."}
+                    {richText.content || `Established in the digital era, ${appName} has grown from a visionary project into a global academic authority, serving thousands of students across every continent. We are built on the foundations of innovation, accessibility, and academic excellence.`}
                  </p>
                  
                  <div className="grid grid-cols-2 gap-8 pt-8">

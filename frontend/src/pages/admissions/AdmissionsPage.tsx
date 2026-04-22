@@ -16,12 +16,14 @@ import {
 } from 'lucide-react';
 import client from '../../api/client';
 import { useBranding } from '../../hooks/useBranding';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface Program { id: number; name: string; }
 interface Department { id: number; name: string; programs: Program[]; }
 interface Faculty { id: number; name: string; departments: Department[]; }
 
 export function AdmissionsInner() {
+  const { appName } = useAppConfig();
   const { branding } = useBranding();
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [activeFaculty, setActiveFaculty] = useState<number | null>(null);
@@ -76,7 +78,7 @@ export function AdmissionsInner() {
   }, []);
 
   const selected = faculties.find(f => f.id === activeFaculty);
-  const institutionName = branding?.institutional_name || 'MyLMS University';
+  const institutionName = branding?.institutional_name || appName;
 
   const statsData = branding?.admissions_stats || [
     { value: '40+', label: 'Degree Programs' },

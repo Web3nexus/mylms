@@ -14,6 +14,7 @@ import {
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
+import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface StaffMember {
   id: number;
@@ -24,6 +25,7 @@ interface StaffMember {
 }
 
 export default function AdminStaffDirectory() {
+  const { appName } = useAppConfig();
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -175,7 +177,7 @@ export default function AdminStaffDirectory() {
            <div className="bg-white w-full max-w-xl rounded-[40px] shadow-2xl relative z-110 overflow-hidden animate-in zoom-in-95 duration-300 border border-border-soft">
               <div className="p-12">
                  <h3 className="text-3xl font-black text-text-main uppercase tracking-tighter mb-4">Personnel Onboarding</h3>
-                 <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-10 opacity-60">MyLMS Security: New Staff Protocol</p>
+                 <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-10 opacity-60">{appName} Security: New Staff Protocol</p>
 
                  <form onSubmit={handleCreate} className="space-y-8">
                     <div className="space-y-3">

@@ -23,7 +23,7 @@ class BrandingController extends Controller
             'favicon_url' => SystemSetting::getVal('branding_favicon_url', '/favicon.ico'),
             'primary_color' => SystemSetting::getVal('branding_primary_color', '#4b345d'),
             'accent_color' => SystemSetting::getVal('branding_accent_color', '#E90171'),
-            'institutional_name' => SystemSetting::getVal('branding_name', 'MyLMS'),
+            'institutional_name' => SystemSetting::getVal('branding_name', config('app.name', 'MyLMS')),
             'institutional_motto' => SystemSetting::getVal('branding_motto', 'University Network Authority'),
             'hero_image' => SystemSetting::getVal('branding_hero_image', 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070'),
             'footer_text' => SystemSetting::getVal('branding_footer', 'An accredited, American, tuition-free, online university dedicated to global access.'),

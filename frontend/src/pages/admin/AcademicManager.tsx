@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useAppConfig } from '../../hooks/useAppConfig';
 import AcademicCalendarManager from './AcademicCalendarManager';
 import AdmissionRegistryManager from './AdmissionRegistryManager';
 import { 
@@ -60,6 +61,7 @@ interface Faculty {
 }
 
 export default function AcademicManager() {
+  const { appName } = useAppConfig();
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFaculty, setNewFaculty] = useState({ name: '', description: '' });
@@ -351,7 +353,7 @@ export default function AcademicManager() {
   if (loading) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center bg-offwhite">
       <div className="w-12 h-12 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-6"></div>
-      <p className="text-mylms-purple font-black uppercase tracking-[0.3em] text-[11px]">Syncing MyLMS Academic Ledger...</p>
+      <p className="text-mylms-purple font-black uppercase tracking-[0.3em] text-[11px]">Syncing {appName} Academic Ledger...</p>
     </div>
   );
 
@@ -374,7 +376,7 @@ export default function AcademicManager() {
                 className={`text-[11px] font-black uppercase tracking-[0.3em] pb-4 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'hierarchy' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
              >
                 <Layers size={16} />
-                MyLMS Hierarchy
+                {appName} Hierarchy
              </button>
              <button 
                 onClick={() => setActiveTab('registry')}
