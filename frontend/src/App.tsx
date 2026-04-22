@@ -30,7 +30,8 @@ import {
   X,
   ChevronLeft,
   Terminal,
-  Mail
+  Mail,
+  Briefcase
 } from 'lucide-react'
 
 // Auth & API
@@ -224,19 +225,25 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'Scholarships', path: '/scholarships', icon: <Award size={18} /> },
       ]
     }
-  } else if (userRole === 'instructor') {
-    sidebarLinks = [
-      { name: 'Faculty Registry', path: '/office/portal', icon: <LayoutDashboard size={18} /> },
-      { name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> },
-    ]
-  } else if (userRole === 'admin' || userRole === 'staff') {
+  } else if (['admin', 'staff', 'instructor'].includes(userRole || '')) {
     const isAdmin = userRole === 'admin';
+    const isInstructor = userRole === 'instructor';
     const permissions = user?.permissions || [];
     
-    sidebarLinks = [
-      { name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> },
-    ];
+    sidebarLinks = [];
 
+    // Default High-Level Entry
+    if (isAdmin || permissions.length > 0) {
+      sidebarLinks.push({ name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> });
+    }
+
+    // Instructor Default Tools
+    if (isInstructor) {
+      sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
+      sidebarLinks.push({ name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> });
+    }
+
+    // Permission-Based Admin Tools
     if (isAdmin || permissions.includes('academic_enrollment')) {
       sidebarLinks.push({ name: 'Academic Manager', path: '/admin/academic', icon: <Settings size={18} /> });
     }

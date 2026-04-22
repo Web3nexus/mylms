@@ -98,6 +98,7 @@ export default function AdminStaffDirectory() {
     });
     setIsEditing(false);
     setEditingId(null);
+    setShowModal(false);
   };
 
   const togglePermission = (featureKey: string) => {
@@ -300,7 +301,7 @@ export default function AdminStaffDirectory() {
                         </div>
                     </div>
 
-                    {formData.role === 'staff' && (
+                    {formData.role !== 'admin' && (
                        <div className="space-y-6 animate-in slide-in-from-top-4 duration-500 bg-offwhite p-8 rounded-3xl border border-border-soft">
                           <div>
                              <h4 className="text-[10px] font-black text-mylms-purple uppercase tracking-[0.4em] mb-2">Feature Permissions</h4>
