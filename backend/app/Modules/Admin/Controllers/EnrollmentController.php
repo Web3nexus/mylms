@@ -134,6 +134,20 @@ class EnrollmentController extends Controller
     }
 
     /**
+     * Public Helper: Get Unique Active Degree Levels
+     */
+    public function getActiveLevels()
+    {
+        $levels = Program::where('is_active', true)
+            ->distinct()
+            ->pluck('degree_level')
+            ->filter()
+            ->values();
+
+        return response()->json($levels);
+    }
+
+    /**
      * Public Helper: Get Programs by Level
      */
     public function getProgramsByLevel($level)

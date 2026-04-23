@@ -64,6 +64,7 @@ Route::get('/public/faculties', [AcademicController::class, 'index']);
 Route::get('/scholarships', [ScholarshipController::class, 'index']);
 
 // Enrollment Lookup
+Route::get('/active-degree-levels', [EnrollmentController::class, 'getActiveLevels']);
 Route::get('/programs-by-level/{level}', [EnrollmentController::class, 'getProgramsByLevel']);
 
 // Public Certificate Verification (Sprint 12)
