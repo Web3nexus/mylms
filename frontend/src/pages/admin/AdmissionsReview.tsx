@@ -283,7 +283,10 @@ export default function AdmissionsReview() {
                      Personal Candidacy Statement
                   </p>
                   <div className="p-10 bg-offwhite border-l-8 border-mylms-purple rounded-r-2xl text-text-main leading-loose font-bold text-sm uppercase shadow-inner tracking-tight">
-                     "{selectedApp.personal_statement}"
+                      {selectedApp.personal_statement 
+                        ? `"${selectedApp.personal_statement}"` 
+                        : <span className="text-gray-300 italic normal-case tracking-normal font-medium">No candidacy statement submitted yet.</span>
+                      }
                   </div>
                </div>
 
