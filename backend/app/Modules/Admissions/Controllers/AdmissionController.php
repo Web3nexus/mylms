@@ -199,26 +199,27 @@ class AdmissionController extends Controller
             return response()->json(['message' => 'Academic Protocol Error: Your admission record could not be localized. Please initiate the registry from the dashboard.'], 404);
         }
 
-        $validated = $request->validate([
-            'step'      => 'required|string',
-            'step_data' => 'required|array',
-        ]);
+        if (!$request->has('step')) {
+            return response()->json(['message' => 'Step identifier missing.'], 422);
+        }
 
-        $existingStepData = $application->step_data ?? [];
-        $existingStepData[$validated['step']] = $validated['step_data'];
+        $step = $request->input('step');
+        $stepData = $request->input('step_data', []);
+
+        $existingStepData[$step] = $stepData;
 
         $application->update([
             'step_data'    => $existingStepData,
-            'current_step' => $validated['step'],
+            'current_step' => $step,
             'status'       => AdmissionApplication::STATUS_IN_PROGRESS,
         ]);
 
         // Handle program selection and auto-resolve faculty
-        if ($validated['step'] === AdmissionApplication::STEP_PROGRAM && !empty($validated['step_data']['program_id'])) {
-            $program = \App\Modules\Academic\Models\Program::with('department.faculty')->find($validated['step_data']['program_id']);
+        if ($step === AdmissionApplication::STEP_PROGRAM && !empty($stepData['program_id'])) {
+            $program = \App\Modules\Academic\Models\Program::with('department.faculty')->find($stepData['program_id']);
             
             $application->update([
-                'program_id' => $validated['step_data']['program_id'],
+                'program_id' => $stepData['program_id'],
                 'faculty_id' => $program?->department?->faculty_id ?? $application->faculty_id
             ]);
         }

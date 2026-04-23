@@ -41,15 +41,10 @@ class AdmissionFieldsSeeder extends Seeder
             ['field_key' => 'social_membership', 'label' => 'Learnforth Social Membership', 'category' => 'membership', 'type' => 'select', 'options' => ['Yes', 'No', 'Interested'], 'is_required' => true, 'order_index' => 17],
             ['field_key' => 'referred_by', 'label' => 'Kindly select who referred you', 'category' => 'membership', 'type' => 'text', 'is_required' => false, 'order_index' => 18],
 
-            // CREDENTIALS
-            ['field_key' => 'username', 'label' => 'Username', 'category' => 'credentials', 'type' => 'text', 'is_required' => true, 'order_index' => 19],
-            ['field_key' => 'password', 'label' => 'Password', 'category' => 'credentials', 'type' => 'text', 'is_required' => true, 'order_index' => 20],
-            ['field_key' => 'captcha', 'label' => 'Captcha', 'category' => 'credentials', 'type' => 'text', 'is_required' => true, 'order_index' => 21],
-
             // DOCUMENTS
-            ['field_key' => 'upload_id', 'label' => 'Upload your ID', 'category' => 'documents', 'type' => 'file', 'is_required' => true, 'order_index' => 22],
-            ['field_key' => 'upload_certificate', 'label' => 'Upload your previous school certificate', 'category' => 'documents', 'type' => 'file', 'is_required' => true, 'order_index' => 23],
-            ['field_key' => 'upload_dob_proof', 'label' => 'Upload proof of date of birth', 'category' => 'documents', 'type' => 'file', 'is_required' => true, 'order_index' => 24],
+            ['field_key' => 'upload_id', 'label' => 'Upload your ID', 'category' => 'documents', 'type' => 'file', 'is_required' => true, 'order_index' => 19],
+            ['field_key' => 'upload_certificate', 'label' => 'Upload your previous school certificate', 'category' => 'documents', 'type' => 'file', 'is_required' => true, 'order_index' => 20],
+            ['field_key' => 'upload_dob_proof', 'label' => 'Upload proof of date of birth', 'category' => 'documents', 'type' => 'file', 'is_required' => true, 'order_index' => 21],
         ];
 
         foreach ($fields as $field) {
