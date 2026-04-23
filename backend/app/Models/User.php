@@ -23,6 +23,7 @@ class User extends Authenticatable
     const ROLE_INSTRUCTOR = 'instructor';
     const ROLE_STAFF = 'staff';
     const ROLE_STUDENT = 'student';
+    const ROLE_ADVISOR = 'advisor';
 
     /**
      * The attributes that are mass assignable.
@@ -41,6 +42,7 @@ class User extends Authenticatable
         'otp_expires_at',
         'email_verified_at',
         'permissions',
+        'academic_advisor_id',
     ];
 
     /**
@@ -92,6 +94,11 @@ class User extends Authenticatable
         return $this->role === self::ROLE_STUDENT;
     }
 
+    public function isAdvisor(): bool
+    {
+        return $this->role === self::ROLE_ADVISOR;
+    }
+
     public function program()
     {
         return $this->belongsTo(Program::class);
@@ -110,5 +117,15 @@ class User extends Authenticatable
     public function courseRegistrations()
     {
         return $this->hasMany(\App\Modules\Courses\Models\CourseRegistration::class);
+    }
+
+    public function advisor()
+    {
+        return $this->belongsTo(User::class, 'academic_advisor_id');
+    }
+
+    public function assignedStudents()
+    {
+        return $this->hasMany(User::class, 'academic_advisor_id');
     }
 }

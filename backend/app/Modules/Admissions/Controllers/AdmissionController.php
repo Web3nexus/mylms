@@ -214,8 +214,13 @@ class AdmissionController extends Controller
             'status'       => AdmissionApplication::STATUS_IN_PROGRESS,
         ]);
 
+        // Handle personal statement persistence
+        if (!empty($stepData['personal_statement'])) {
+            $application->update(['personal_statement' => $stepData['personal_statement']]);
+        }
+
         // Handle program selection and auto-resolve faculty
-        if ($step === AdmissionApplication::STEP_PROGRAM && !empty($stepData['program_id'])) {
+        if (($step === AdmissionApplication::STEP_PROGRAM || $step === 'academic_registry') && !empty($stepData['program_id'])) {
             $program = \App\Modules\Academic\Models\Program::with('department.faculty')->find($stepData['program_id']);
             
             $application->update([

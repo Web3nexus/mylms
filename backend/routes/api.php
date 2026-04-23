@@ -246,6 +246,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/topics/{topic}/posts', [ForumPostController::class, 'store']);
     Route::delete('/posts/{post}', [ForumPostController::class, 'destroy']);
 
+    // Academic Advisor & Mentorship (Admissions Sprint 24)
+    Route::get('/advisor/my-students', [AcademicAdvisorController::class, 'myStudents']);
+    Route::get('/advisor/chat/{student}', [AcademicAdvisorController::class, 'getChat']);
+    Route::post('/advisor/send', [AcademicAdvisorController::class, 'sendMessage']);
+    Route::get('/admin/advisors', [AcademicAdvisorController::class, 'listAdvisors']);
+    Route::post('/admin/advisors/assign', [AcademicAdvisorController::class, 'assignAdvisor']);
+
     // Student Finances & Billing (Sprint 11)
     Route::get('/finance/my-invoices', [FinanceController::class, 'myInvoices']);
     Route::get('/finance/gateways', [FinanceController::class, 'getGatewayConfig']);

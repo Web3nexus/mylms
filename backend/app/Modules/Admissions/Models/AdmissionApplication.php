@@ -40,6 +40,7 @@ class AdmissionApplication extends Model
         'status', 
         'current_step',
         'step_data',
+        'personal_statement',
         'scholarship_reason',
         'scholarship_status',
         'application_fee_status',
