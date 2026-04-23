@@ -164,9 +164,9 @@ class AdmissionController extends Controller
         // Prevent institutional protocol reset if already initiated
         if (!$application->waiver_requested_at) {
             $application->update(['waiver_requested_at' => now()]);
-            
-            ProcessFeeWaiverJob::dispatch($application->id)
-                ->delay(now()->addMinutes($delayMinutes));
+
+            // Use dispatchSync to bypass queue worker dependency and send immediately
+            ProcessFeeWaiverJob::dispatchSync($application->id);
         }
 
         // Registry Feedback Mail
@@ -362,9 +362,16 @@ class AdmissionController extends Controller
             'reviewed_by'  => Auth::id(),
         ]);
 
-        // If approved, dispatch delayed email and create offer
+        // If approved, send email inline (no queue dependency) and create offer
         if ($validated['status'] === 'approved') {
-            SendAdmissionEmailJob::dispatch($application->id);
+            // Send admission approval email synchronously
+            try {
+                $application->load(['user', 'program']);
+                \Illuminate\Support\Facades\Mail::to($application->user->email)
+                    ->send(new \App\Mail\AdmissionApproved($application));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Admission Approval Mail Failed', ['error' => $e->getMessage()]);
+            }
 
             $application->offer()->create([
                 'offer_type'  => 'unconditional',
