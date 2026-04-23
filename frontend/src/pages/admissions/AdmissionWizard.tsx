@@ -120,13 +120,28 @@ export default function AdmissionWizard() {
     setRemainingSeconds(diff);
   };
 
-  // Persistency Sync: Load step data when step changes
+  // Persistency Sync: Load step data ONLY when step changes
   useEffect(() => {
     if (application?.step_data && currentStepId) {
-      let data = { ...(application.step_data[currentStepId] || {}) };
-      setFormData(data);
+      const serverData = application.step_data[currentStepId] || {};
+      setFormData(serverData);
     }
-  }, [currentStepId, application?.step_data, application?.program]);
+  }, [currentStepId]); // Only run when step changes
+
+  // Debounced Auto-Save Protocol
+  useEffect(() => {
+    if (Object.keys(formData).length === 0) return;
+    
+    const timeoutId = setTimeout(() => {
+      // Only auto-save if we're on a data-entry step
+      const entrySteps = ['identity_verification', 'academic_registry', 'cultural_integration'];
+      if (entrySteps.includes(currentStepId)) {
+        saveStep();
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
 
   useEffect(() => {
     let timer: any;
