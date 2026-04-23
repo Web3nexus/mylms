@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, 
   ShieldCheck, 
@@ -14,7 +14,8 @@ import {
   HelpCircle,
   Award,
   Hash,
-  Loader2
+  Loader2,
+  MessageSquare
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import client from '../../api/client';
@@ -29,6 +30,7 @@ interface TranscriptData {
 
 export default function StudentPortal() {
   const { user, token } = useAuthStore();
+  const navigate = useNavigate();
   const [scholarships, setScholarships] = useState<any[]>([]);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -151,6 +153,17 @@ export default function StudentPortal() {
                         {creditsEarned} <span className="text-sm opacity-30">/ {totalCreditsRequired}</span>
                       </p>
                       <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Credits</p>
+                   </div>
+                </div>
+                <div className="mt-4 p-4 md:p-6 bg-mylms-purple/5 border border-mylms-purple/10 rounded-xl flex justify-between items-center group cursor-pointer hover:bg-mylms-purple/10 transition-all" onClick={() => navigate('/office/advisor')}>
+                   <div>
+                      <p className="text-[11px] md:text-sm font-black text-mylms-purple uppercase tracking-tight leading-tight">Academic Advisor</p>
+                      <p className="text-[8px] font-bold text-text-secondary uppercase tracking-widest mt-1">
+                         {user?.advisor?.name || 'Assigned Protocol Pending'}
+                      </p>
+                   </div>
+                   <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-mylms-purple shadow-sm group-hover:scale-110 transition-transform">
+                      <MessageSquare size={18} />
                    </div>
                 </div>
                 <div className="mt-4 p-4 md:p-6 bg-mylms-purple/5 border border-mylms-purple/10 rounded-xl flex justify-between items-center">

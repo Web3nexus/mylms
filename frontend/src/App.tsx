@@ -104,6 +104,7 @@ import EmailTemplateManager from './pages/admin/EmailTemplateManager'
 import EmailAccountManager from './pages/admin/EmailAccountManager'
 import CommandCenter from './pages/admin/CommandCenter'
 import PaymentSettings from './pages/admin/PaymentSettings'
+import AdvisorPortal from './pages/advisors/AdvisorPortal'
 
 // Hooks
 import { useBranding } from './hooks/useBranding'
@@ -270,6 +271,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     if (isAdmin) {
       sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
       sidebarLinks.push({ name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> });
+    }
+
+    if (userRole === 'advisor') {
+      sidebarLinks.push({ name: 'Advisor Desk', path: '/office/advisor', icon: <ShieldCheck size={18} /> });
     }
   }
 
@@ -470,6 +475,10 @@ function App() {
             <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
             <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
             <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
+          </Route>
+
+          <Route element={<ProtectedRoute roles={['advisor']} />}>
+            <Route path="/office/advisor" element={<AdvisorPortal />} />
           </Route>
    
           <Route element={<ProtectedRoute roles={['admin', 'staff']} />}>

@@ -5,10 +5,12 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'staff' | 'instructor' | 'student';
+  role: 'admin' | 'staff' | 'instructor' | 'student' | 'advisor';
   student_id?: string | null;
   program_id?: number | null;
   permissions?: string[];
+  academic_advisor_id?: number | null;
+  advisor?: { id: number; name: string; email: string } | null;
 }
 
 interface AuthState {

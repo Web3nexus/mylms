@@ -32,6 +32,7 @@ interface Application {
   status: string;
   personal_statement: string;
   form_data: any;
+  user_id: number;
   documents: Record<string, string>;
   submitted_at: string;
   review_notes?: string;
@@ -188,9 +189,23 @@ export default function AdmissionsReview() {
                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Authorized Faculty</p>
                      <p className="text-sm font-black text-text-main uppercase">{selectedApp.faculty?.name || 'N/A'}</p>
                   </div>
-                  <div className="p-6 bg-offwhite rounded-xl border border-border-soft">
+                  <div className="p-6 bg-offwhite rounded-xl border border-border-soft group/adv relative">
                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Academic Advisor</p>
-                     <p className="text-sm font-black text-text-main uppercase">{selectedApp.instructor?.name || 'Unassigned'}</p>
+                     <div className="flex items-center justify-between">
+                        <p className="text-sm font-black text-text-main uppercase">{selectedApp.instructor?.name || 'Unassigned'}</p>
+                        <button 
+                          onClick={async () => {
+                            const advisorId = prompt('Enter Advisor User ID to assign:');
+                            if (!advisorId) return;
+                            try {
+                              await client.post('/admin/advisors/assign', { student_id: selectedApp.user_id, advisor_id: advisorId });
+                              alert('Advisor assigned!');
+                              fetchApplications();
+                            } catch (e) { alert('Assignment Failed'); }
+                          }}
+                          className="opacity-0 group-hover/adv:opacity-100 transition-opacity text-mylms-purple text-[8px] font-black uppercase tracking-widest"
+                        > Assign </button>
+                     </div>
                   </div>
                   <div className="p-6 bg-offwhite rounded-xl border border-border-soft">
                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Target Program</p>
