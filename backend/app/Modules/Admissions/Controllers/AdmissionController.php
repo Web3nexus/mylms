@@ -89,7 +89,29 @@ class AdmissionController extends Controller
         }
 
         $application = $application->load(['program', 'offer', 'user', 'faculty', 'instructor']);
-        $application->admission_fee_waiver_delay_minutes = (int) SystemSetting::getVal('admission_fee_waiver_delay_minutes', 5);
+        $delayMinutes = (int) SystemSetting::getVal('admission_fee_waiver_delay_minutes', 5);
+        $application->admission_fee_waiver_delay_minutes = $delayMinutes;
+
+        // SELF-HEALING: If waiver delay has passed, auto-waive now (bypasses local queue issues)
+        if ($application->application_fee_status === AdmissionApplication::FEE_PENDING && 
+            $application->waiver_requested_at && 
+            $application->waiver_requested_at->addMinutes($delayMinutes)->isPast()) {
+            
+            $application->update([
+                'application_fee_status' => AdmissionApplication::FEE_WAIVED,
+                'application_fee_waived_at' => now()
+            ]);
+            
+            // Execute the success sequence (emails/notifications) immediately
+            try {
+                \App\Jobs\ProcessFeeWaiverJob::dispatch($application->id);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failsafe Waiver Job Error: ' . $e->getMessage());
+            }
+
+            $application = $application->fresh(['program', 'offer', 'user', 'faculty', 'instructor']);
+            $application->admission_fee_waiver_delay_minutes = $delayMinutes;
+        }
 
         return response()->json($application);
     }
@@ -141,6 +163,14 @@ class AdmissionController extends Controller
 
         ProcessFeeWaiverJob::dispatch($application->id)
             ->delay(now()->addMinutes($delayMinutes));
+
+        // Registry Feedback Mail
+        try {
+            \App\Services\CommunicationService::send(Auth::user()->email, 'waiver_request_success', [
+                'student_name' => Auth::user()->name,
+                'delay'        => $delayMinutes
+            ]);
+        } catch (\Exception $e) {}
 
         return response()->json([
             'message'        => 'Waiver request received. Your fee will be automatically waived in approximately ' . $delayMinutes . ' minutes.',
@@ -247,6 +277,13 @@ class AdmissionController extends Controller
         try {
             \Illuminate\Support\Facades\Mail::to($application->user->email)
                 ->send(new \App\Mail\AdmissionSubmitted($application->load(['user', 'program'])));
+
+            if ($scholarshipStatus === AdmissionApplication::SCHOLARSHIP_APPROVED) {
+               \App\Services\CommunicationService::send($application->user->email, 'scholarship_approved', [
+                   'student_name' => $application->user->name,
+                   'provider'     => $scholarshipProvider
+               ]);
+            }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Admission Mail Failed', ['error' => $e->getMessage()]);
         }

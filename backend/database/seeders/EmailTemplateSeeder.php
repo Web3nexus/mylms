@@ -97,7 +97,33 @@ class EmailTemplateSeeder extends Seeder
                             <a href="{{instagram_url}}" style="background: #fb7185; color: #fff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 12px;">Instagram</a>
                         </div>
                         
-                        <p style="color: #94a3b8; font-size: 11px; margin-top: 40px;">From all of us at <strong>Learnforth University</strong></p>
+                        <p style="color: #94a3b8; font-size: 11px; margin-top: 40px;">From all of us at <strong>{{campus_name}}</strong></p>
+                    </div>'
+            ],
+            [
+                'slug' => 'waiver_request_success',
+                'subject' => '🛡️ Registry Protocol: Your waiver request is being processed',
+                'category' => 'system',
+                'placeholders' => '["student_name", "delay", "campus_name"]',
+                'content_html' => '
+                    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 40px; background: #fff;">
+                        <h2 style="color: #4b345d; font-size: 24px; font-weight: 800; margin-bottom: 16px;">Waiver Request Received</h2>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Hi {{student_name}},</p>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Your request for an institutional fee waiver has been successfully logged. Our automated evaluation protocol will complete its assessment in approximately <strong>{{delay}} minutes</strong>.</p>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Please keep your admission portal open to proceed immediately after clearance.</p>
+                    </div>'
+            ],
+            [
+                'slug' => 'scholarship_approved',
+                'subject' => '🎓 Official Scholarship Award Notice - {{campus_name}}',
+                'category' => 'institutional',
+                'placeholders' => '["student_name", "provider", "campus_name"]',
+                'content_html' => '
+                    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 40px; background: #fff; border-left: 8px solid #4b345d;">
+                        <h2 style="color: #4b345d; font-size: 24px; font-weight: 800; margin-bottom: 16px;">Scholarship Approved</h2>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Hi {{student_name}},</p>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">We are pleased to inform you that your scholarship application has been reviewed and <strong>approved</strong> by the {{provider}} fund.</p>
+                        <p style="color: #1e293b; font-size: 15px; line-height: 1.6;">Your financial aid will be applied automatically once you finalize your enrollment. Congratulations on this achievement!</p>
                     </div>'
             ]
         ];

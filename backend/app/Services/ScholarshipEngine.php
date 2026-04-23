@@ -11,9 +11,9 @@ class ScholarshipEngine
      * - Keyword matching for financial hardship, academic ambition
      * Returns: >= 5 (Auto-Approve), 3-4 (Review), < 3 (Reject)
      */
-    public static function evaluate($reason)
+    public function evaluate($reason)
     {
-        if (empty($reason)) return 0;
+        if (empty($reason)) return 'rejected';
         
         $score = 0;
         $wordCount = str_word_count($reason);
@@ -40,6 +40,13 @@ class ScholarshipEngine
         if ($ambitionMatches > 0) $score += 1;
         if ($ambitionMatches > 2) $score += 1;
 
-        return $score;
+        if ($score >= 5) return 'approved';
+        if ($score >= 3) return 'pending';
+        return 'rejected';
+    }
+
+    public function evaluateRenewal($gpa, $minGpa)
+    {
+        return $gpa >= $minGpa;
     }
 }
