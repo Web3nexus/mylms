@@ -31,7 +31,7 @@ interface Application {
   instructor?: { name: string };
   status: string;
   personal_statement: string;
-  form_data: any;
+  step_data: any;
   user_id: number;
   documents: Record<string, string>;
   submitted_at: string;
@@ -175,12 +175,16 @@ export default function AdmissionsReview() {
                      </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-xs font-black text-gray-300 uppercase tracking-[0.3em] mb-4 flex items-center justify-end gap-2">
-                        <Clock size={16} />
-                        Submission
-                     </p>
-                     <p className="text-lg font-black text-text-main font-mono tracking-tighter">{new Date(selectedApp.submitted_at).toLocaleDateString()}</p>
-                  </div>
+                      <p className="text-xs font-black text-gray-300 uppercase tracking-[0.3em] mb-4 flex items-center justify-end gap-2">
+                         <Clock size={16} />
+                         Submission
+                      </p>
+                      <p className="text-lg font-black text-text-main font-mono tracking-tighter">
+                         {selectedApp.submitted_at 
+                            ? new Date(selectedApp.submitted_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                            : 'PENDING PROTOCOL'}
+                      </p>
+                   </div>
                </div>
 
                {/* Profile Quick Stats */}
@@ -232,18 +236,45 @@ export default function AdmissionsReview() {
 
                {/* Dynamic Form Data Display */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative z-10 animate-in fade-in duration-300">
-                   {selectedApp.form_data && Object.keys(selectedApp.form_data).length > 0 ? (
-                      Object.keys(selectedApp.form_data).map(key => (
-                         // Filtering by keyword as category isn't stored in results, only keys.
-                         // This is a simple fallback logic for better UX.
+                   {(() => {
+                      // Flatten step_data which is nested by step ID
+                      const rawData = selectedApp.step_data || {};
+                      const flattenedData: Record<string, any> = {};
+                      
+                      Object.values(rawData).forEach((stepValues: any) => {
+                         if (typeof stepValues === 'object' && stepValues !== null) {
+                            Object.assign(flattenedData, stepValues);
+                         }
+                      });
+
+                      const keys = Object.keys(flattenedData).filter(key => {
+                         const k = key.toLowerCase();
+                         if (activeDataTab === 'personal') {
+                            return ['first_name', 'last_name', 'middle_name', 'dob', 'gender', 'nationality', 'id_number'].some(p => k.includes(p));
+                         }
+                         if (activeDataTab === 'contact') {
+                            return ['email', 'phone', 'address', 'city', 'state', 'zip', 'country', 'social'].some(p => k.includes(p));
+                         }
+                         if (activeDataTab === 'academic') {
+                            return ['school', 'grad', 'gpa', 'degree', 'previous', 'sat', 'act', 'toefl', 'transcript'].some(p => k.includes(p));
+                         }
+                         if (activeDataTab === 'financial') {
+                            return ['scholarship', 'income', 'finaid', 'sponsor', 'funding'].some(p => k.includes(p));
+                         }
+                         return false;
+                      });
+
+                      if (keys.length === 0) {
+                         return <div className="col-span-full py-10 text-center text-gray-200 uppercase tracking-widest font-black text-[10px]">No registry details found under {activeDataTab} protocol.</div>;
+                      }
+
+                      return keys.map(key => (
                          <div key={key} className="p-6 bg-offwhite/50 border border-border-soft rounded-xl shadow-sm hover:shadow-md transition-all">
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{key.replace(/_/g, ' ')}</p>
-                            <p className="text-sm font-bold text-text-main uppercase">{selectedApp.form_data[key]}</p>
+                            <p className="text-sm font-bold text-text-main uppercase">{String(flattenedData[key])}</p>
                          </div>
-                      ))
-                   ) : (
-                      <div className="col-span-full py-10 text-center text-gray-200 uppercase tracking-widest font-black text-[10px]">No dynamic protocol data found.</div>
-                   )}
+                      ));
+                   })()}
                </div>
 
                <div className="mb-16 relative z-10">
