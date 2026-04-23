@@ -31,7 +31,19 @@ export default function GuidedPageEditor() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPage(res.data);
-        setContent(res.data.puck_json?.content || []);
+        const parsedContent = res.data.puck_json?.content || [];
+        
+        // Auto-inject missing structural properties so they instantly appear on live servers
+        parsedContent.forEach((block: any) => {
+          if (block.type === 'Hero') {
+            if (block.props.showBgImage === undefined) block.props.showBgImage = "true";
+            if (block.props.showOverlay === undefined) block.props.showOverlay = "true";
+            if (block.props.overlayColor === undefined) block.props.overlayColor = "";
+            if (block.props.overlayOpacity === undefined) block.props.overlayOpacity = 0.8;
+          }
+        });
+
+        setContent(parsedContent);
       } catch (err) {
         console.error("Fetch failed:", err);
       } finally {
@@ -140,6 +152,40 @@ export default function GuidedPageEditor() {
                 <div className="p-10 space-y-10">
                    {/* Standard Fields for basic blocks */}
                    {Object.entries(block.props).map(([key, value]: [string, any]) => {
+                     const isToggle = key === 'showOverlay' || key === 'showBgImage';
+                     const isVariant = key === 'variant';
+                     
+                     if (isToggle) {
+                       const isEnabled = value === "true" || value === true;
+                       return (
+                         <div key={key} className="flex items-center justify-between p-5 bg-offwhite border border-border-soft rounded-2xl">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{key.replace(/([A-Z])/g, ' $1')}</label>
+                            <button
+                              onClick={() => handleUpdateField(i, key, isEnabled ? "false" : "true")}
+                              className={`w-14 h-8 rounded-full transition-colors relative ${isEnabled ? 'bg-mylms-purple' : 'bg-gray-300'}`}
+                            >
+                              <div className={`w-6 h-6 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${isEnabled ? 'left-7' : 'left-1'}`}></div>
+                            </button>
+                         </div>
+                       );
+                     }
+                     
+                     if (isVariant) {
+                        return (
+                         <div key={key}>
+                            <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Layout Variant</label>
+                            <select 
+                              value={value}
+                              onChange={(e) => handleUpdateField(i, key, e.target.value)}
+                              className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-bold text-sm tracking-tight transition-all appearance-none"
+                            >
+                              <option value="default">Modern Purple</option>
+                              <option value="split-gradient">Split Gradient Overlay</option>
+                            </select>
+                         </div>
+                        );
+                     }
+
                      if (typeof value === 'string') {
                        return (
                          <div key={key}>
