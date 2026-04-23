@@ -37,6 +37,7 @@ export default function AdmissionWizard() {
   const [selectedLevel, setSelectedLevel] = useState('');
   const [availablePrograms, setAvailablePrograms] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [personalStatement, setPersonalStatement] = useState('');
   const [scholarshipReason, setScholarshipReason] = useState('');
   const [waiverRequested, setWaiverRequested] = useState(false);
   const [waiverDelayMinutes, setWaiverDelayMinutes] = useState(5);
@@ -106,6 +107,12 @@ export default function AdmissionWizard() {
       if (res.data.waiver_requested_at && res.data.application_fee_status === 'pending') {
         setWaiverRequested(true);
         calculateRemainingTime(res.data.waiver_requested_at, res.data.admission_fee_waiver_delay_minutes || 5, res.data.server_time);
+      }
+      if (res.data.personal_statement) {
+        setPersonalStatement(res.data.personal_statement);
+      }
+      if (res.data.scholarship_reason) {
+        setScholarshipReason(res.data.scholarship_reason);
       }
     } catch (err) {
       console.error('Error fetching application:', err);
@@ -297,6 +304,7 @@ export default function AdmissionWizard() {
     setError(null);
     try {
       const res = await client.post('/admission/submit', {
+        personal_statement: personalStatement,
         scholarship_reason: scholarshipReason,
       });
       setSubmissionResult(res.data);
@@ -707,6 +715,18 @@ export default function AdmissionWizard() {
                           <span className="text-mylms-purple">{application?.program?.name || 'Not selected'}</span>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/15 rounded-3xl mb-10">
+                      <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4">Personal Candidacy Statement</h4>
+                      <p className="text-[10px] font-black text-mylms-rose uppercase tracking-widest mb-6 italic">* Mandatory Academic Prerequisite</p>
+                      <textarea
+                        required
+                        value={personalStatement}
+                        onChange={(e) => setPersonalStatement(e.target.value)}
+                        placeholder="Detail your academic motivations, operational objectives, and why you are the ideal candidate for this institution (Min 50 characters)..."
+                        className="w-full p-6 bg-white border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-medium text-sm min-h-[150px] shadow-sm mb-2"
+                      />
                     </div>
 
                     <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/15 rounded-3xl">

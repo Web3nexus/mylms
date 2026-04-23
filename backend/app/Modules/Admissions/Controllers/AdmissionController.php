@@ -258,6 +258,7 @@ class AdmissionController extends Controller
         }
 
         $validated = $request->validate([
+            'personal_statement' => 'required|string|min:50',
             'scholarship_reason' => 'required|string|min:50',
         ]);
 
@@ -280,6 +281,7 @@ class AdmissionController extends Controller
         $application->update([
             'status'              => AdmissionApplication::STATUS_PENDING,
             'submitted_at'        => now(),
+            'personal_statement'  => trim($validated['personal_statement']),
             'scholarship_reason'  => $reason ?: null,
             'scholarship_status'  => $scholarshipStatus,
             'scholarship_provider'=> $scholarshipProvider,
