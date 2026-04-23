@@ -507,7 +507,7 @@ export default function AdmissionWizard() {
           <nav className="space-y-4">
             {steps.map((s, idx) => {
               const isActive = s.id === currentStepId;
-              const isDone = application?.step_data?.[s.id];
+              const isDone = s.isGate ? feeCleared : !!application?.step_data?.[s.id];
               return (
                 <button
                   key={idx}
