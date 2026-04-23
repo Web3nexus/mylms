@@ -122,8 +122,8 @@ export default function AdmissionWizard() {
 
   // Persistency Sync: Load step data ONLY when step changes
   useEffect(() => {
-    if (application?.form_data && currentStepId) {
-      const serverData = application.form_data[currentStepId] || {};
+    if (application?.step_data && currentStepId) {
+      const serverData = application.step_data[currentStepId] || {};
       setFormData(serverData);
     }
   }, [currentStepId]); // Only run when step changes

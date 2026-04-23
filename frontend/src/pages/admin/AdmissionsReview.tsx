@@ -31,7 +31,7 @@ interface Application {
   instructor?: { name: string };
   status: string;
   personal_statement: string;
-  form_data: any;
+  step_data: any;
   user_id: number;
   documents: Record<string, string>;
   submitted_at: string;
@@ -242,8 +242,8 @@ export default function AdmissionsReview() {
                {/* Dynamic Form Data Display */}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative z-10 animate-in fade-in duration-300">
                    {(() => {
-                      // Flatten form_data which is nested by step ID
-                      const rawData = selectedApp.form_data || {};
+                      // Flatten step_data which is nested by step ID
+                      const rawData = selectedApp.step_data || {};
                       const flattenedData: Record<string, any> = {};
                       
                       Object.values(rawData).forEach((stepValues: any) => {
