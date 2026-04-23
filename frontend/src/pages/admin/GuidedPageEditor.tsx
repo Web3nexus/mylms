@@ -186,23 +186,34 @@ export default function GuidedPageEditor() {
                         );
                      }
 
-                     if (typeof value === 'string') {
+                     if (typeof value === 'string' || typeof value === 'number') {
+                       const isColor = key.toLowerCase().includes('color');
                        return (
                          <div key={key}>
                             <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">{key.replace(/([A-Z])/g, ' $1')}</label>
-                            {value.length > 60 ? (
+                            {typeof value === 'string' && value.length > 60 ? (
                               <textarea 
                                 value={value}
                                 onChange={(e) => handleUpdateField(i, key, e.target.value)}
                                 className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-bold text-sm tracking-tight transition-all min-h-[120px]"
                               />
                             ) : (
-                              <input 
-                                type="text"
-                                value={value}
-                                onChange={(e) => handleUpdateField(i, key, e.target.value)}
-                                className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-bold text-sm tracking-tight transition-all"
-                              />
+                              <div className="flex items-center gap-3">
+                                {isColor && (
+                                  <div 
+                                    className="w-10 h-10 rounded-xl border border-border-soft shadow-inner shrink-0" 
+                                    style={{ backgroundColor: typeof value === 'string' ? value || 'transparent' : 'transparent' }}
+                                  ></div>
+                                )}
+                                <input 
+                                  type={typeof value === 'number' ? 'number' : 'text'}
+                                  step={typeof value === 'number' ? '0.1' : undefined}
+                                  value={value}
+                                  onChange={(e) => handleUpdateField(i, key, typeof value === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
+                                  className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple font-bold text-sm tracking-tight transition-all"
+                                  placeholder={isColor ? "#HEX or rgba()" : ""}
+                                />
+                              </div>
                             )}
                          </div>
                        )
