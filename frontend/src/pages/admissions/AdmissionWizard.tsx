@@ -255,6 +255,7 @@ export default function AdmissionWizard() {
       const res = await client.post('/admission/request-waiver');
       setWaiverRequested(true);
       setWaiverDelayMinutes(res.data.delay_minutes ?? 5);
+      await fetchApplication();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Waiver request failed.');
     } finally {
