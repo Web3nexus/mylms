@@ -94,8 +94,8 @@ export const config: Config<Props> = {
     // ---------------- EXISTING BLOCKS ---------------- //
     Hero: {
       fields: {
-        showOverlay: { type: "select", options: [{ label: "ON (Show Overlay)", value: "true" }, { label: "OFF (Hide Overlay)", value: "false" }] },
-        showBgImage: { type: "select", options: [{ label: "ON (Show Image)", value: "true" }, { label: "OFF (Hide Image)", value: "false" }] },
+        showOverlay: { type: "radio", options: [{ label: "ON", value: "true" }, { label: "OFF", value: "false" }] },
+        showBgImage: { type: "radio", options: [{ label: "ON", value: "true" }, { label: "OFF", value: "false" }] },
         overlayColor: { type: "text" },
         overlayOpacity: { type: "number" },
         title: { type: "text" },
@@ -105,7 +105,7 @@ export const config: Config<Props> = {
         buttonLink: { type: "text" },
         bgImage: { type: "text" },
         variant: {
-          type: "select",
+          type: "radio",
           options: [{ label: "Modern Purple", value: "default" }, { label: "Split Gradient Overlay", value: "split-gradient" }]
         }
       },
