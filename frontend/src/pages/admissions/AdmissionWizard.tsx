@@ -33,7 +33,7 @@ export default function AdmissionWizard() {
   const [application, setApplication] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [levels] = useState(['Associate', 'Bachelor', 'Master', 'PhD']);
+  const [levels, setLevels] = useState<string[]>([]);
   const [selectedLevel, setSelectedLevel] = useState('');
   const [availablePrograms, setAvailablePrograms] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +79,7 @@ export default function AdmissionWizard() {
       setLoading(false);
     };
     init();
+    client.get('/active-degree-levels').then(res => setLevels(res.data));
   }, [token]);
 
   useEffect(() => {
