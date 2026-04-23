@@ -533,6 +533,9 @@ export default function AdmissionWizard() {
               if (s.id === 'document_upload') {
                 isDone = application?.documents && Object.keys(application.documents).length > 0;
               }
+
+              // PERSISTENCE GUARD: Prevent status "flicker" for previous valid steps
+              if (idx < currentIndex && !isDone) isDone = true;
               return (
                 <button
                   key={idx}
