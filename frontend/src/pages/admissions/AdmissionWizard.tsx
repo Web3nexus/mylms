@@ -710,13 +710,14 @@ export default function AdmissionWizard() {
                     </div>
 
                     <div className="p-8 bg-mylms-purple/5 border-2 border-mylms-purple/15 rounded-3xl">
-                      <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4">Scholarship Application (Optional)</h4>
+                      <h4 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4">Scholarship Application Protocol</h4>
+                      <p className="text-[10px] font-black text-mylms-rose uppercase tracking-widest mb-6 italic">* Institutional Justification Required</p>
                       <textarea
+                        required
                         value={scholarshipReason}
                         onChange={(e) => setScholarshipReason(e.target.value)}
-                        rows={5}
-                        placeholder="Why do you need financial support?..."
-                        className="w-full p-6 bg-white border-2 border-border-soft rounded-2xl font-medium text-text-main text-sm"
+                        placeholder="Detail your financial eligibility and academic merit justification for institutional support (Min 50 characters)..."
+                        className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-medium text-sm min-h-[150px] shadow-inner"
                       />
                     </div>
 
