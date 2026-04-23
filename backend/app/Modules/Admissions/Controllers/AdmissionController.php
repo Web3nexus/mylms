@@ -205,11 +205,11 @@ class AdmissionController extends Controller
         $step = $request->input('step');
         $stepData = $request->input('step_data', []);
 
-        $existingStepData = $application->form_data ?? [];
+        $existingStepData = $application->step_data ?? [];
         $existingStepData[$step] = $stepData;
 
         $application->update([
-            'form_data'    => $existingStepData,
+            'step_data'    => $existingStepData,
             'current_step' => $step,
             'status'       => AdmissionApplication::STATUS_IN_PROGRESS,
         ]);
