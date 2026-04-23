@@ -39,7 +39,7 @@ class AdmissionApplication extends Model
         'instructor_id',
         'status', 
         'current_step',
-        'step_data',
+        'form_data',
         'personal_statement',
         'scholarship_reason',
         'scholarship_status',
@@ -50,7 +50,7 @@ class AdmissionApplication extends Model
     ];
 
     protected $casts = [
-        'step_data' => 'json',
+        'form_data' => 'json',
         'waiver_requested_at' => 'datetime',
         'submitted_at' => 'datetime',
     ];
