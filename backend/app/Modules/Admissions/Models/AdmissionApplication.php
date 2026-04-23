@@ -44,6 +44,7 @@ class AdmissionApplication extends Model
         'scholarship_status',
         'application_fee_status',
         'waiver_requested_at',
+        'waiver_emails_sent',
     ];
 
     protected $casts = [

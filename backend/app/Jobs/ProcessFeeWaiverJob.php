@@ -24,10 +24,11 @@ class ProcessFeeWaiverJob implements ShouldQueue
     {
         $app = AdmissionApplication::with(['user', 'program'])->find($this->applicationId);
         
-        if ($app && ($app->application_fee_status === 'pending' || $app->application_fee_status === 'waiver_pending')) {
+        if ($app && in_array($app->application_fee_status, ['pending', 'waived']) && !$app->waiver_emails_sent) {
             $app->update([
                 'application_fee_status' => 'waived',
-                'application_fee_waived_at' => now()
+                'application_fee_waived_at' => $app->application_fee_waived_at ?? now(),
+                'waiver_emails_sent' => true
             ]);
             
             $user = $app->user;
@@ -48,7 +49,7 @@ class ProcessFeeWaiverJob implements ShouldQueue
             \App\Services\CommunicationService::send($user->email, 'tuition_statement', [
                 'student_name'  => $user->name,
                 'tuition_worth' => number_format($tuitionValue, 2),
-                'academic_year' => '2026/2027', // Dynamic resolution could be added later
+                'academic_year' => '2026/2027', 
             ]);
 
             // 4. Delayed Job: Follow the Mission (2 days)

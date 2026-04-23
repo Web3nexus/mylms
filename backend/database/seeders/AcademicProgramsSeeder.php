@@ -83,6 +83,7 @@ class AcademicProgramsSeeder extends Seeder
                     'duration_years' => $duration,
                     'tuition_fee' => 0.00,
                     'application_fee' => 30.00,
+                    'is_active' => true,
                     'is_scholarship_eligible' => true
                 ]);
             }

@@ -113,7 +113,10 @@ class AdmissionController extends Controller
             $application->admission_fee_waiver_delay_minutes = $delayMinutes;
         }
 
-        return response()->json($application);
+        $res = $application->toArray();
+        $res['server_time'] = now()->toIso8601String();
+        
+        return response()->json($res);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -159,10 +162,13 @@ class AdmissionController extends Controller
 
         // Register institutional delay and request timestamp
         $delayMinutes = (int) SystemSetting::getVal('admission_fee_waiver_delay_minutes', 5);
-        $application->update(['waiver_requested_at' => now()]);
-
-        ProcessFeeWaiverJob::dispatch($application->id)
-            ->delay(now()->addMinutes($delayMinutes));
+        // Prevent institutional protocol reset if already initiated
+        if (!$application->waiver_requested_at) {
+            $application->update(['waiver_requested_at' => now()]);
+            
+            ProcessFeeWaiverJob::dispatch($application->id)
+                ->delay(now()->addMinutes($delayMinutes));
+        }
 
         // Registry Feedback Mail
         try {
