@@ -35,6 +35,8 @@ interface Application {
   user_id: number;
   documents: Record<string, string>;
   submitted_at: string;
+  created_at: string;
+  updated_at: string;
   review_notes?: string;
 }
 
@@ -180,9 +182,12 @@ export default function AdmissionsReview() {
                          Submission
                       </p>
                       <p className="text-lg font-black text-text-main font-mono tracking-tighter">
-                         {selectedApp.submitted_at 
-                            ? new Date(selectedApp.submitted_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' }) 
-                            : 'PENDING PROTOCOL'}
+                         {(() => {
+                            const dateStr = selectedApp.submitted_at || selectedApp.created_at || selectedApp.updated_at;
+                            return dateStr 
+                              ? new Date(dateStr).toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' }) 
+                              : 'PENDING PROTOCOL';
+                         })()}
                       </p>
                    </div>
                </div>
@@ -247,28 +252,23 @@ export default function AdmissionsReview() {
                          }
                       });
 
-                      const keys = Object.keys(flattenedData).filter(key => {
-                         const k = key.toLowerCase();
-                         if (activeDataTab === 'personal') {
-                            return ['first_name', 'last_name', 'middle_name', 'dob', 'gender', 'nationality', 'id_number'].some(p => k.includes(p));
-                         }
-                         if (activeDataTab === 'contact') {
-                            return ['email', 'phone', 'address', 'city', 'state', 'zip', 'country', 'social'].some(p => k.includes(p));
-                         }
-                         if (activeDataTab === 'academic') {
-                            return ['school', 'grad', 'gpa', 'degree', 'previous', 'sat', 'act', 'toefl', 'transcript'].some(p => k.includes(p));
-                         }
-                         if (activeDataTab === 'financial') {
-                            return ['scholarship', 'income', 'finaid', 'sponsor', 'funding'].some(p => k.includes(p));
-                         }
-                         return false;
-                      });
+                      const keys = Object.keys(flattenedData);
+                      
+                      const categorizeKey = (k: string) => {
+                         const lowerK = k.toLowerCase();
+                         if (['email', 'phone', 'mobile', 'address', 'city', 'state', 'zip', 'country', 'social', 'contact', 'postcode', 'residential'].some(p => lowerK.includes(p))) return 'contact';
+                         if (['school', 'grad', 'gpa', 'degree', 'previous', 'sat', 'act', 'toefl', 'transcript', 'academic', 'subject', 'university', 'college'].some(p => lowerK.includes(p))) return 'academic';
+                         if (['scholarship', 'income', 'finaid', 'sponsor', 'funding', 'finance', 'payment', 'assistance', 'fee'].some(p => lowerK.includes(p))) return 'financial';
+                         return 'personal'; // Fallback bucket ensures NO data is ever lost.
+                      };
 
-                      if (keys.length === 0) {
+                      const filteredKeys = keys.filter(key => categorizeKey(key) === activeDataTab);
+
+                      if (filteredKeys.length === 0) {
                          return <div className="col-span-full py-10 text-center text-gray-200 uppercase tracking-widest font-black text-[10px]">No registry details found under {activeDataTab} protocol.</div>;
                       }
 
-                      return keys.map(key => (
+                      return filteredKeys.map(key => (
                          <div key={key} className="p-6 bg-offwhite/50 border border-border-soft rounded-xl shadow-sm hover:shadow-md transition-all">
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{key.replace(/_/g, ' ')}</p>
                             <p className="text-sm font-bold text-text-main uppercase">{String(flattenedData[key])}</p>
