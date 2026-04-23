@@ -32,6 +32,8 @@ class BrandingController extends Controller
             'about_hero_title' => SystemSetting::getVal('about_hero_title', 'Innovation in Education.'),
             'accreditor_logos' => SystemSetting::getVal('branding_accreditor_logos', []),
             'partner_logos' => SystemSetting::getVal('branding_partner_logos', []),
+            'registrar_name' => SystemSetting::getVal('registrar_name', 'University Registrar'),
+            'branding_seal_url' => SystemSetting::getVal('branding_seal_url', null),
         ];
 
         $footerColumns = SystemSetting::getVal('branding_footer_columns');
@@ -89,16 +91,17 @@ class BrandingController extends Controller
             'about_hero_title' => 'nullable|string',
             'accreditor_logos' => 'nullable|array',
             'partner_logos' => 'nullable|array',
+            'registrar_name' => 'nullable|string|max:100',
+            'branding_seal_url' => 'nullable|string',
         ]);
 
         $allowed = [
             'logo_url', 'logo_light_url', 'favicon_url', 'primary_color', 'accent_color', 
             'institutional_name', 'institutional_motto', 
             'hero_image', 'footer_text', 'admissions_enabled', 'admissions_opens_at',
-            'footer_columns',
-            'about_hero_title',
-            'accreditor_logos',
-            'partner_logos'
+            'footer_columns', 'about_hero_title',
+            'accreditor_logos', 'partner_logos',
+            'registrar_name', 'branding_seal_url',
         ];
 
         foreach ($request->only($allowed) as $key => $value) {
