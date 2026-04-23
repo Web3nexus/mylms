@@ -521,7 +521,11 @@ export default function AdmissionWizard() {
             {steps.map((s, idx) => {
               const isActive = s.id === currentStepId;
               const stepData = application?.step_data?.[s.id];
-              const isDone = s.isGate ? feeCleared : (stepData && Object.keys(stepData).length > 0);
+              let isDone = s.isGate ? feeCleared : (stepData && Object.keys(stepData).length > 0);
+              
+              if (s.id === 'document_upload') {
+                isDone = application?.documents && Object.keys(application.documents).length > 0;
+              }
               return (
                 <button
                   key={idx}
