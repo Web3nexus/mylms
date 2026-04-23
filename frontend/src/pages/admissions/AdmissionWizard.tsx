@@ -97,6 +97,12 @@ export default function AdmissionWizard() {
         setWaiverDelayMinutes(res.data.admission_fee_waiver_delay_minutes);
       }
 
+      // Routing Guard: Redirect to first step if current step is invalid/decommissioned
+      const isValid = steps.some(s => s.id === currentStepId);
+      if (!isValid) {
+        setSearchParams({ step: steps[0].id });
+      }
+
       if (res.data.waiver_requested_at && res.data.application_fee_status === 'pending') {
         setWaiverRequested(true);
         calculateRemainingTime(res.data.waiver_requested_at, res.data.admission_fee_waiver_delay_minutes || 5, res.data.server_time);
@@ -514,7 +520,8 @@ export default function AdmissionWizard() {
           <nav className="space-y-4">
             {steps.map((s, idx) => {
               const isActive = s.id === currentStepId;
-              const isDone = s.isGate ? feeCleared : !!application?.step_data?.[s.id];
+              const stepData = application?.step_data?.[s.id];
+              const isDone = s.isGate ? feeCleared : (stepData && Object.keys(stepData).length > 0);
               return (
                 <button
                   key={idx}
