@@ -117,10 +117,17 @@ export default function AdmissionWizard() {
 
   // Persistency Sync: Load step data when step changes
   useEffect(() => {
-    if (application?.step_data) {
-      setFormData(application.step_data[currentStepId] || {});
+    if (application?.step_data && currentStepId) {
+      let data = { ...(application.step_data[currentStepId] || {}) };
+      
+      // Auto-populate 'course_interest' if we're on Scholastic History (academic_registry)
+      if (currentStepId === 'academic_registry' && !data.course_interest && application.program?.name) {
+          data.course_interest = application.program.name;
+      }
+      
+      setFormData(data);
     }
-  }, [currentStepId, application?.step_data]);
+  }, [currentStepId, application?.step_data, application?.program]);
 
   useEffect(() => {
     let timer: any;
