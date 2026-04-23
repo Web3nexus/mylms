@@ -32,7 +32,6 @@ class AdmissionFieldsSeeder extends Seeder
             ['field_key' => 'grad_year', 'label' => 'Year of graduation', 'category' => 'academic', 'type' => 'number', 'is_required' => false, 'order_index' => 12],
             ['field_key' => 'lang_study', 'label' => 'Preferred language of studies', 'category' => 'academic', 'type' => 'select', 'options' => ['English', 'French', 'Other'], 'is_required' => true, 'order_index' => 13],
             ['field_key' => 'academic_year', 'label' => 'Academic year', 'category' => 'academic', 'type' => 'select', 'options' => ['2026/2027', '2027/2028'], 'is_required' => true, 'order_index' => 14],
-            ['field_key' => 'course_interest', 'label' => 'Course of interest', 'category' => 'academic', 'type' => 'text', 'is_required' => true, 'order_index' => 15],
 
             // FINANCIAL
             ['field_key' => 'sponsors', 'label' => 'Sponsors', 'category' => 'financial', 'type' => 'textarea', 'is_required' => true, 'order_index' => 16],

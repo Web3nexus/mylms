@@ -90,7 +90,6 @@ class AdmissionController extends Controller
 
         $application = $application->load(['program', 'offer', 'user', 'faculty', 'instructor']);
         $delayMinutes = (int) SystemSetting::getVal('admission_fee_waiver_delay_minutes', 5);
-        $application->admission_fee_waiver_delay_minutes = $delayMinutes;
 
         // SELF-HEALING: If waiver delay has passed, auto-waive now (bypasses local queue issues)
         if ($application->application_fee_status === AdmissionApplication::FEE_PENDING && 
@@ -110,10 +109,10 @@ class AdmissionController extends Controller
             }
 
             $application = $application->fresh(['program', 'offer', 'user', 'faculty', 'instructor']);
-            $application->admission_fee_waiver_delay_minutes = $delayMinutes;
         }
 
         $res = $application->toArray();
+        $res['admission_fee_waiver_delay_minutes'] = $delayMinutes;
         $res['server_time'] = now()->toIso8601String();
         
         return response()->json($res);
@@ -357,10 +356,7 @@ class AdmissionController extends Controller
 
         // If approved, dispatch delayed email and create offer
         if ($validated['status'] === 'approved') {
-            $delayHours = (int) SystemSetting::getVal('admission_email_delay_hours', 1);
-
-            SendAdmissionEmailJob::dispatch($application->id)
-                ->delay(now()->addHours($delayHours));
+            SendAdmissionEmailJob::dispatch($application->id);
 
             $application->offer()->create([
                 'offer_type'  => 'unconditional',

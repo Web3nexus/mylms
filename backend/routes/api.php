@@ -260,6 +260,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
+    // Unified Student Dashboard (Spring 2026 Stability)
+    Route::get('/student/dashboard-home', [\App\Http\Controllers\StudentDashboardController::class, 'index']);
 });
 
 // Public Payment Webhooks

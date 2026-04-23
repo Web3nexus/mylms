@@ -29,7 +29,17 @@
 
     <p>Your official matriculation number is now active. Please proceed to the portal to finalize your enrollment, satisfy any pending institutional fees, and synchronize your academic calendar.</p>
 
+    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 32px 0;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em;">Final Step: Accessing Your Campus</h3>
+        <p style="font-size: 13px; color: #475569; margin-bottom: 16px;">You can now log in to the <strong>Unified Campus</strong> using the following credentials:</p>
+        <ul style="font-size: 13px; color: #475569; padding-left: 20px;">
+            <li style="margin-bottom: 8px;"><strong>Username/ID:</strong> {{ $application->user->student_id }}</li>
+            <li style="margin-bottom: 8px;"><strong>Password:</strong> Use the secure password you created during registration.</li>
+        </ul>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 16px; font-style: italic;">Note: For your security, keep these credentials confidential at all times.</p>
+    </div>
+
     <div style="text-align: center; margin-top: 40px;">
-        <a href="{{ config('app.url') }}/apply/dashboard" class="btn">Complete Enrollment</a>
+        <a href="{{ config('app.url') }}/campus" class="btn">Access Unified Campus</a>
     </div>
 @endsection
