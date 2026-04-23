@@ -145,8 +145,12 @@ export default function Login() {
           <div className="p-10">
             <div className="mb-10">
                <div className="flex justify-between items-center mb-6">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-inner border border-border-soft transition-all group-hover/card:bg-mylms-purple group-hover/card:text-white ${isSecurityGate ? 'text-mylms-rose' : 'text-mylms-purple'}`}>
-                     {isSecurityGate ? 'SG' : isStaffGate ? 'SO' : 'ML'}
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-inner border border-border-soft transition-all group-hover/card:bg-mylms-purple group-hover/card:text-white ${isSecurityGate ? 'text-mylms-rose' : 'text-mylms-purple'}`}>
+                     {branding?.favicon_url ? (
+                       <img src={branding.favicon_url} className="w-full h-full object-contain" alt="Identity" />
+                     ) : (
+                       isSecurityGate ? 'SG' : isStaffGate ? 'SO' : 'ML'
+                     )}
                   </div>
                   {isStudentGate && (
                     <div className="flex bg-offwhite p-1 rounded-xl border border-border-soft shadow-inner">

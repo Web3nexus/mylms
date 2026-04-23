@@ -132,8 +132,12 @@ export default function Register() {
 
           <div className="p-10">
             <div className="mb-10">
-              <div className="w-16 h-16 bg-white border border-border-soft flex items-center justify-center text-mylms-purple font-black text-2xl rounded-2xl shadow-sm mb-6 font-display relative z-10 transition-all group-hover/card:bg-mylms-purple group-hover/card:text-white">
-                ML
+              <div className="w-16 h-16 bg-white border border-border-soft flex items-center justify-center text-mylms-purple font-black text-2xl rounded-2xl overflow-hidden shadow-sm mb-6 font-display relative z-10 transition-all group-hover/card:bg-mylms-purple group-hover/card:text-white">
+                {branding?.favicon_url ? (
+                  <img src={branding.favicon_url} className="w-full h-full object-contain" alt="Identity" />
+                ) : (
+                  'ML'
+                )}
               </div>
               <h2 className="text-3xl font-black text-text-main tracking-tighter uppercase leading-none relative z-10">
                 {branding?.admissions_enabled ? 'Student Enrollment' : 'Enrollment Protocol Paused'}

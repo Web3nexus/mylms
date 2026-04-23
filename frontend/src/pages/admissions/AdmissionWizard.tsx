@@ -122,12 +122,12 @@ export default function AdmissionWizard() {
 
   useEffect(() => {
     let timer: any;
-    if (waiverRequested && remainingSeconds !== null && remainingSeconds > 0) {
+    if (waiverRequested && remainingSeconds !== null && remainingSeconds >= 0) {
       timer = setInterval(() => {
         setRemainingSeconds(prev => {
           if (prev === null || prev <= 1) {
             clearInterval(timer);
-            fetchApplication(); 
+            fetchApplication(); // Pull fresh fee status
             return 0;
           }
           return prev - 1;
@@ -136,6 +136,15 @@ export default function AdmissionWizard() {
     }
     return () => clearInterval(timer);
   }, [waiverRequested, remainingSeconds]);
+
+  // Periodic Polling specifically for Fee Status when waiting
+  useEffect(() => {
+    let polling: any;
+    if (waiverRequested && remainingSeconds === 0 && !feeCleared) {
+      polling = setInterval(() => fetchApplication(), 5000);
+    }
+    return () => clearInterval(polling);
+  }, [waiverRequested, remainingSeconds, feeCleared]);
 
   // Handle Automatic Redirect after Fee Protocol Clearance
   useEffect(() => {
@@ -424,19 +433,33 @@ export default function AdmissionWizard() {
                 </div>
               )}
               {waiverRequested ? (
-                <div className="p-8 bg-offwhite border-2 border-border-soft rounded-3xl text-center max-w-md mx-auto">
-                  <div className="relative w-16 h-16 mx-auto mb-4">
-                    <Clock size={32} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-mylms-rose animate-pulse" />
+                <div className="p-8 bg-offwhite border-2 border-border-soft rounded-3xl text-center max-w-md mx-auto relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-100 overflow-hidden">
+                     <div 
+                        className="h-full bg-mylms-rose transition-all duration-1000 ease-linear" 
+                        style={{ width: `${remainingSeconds !== null ? (1 - remainingSeconds / (waiverDelayMinutes * 60)) * 100 : 0}%` }}
+                     />
                   </div>
-                  <h3 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4 italic">Wait Period Active</h3>
+                  <div className="relative w-16 h-16 mx-auto mb-4">
+                    <Clock size={32} className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-mylms-rose ${remainingSeconds !== 0 ? 'animate-pulse' : ''}`} />
+                  </div>
+                  <h3 className="text-sm font-black text-mylms-purple uppercase tracking-tight mb-4 italic">
+                    {remainingSeconds === 0 ? 'Protocol Satisfied' : 'Wait Period Active'}
+                  </h3>
                   <div className="flex flex-col items-center justify-center gap-1 mb-6">
-                    <p className="text-2xl font-black text-mylms-purple tabular-nums">
+                    <p className={`text-2xl font-black tabular-nums transition-colors ${remainingSeconds === 0 ? 'text-green-600' : 'text-mylms-purple'}`}>
                       {remainingSeconds !== null ? `${Math.floor(remainingSeconds / 60)}:${(remainingSeconds % 60).toString().padStart(2, '0')}` : '--:--'}
                     </p>
                   </div>
-                  <button onClick={() => fetchApplication()} className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm">
-                    Refresh Status
-                  </button>
+                  {feeCleared ? (
+                     <button onClick={() => setSearchParams({ step: 'program_selection' })} className="w-full bg-green-600 text-white py-5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:brightness-110 animate-bounce">
+                        Continue to Registry
+                     </button>
+                  ) : (
+                    <button onClick={() => fetchApplication()} className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm">
+                      Sync Status Now
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-4">

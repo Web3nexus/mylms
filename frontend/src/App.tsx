@@ -111,6 +111,7 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import DashboardHeader from './components/layout/DashboardHeader'
 import MobileOptimizationPrompt from './components/MobileOptimizationPrompt'
+import { useAppConfig } from './hooks/useAppConfig'
 
 function Home() {
   return <PublicPage />;
@@ -119,6 +120,7 @@ function Home() {
 function MainLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, logout, token } = useAuthStore()
   const { branding } = useBranding()
+  const { appName } = useAppConfig()
   const navigate = useNavigate()
   const location = useLocation()
   const [systemTime, setSystemTime] = useState(new Date())
@@ -156,18 +158,16 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   // Dynamic Document Title
   useEffect(() => {
-    const appName = branding?.institutional_name || import.meta.env.VITE_APP_NAME || 'MyLMS';
-    // Attempt to extract page name from path, fallback to something generic if not in sidebar
+    const institutionName = branding?.institutional_name || appName;
     const cleanPath = location.pathname.split('/').pop() || 'Portal';
-    const pageName = cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
+    const pageName = cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1).replace('-', ' ');
     
-    // Fallback if we are on root
     if (location.pathname === '/') {
-       document.title = `${appName} | Unified Campus`;
+       document.title = `${institutionName} | Unified Campus`;
     } else {
-       document.title = `${pageName} - ${appName}`;
+       document.title = `${pageName} - ${institutionName}`;
     }
-  }, [location.pathname, branding?.institutional_name]);
+  }, [location.pathname, branding?.institutional_name, appName]);
   
   const handleLogout = async () => {
     try {
@@ -308,9 +308,13 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                     </div>
                   ) : (
                     <>
-                      <div className="w-10 h-10 flex items-center justify-center font-black text-xl rounded-lg shadow-sm bg-mylms-purple text-white overflow-hidden shrink-0">
-                        {(branding?.institutional_name?.charAt(0) || 'M')}
-                      </div>
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-inner border border-border-soft transition-all group-hover/card:bg-mylms-purple group-hover/card:text-white ${location.pathname.includes('securegate') ? 'text-mylms-rose' : 'text-mylms-purple'}`}>
+                     {branding?.favicon_url ? (
+                       <img src={branding.favicon_url} className="w-full h-full object-contain" alt="Identity" />
+                     ) : (
+                       location.pathname.includes('securegate') ? 'SG' : location.pathname.includes('office') ? 'SO' : 'ML'
+                     )}
+                  </div>
                       <span className="text-[11px] font-black text-text-main tracking-[0.2em] leading-none mt-3 uppercase">{branding?.institutional_name || 'MyLMS'}</span>
                       <span className="text-[7px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 opacity-50">{branding?.institutional_motto || 'University Network'}</span>
                     </>
