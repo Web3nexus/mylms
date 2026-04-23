@@ -236,12 +236,16 @@ export default function AdmissionWizard() {
     payload.append('type', fileKey);
     payload.append('file', file);
     setSaving(true);
+    setError(null);
     try {
       const res = await client.post('/admission/upload-document', payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setApplication(res.data.application);
-    } catch (err) {
+      if (res.data.application) setApplication(res.data.application);
+      setShowSaved(true);
+      setTimeout(() => setShowSaved(false), 2000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'File upload failed. Max size 5MB (PDF/JPG/PNG).');
       console.error('Upload failed', err);
     } finally {
       setSaving(false);
