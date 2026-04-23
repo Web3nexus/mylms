@@ -68,19 +68,101 @@ class StudentDashboardController extends Controller
         // 5. Full Transcript for courses list
         $transcriptData = $transcriptCtrl->index($request)->getData(true);
 
+        // 6. Categorized Course Lists (with semester dates for filtering)
+        $allRegs = \App\Modules\Courses\Models\CourseRegistration::where('user_id', $user->id)
+            ->where('status', '!=', 'dropped')
+            ->with(['course', 'semester'])
+            ->get();
+
+        $currentCourses = $allRegs->filter(function ($reg) {
+            $sem = $reg->semester;
+            return $sem && $sem->start_date <= now() && $sem->end_date >= now();
+        })->map(fn($reg) => [
+            'course_id' => $reg->course->id,
+            'title' => $reg->course->title,
+            'code' => $reg->course->code ?? '',
+            'credits' => $reg->course->credit_hours ?? 3,
+            'grade' => $reg->grade,
+            'letter' => $reg->grade_letter,
+            'semester' => $reg->semester->name ?? '—',
+            'status' => $reg->grade ? 'graded' : 'in_progress',
+        ])->values();
+
+        $futureCourses = $allRegs->filter(function ($reg) {
+            $sem = $reg->semester;
+            return $sem && $sem->start_date > now();
+        })->map(fn($reg) => [
+            'course_id' => $reg->course->id,
+            'title' => $reg->course->title,
+            'code' => $reg->course->code ?? '',
+            'credits' => $reg->course->credit_hours ?? 3,
+            'grade' => null,
+            'letter' => null,
+            'semester' => $reg->semester->name ?? '—',
+            'status' => 'upcoming',
+        ])->values();
+
+        $pastCourses = $allRegs->filter(function ($reg) {
+            $sem = $reg->semester;
+            return $sem && $sem->end_date < now();
+        })->map(fn($reg) => [
+            'course_id' => $reg->course->id,
+            'title' => $reg->course->title,
+            'code' => $reg->course->code ?? '',
+            'credits' => $reg->course->credit_hours ?? 3,
+            'grade' => $reg->grade,
+            'letter' => $reg->grade_letter,
+            'semester' => $reg->semester->name ?? '—',
+            'status' => $reg->grade ? 'graded' : 'incomplete',
+        ])->values();
+
+        // 7. Checklist items from upcoming events
+        $upcomingEvents = AcademicEvent::where('start_date', '>=', now())
+            ->orderBy('start_date')
+            ->take(5)
+            ->get()
+            ->map(fn($e) => [
+                'id' => $e->id,
+                'title' => $e->title,
+                'date' => optional($e->start_date)->toDateString(),
+                'type' => $e->type ?? 'ACADEMIC',
+                'completed' => false,
+            ]);
+
+        $completedEvents = AcademicEvent::where('end_date', '<', now())
+            ->orderBy('end_date', 'desc')
+            ->take(5)
+            ->get()
+            ->map(fn($e) => [
+                'id' => $e->id,
+                'title' => $e->title,
+                'date' => optional($e->end_date)->toDateString(),
+                'type' => $e->type ?? 'ACADEMIC',
+                'completed' => true,
+            ]);
+
         return response()->json([
             'user' => $user,
             'stats' => [
                 'cgpa' => $cgpa,
                 'credits_earned' => $creditsEarned,
                 'credits_required' => $totalCreditsRequired,
-                'program_name' => $user->program->name ?? 'Undergraduate Degree',
-                'active_courses_count' => $registrations->where('status', 'registered')->count()
+                'program_name' => $user->program->name ?? 'Academic Registry',
+                'active_courses_count' => $currentCourses->count(),
             ],
             'countdown' => $countdown,
             'announcements' => $announcements,
             'events' => $events,
             'transcript' => $transcriptData['transcript'] ?? [],
+            'courses' => [
+                'current' => $currentCourses,
+                'future' => $futureCourses,
+                'past' => $pastCourses,
+            ],
+            'checklist' => [
+                'current' => $upcomingEvents,
+                'completed' => $completedEvents,
+            ],
             'server_time' => now()->toIso8601String()
         ]);
     }
