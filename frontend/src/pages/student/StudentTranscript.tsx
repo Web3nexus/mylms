@@ -5,7 +5,6 @@ import {
   Printer, 
   ShieldCheck, 
   Layers,
-  Calendar,
   Bell
 } from 'lucide-react';
 import { useBranding } from '../../hooks/useBranding';
@@ -39,6 +38,7 @@ export default function StudentTranscript() {
   const { branding } = useBranding();
   const { token, user } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
+  const { notify } = useNotificationStore();
 
   const [data, setData] = useState<TranscriptData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,7 +64,6 @@ export default function StudentTranscript() {
         headers,
         responseType: 'blob',
       });
-      
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -78,7 +77,13 @@ export default function StudentTranscript() {
     }
   };
 
-  const { notify } = useNotificationStore();
+  // Compute dynamic GPA chart bars from real semester data
+  const chartBars = data?.transcript?.map(t => ({ label: t.semester_name, value: t.sgpa })) ?? [];
+  const maxSgpa = Math.max(...chartBars.map(b => b.value), 4);
+
+  // Dynamically count passed courses
+  const countPassed = (courses: CourseRecord[]) =>
+    courses.filter(c => c.letter !== null && c.letter !== 'F').length;
 
   if (loading) {
     return (
@@ -105,13 +110,10 @@ export default function StudentTranscript() {
          </div>
          <div className="flex gap-4">
             <button className="p-3 rounded-lg bg-white border border-border-soft text-mylms-purple transition-all shadow-sm hover:shadow-md">
-               <Calendar size={18} />
+               <Bell size={18} />
             </button>
             <button className="p-3 rounded-lg bg-white border border-border-soft text-mylms-purple transition-all shadow-sm hover:shadow-md">
                <Layers size={18} />
-            </button>
-            <button className="p-3 rounded-lg bg-white border border-border-soft text-mylms-purple transition-all shadow-sm hover:shadow-md">
-               <Bell size={18} />
             </button>
          </div>
       </div>
@@ -131,47 +133,59 @@ export default function StudentTranscript() {
             <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-10 relative overflow-hidden">
                 <div className="flex justify-between items-center mb-10 border-b border-border-soft pb-6">
                    <div className="flex items-center gap-3">
-                      <p className="text-[11px] font-black text-text-main uppercase tracking-tight">Institutional ID: <span className="text-mylms-purple">{user?.student_id || 'C110635487'}</span></p>
-                      <button className="text-mylms-rose hover:scale-110 transition-transform"><Layers size={14} /></button>
+                      <p className="text-[11px] font-black text-text-main uppercase tracking-tight">Institutional ID: <span className="text-mylms-purple">{user?.student_id || '—'}</span></p>
                    </div>
-                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Academic Year 2025-2026</p>
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                     {data?.transcript?.[0]?.academic_session || 'Academic Registry'}
+                   </p>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-1">
                    <div className="p-8 text-center border-r border-border-soft relative group">
-                      <p className="text-5xl font-serif font-black text-mylms-purple mb-4">{data?.total_credits_earned || 6}<span className="text-lg opacity-20 ml-1">/6</span></p>
+                      <p className="text-5xl font-serif font-black text-mylms-purple mb-4">
+                        {data?.total_credits_earned ?? '—'}
+                      </p>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Credits Earned</p>
-                      <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest mt-2">January 2026</p>
                    </div>
                    <div className="p-8 text-center border-r border-border-soft relative">
-                      <p className="text-5xl font-serif font-black text-mylms-purple mb-4">{data?.cgpa.toFixed(2) || '2.84'}</p>
+                      <p className="text-5xl font-serif font-black text-mylms-purple mb-4">
+                        {data?.cgpa != null ? data.cgpa.toFixed(2) : '—'}
+                      </p>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Cumulative GPA</p>
-                      <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest mt-2">-</p>
                    </div>
                    <div className="p-8 text-center relative">
-                      <p className="text-5xl font-serif font-black text-mylms-purple mb-4">-</p>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Meeting SAP Status</p>
-                      <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest mt-2">-</p>
+                      <p className="text-5xl font-serif font-black text-mylms-purple mb-4">
+                        {data?.transcript ? data.transcript.reduce((sum, t) => sum + countPassed(t.courses), 0) : '—'}
+                      </p>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Courses Passed</p>
                    </div>
                 </div>
             </div>
          </div>
 
-         {/* GPA Trend Chart Placeholder */}
+         {/* GPA Trend Chart — Dynamic */}
          <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-10">
             <h4 className="text-[11px] font-black text-mylms-purple uppercase tracking-[0.3em] mb-6">GPA Trend</h4>
-            <div className="h-48 flex items-end justify-around gap-4 px-4 pb-4 border-b border-l border-border-soft">
-               <div className="w-12 bg-mylms-rose/20 h-[40%] rounded-t-lg relative group transition-all hover:bg-mylms-rose">
-                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold">1.67</span>
-               </div>
-               <div className="w-12 bg-mylms-purple h-[70%] rounded-t-lg relative group transition-all hover:bg-mylms-rose/80">
-                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold">4.00</span>
-               </div>
-            </div>
-            <div className="flex justify-between text-[8px] font-black text-gray-300 uppercase tracking-widest mt-4">
-               <span>Sept 2025</span>
-               <span>Jan 2026</span>
-            </div>
+            {chartBars.length === 0 ? (
+              <div className="h-48 flex items-center justify-center text-[10px] text-gray-300 font-black uppercase tracking-widest">No Data Yet</div>
+            ) : (
+              <>
+                <div className="h-48 flex items-end justify-around gap-4 px-4 pb-4 border-b border-l border-border-soft">
+                   {chartBars.map((bar, i) => (
+                      <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                        <span className="text-[9px] font-bold text-gray-500">{bar.value.toFixed(2)}</span>
+                        <div
+                          className="w-full rounded-t-lg bg-mylms-purple hover:bg-mylms-rose transition-all"
+                          style={{ height: `${(bar.value / maxSgpa) * 100}%` }}
+                        />
+                      </div>
+                   ))}
+                </div>
+                <div className="flex justify-between text-[8px] font-black text-gray-300 uppercase tracking-widest mt-4">
+                   {chartBars.map((bar, i) => <span key={i}>{bar.label}</span>)}
+                </div>
+              </>
+            )}
          </div>
       </div>
 
@@ -189,6 +203,9 @@ export default function StudentTranscript() {
 
          <select className="bg-white border border-border-soft rounded-lg px-6 py-4 text-[10px] font-black uppercase tracking-widest outline-none shadow-sm mb-10 w-full lg:w-96">
             <option>All Academic Sessions</option>
+            {data?.transcript?.map((t, i) => (
+              <option key={i} value={t.semester_id}>{t.semester_name} — {t.academic_session}</option>
+            ))}
          </select>
 
          {/* Term Accordions */}
@@ -215,7 +232,7 @@ export default function StudentTranscript() {
                         </div>
                         <div>
                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Courses Passed</p>
-                           <p className="text-xl font-serif font-black text-text-main">1 out of {term.courses.length}</p>
+                           <p className="text-xl font-serif font-black text-text-main">{countPassed(term.courses)} of {term.courses.length}</p>
                         </div>
                      </div>
                   </div>
@@ -236,7 +253,7 @@ export default function StudentTranscript() {
                               <div className="text-right">
                                  <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">Grade</p>
                                  <div className={`text-lg font-black ${course.letter === 'F' ? 'text-mylms-rose' : 'text-green-600'}`}>
-                                    {course.grade !== null ? `${course.grade}/${course.letter || 'P'}` : 'N/A'}
+                                    {course.grade !== null ? `${course.grade} / ${course.letter || 'P'}` : 'N/A'}
                                  </div>
                               </div>
                            </div>

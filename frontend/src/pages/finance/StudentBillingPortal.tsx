@@ -371,40 +371,16 @@ export default function StudentBillingPortal() {
                        <h3 className="text-sm font-black text-mylms-purple uppercase tracking-tight italic mb-2">Settlement Protocols</h3>
                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">Manage your institutional-grade payment methods.</p>
                     </div>
-                    <button 
-                      onClick={() => notify("Registry: New payment method protocol initialized.", "success")}
-                      className="flex items-center gap-2 px-6 py-3 bg-mylms-purple text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg hover:scale-105 transition-all"
-                    >
-                       <Plus size={14} /> Add New Method
-                    </button>
                  </div>
 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="p-8 bg-gradient-to-br from-mylms-purple to-[#2A1D35] rounded-[32px] text-white shadow-2xl relative overflow-hidden group border border-white/5 cursor-pointer hover:scale-[1.02] transition-all">
-                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full group-hover:scale-150 transition-transform duration-1000"></div>
-                       <div className="relative z-10">
-                          <div className="flex justify-between items-start mb-12">
-                             <CreditCard size={32} className="opacity-40" />
-                             <span className="text-[8px] font-black uppercase tracking-[0.4em] bg-white/10 px-3 py-1 rounded-full border border-white/5 opacity-60">Secured Layer</span>
-                          </div>
-                          <p className="text-[10px] font-medium tracking-[0.4em] mb-1 opacity-50 uppercase italic font-sans">Primary Source</p>
-                          <p className="text-2xl font-black italic tracking-widest mb-10">•••• •••• •••• 4492</p>
-                          <div className="flex justify-between items-end">
-                             <div>
-                                <p className="text-[7px] font-black uppercase tracking-widest opacity-40 mb-1 leading-none italic">Custodian</p>
-                                <p className="text-[10px] font-black uppercase tracking-tight italic">NWANWAN PORTAL</p>
-                             </div>
-                             <p className="text-[10px] font-black tracking-widest italic opacity-60">12/28</p>
-                          </div>
-                       </div>
+                 <div className="py-16 text-center bg-white border border-dashed border-border-soft rounded-[32px] flex flex-col items-center gap-6">
+                    <div className="w-16 h-16 rounded-full bg-offwhite flex items-center justify-center text-gray-300">
+                       <CreditCard size={28} />
                     </div>
-
-                    <div className="p-8 bg-white border-2 border-dashed border-border-soft rounded-[32px] flex flex-col items-center justify-center text-center group cursor-pointer hover:border-mylms-purple/30 transition-all">
-                       <div className="w-16 h-16 rounded-full bg-offwhite flex items-center justify-center text-gray-300 group-hover:bg-mylms-purple/5 group-hover:text-mylms-purple transition-all mb-4">
-                          <Plus size={24} />
-                       </div>
-                       <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-mylms-purple italic">Onboard Supplemental Protocol</p>
-                    </div>
+                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">No saved payment methods on file.</p>
+                    <p className="text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] max-w-xs leading-relaxed">
+                       Payment methods are managed directly through the gateway during checkout. Contact the Bursar for manual arrangements.
+                    </p>
                  </div>
 
                  <div className="p-8 bg-amber-50 border border-amber-100 rounded-3xl flex items-center gap-6">

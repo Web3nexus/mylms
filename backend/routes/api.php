@@ -270,6 +270,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Unified Student Dashboard (Spring 2026 Stability)
     Route::get('/student/dashboard-home', [\App\Http\Controllers\StudentDashboardController::class, 'index']);
+
+    // Self-Service Form Requests
+    Route::get('/student/form-requests', [\App\Http\Controllers\StudentFormRequestController::class, 'index']);
+    Route::post('/student/form-requests', [\App\Http\Controllers\StudentFormRequestController::class, 'store']);
+
+    // Campus Calendar Events
+    Route::get('/student/calendar/events', [\App\Http\Controllers\StudentCalendarController::class, 'index']);
 });
 
 // Public Payment Webhooks
