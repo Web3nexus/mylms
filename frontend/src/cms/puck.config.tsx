@@ -94,20 +94,20 @@ export const config: Config<Props> = {
     // ---------------- EXISTING BLOCKS ---------------- //
     Hero: {
       fields: {
+        showOverlay: { type: "select", options: [{ label: "ON (Show Overlay)", value: "true" }, { label: "OFF (Hide Overlay)", value: "false" }] },
+        showBgImage: { type: "select", options: [{ label: "ON (Show Image)", value: "true" }, { label: "OFF (Hide Image)", value: "false" }] },
+        overlayColor: { type: "text" },
+        overlayOpacity: { type: "number" },
         title: { type: "text" },
         titleColor: { type: "text" },
         description: { type: "textarea" },
         buttonText: { type: "text" },
         buttonLink: { type: "text" },
-        showBgImage: { type: "select", options: [{ label: "Yes", value: "true" }, { label: "No", value: "false" }] },
         bgImage: { type: "text" },
         variant: {
           type: "select",
           options: [{ label: "Modern Purple", value: "default" }, { label: "Split Gradient Overlay", value: "split-gradient" }]
-        },
-        showOverlay: { type: "select", options: [{ label: "Yes", value: "true" }, { label: "No", value: "false" }] },
-        overlayColor: { type: "text" },
-        overlayOpacity: { type: "number" }
+        }
       },
       render: ({ title, titleColor, description, buttonText, buttonLink, bgImage, showBgImage = "true", variant, showOverlay = "true", overlayColor, overlayOpacity = 0.8 }) => {
         const titleStyle = { fontSize: '42px', color: titleColor || "#C6C09A" };
