@@ -225,6 +225,9 @@ export default function AdmissionWizard() {
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to save progress.');
     } finally {
+      if (currentStepId === 'document_upload' && nextStepId) {
+        setSearchParams({ step: nextStepId });
+      }
       setSaving(false);
     }
   };
