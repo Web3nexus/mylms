@@ -43,7 +43,7 @@ class AdmissionWizardController extends Controller
             ['status' => AdmissionApplication::STATUS_IN_PROGRESS]
         );
 
-        if ($application->status === AdmissionApplication::STATUS_SUBMITTED || $application->status === AdmissionApplication::STATUS_APPROVED) {
+        if ($application->status === AdmissionApplication::STATUS_PENDING || $application->status === AdmissionApplication::STATUS_APPROVED) {
             return response()->json(['message' => 'Application is locked for editing.'], 422);
         }
 
@@ -95,7 +95,7 @@ class AdmissionWizardController extends Controller
         // Final verification of required data could go here (e.g. checking if all 5 JSON keys exist)
         
         $application->update([
-            'status' => AdmissionApplication::STATUS_SUBMITTED,
+            'status' => AdmissionApplication::STATUS_PENDING,
             'submitted_at' => now()
         ]);
 

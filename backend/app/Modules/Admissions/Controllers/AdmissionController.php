@@ -248,12 +248,12 @@ class AdmissionController extends Controller
         }
 
         // Gate: cannot re-submit
-        if (in_array($application->status, [AdmissionApplication::STATUS_SUBMITTED, AdmissionApplication::STATUS_APPROVED])) {
+        if (in_array($application->status, [AdmissionApplication::STATUS_PENDING, AdmissionApplication::STATUS_APPROVED])) {
             return response()->json(['message' => 'Application already submitted.'], 422);
         }
 
         $validated = $request->validate([
-            'scholarship_reason' => 'nullable|string',
+            'scholarship_reason' => 'required|string|min:50',
         ]);
 
         // Evaluate scholarship reason
@@ -273,7 +273,7 @@ class AdmissionController extends Controller
         }
 
         $application->update([
-            'status'              => AdmissionApplication::STATUS_SUBMITTED,
+            'status'              => AdmissionApplication::STATUS_PENDING,
             'submitted_at'        => now(),
             'scholarship_reason'  => $reason ?: null,
             'scholarship_status'  => $scholarshipStatus,
