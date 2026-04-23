@@ -205,6 +205,7 @@ class AdmissionController extends Controller
         $step = $request->input('step');
         $stepData = $request->input('step_data', []);
 
+        $existingStepData = $application->step_data ?? [];
         $existingStepData[$step] = $stepData;
 
         $application->update([
