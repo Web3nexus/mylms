@@ -99,17 +99,18 @@ export default function AdmissionWizard() {
 
       if (res.data.waiver_requested_at && res.data.application_fee_status === 'pending') {
         setWaiverRequested(true);
-        calculateRemainingTime(res.data.waiver_requested_at, res.data.admission_fee_waiver_delay_minutes || 5);
+        calculateRemainingTime(res.data.waiver_requested_at, res.data.admission_fee_waiver_delay_minutes || 5, res.data.server_time);
       }
     } catch (err) {
       console.error('Error fetching application:', err);
     }
   };
 
-  const calculateRemainingTime = (requestedAt: string, delayMins: number) => {
+  const calculateRemainingTime = (requestedAt: string, delayMins: number, serverTimeStr?: string) => {
     const start = new Date(requestedAt).getTime();
     const expiry = start + (delayMins * 60 * 1000);
-    const diff = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+    const now = serverTimeStr ? new Date(serverTimeStr).getTime() : Date.now();
+    const diff = Math.max(0, Math.floor((expiry - now) / 1000));
     setRemainingSeconds(diff);
   };
 
