@@ -60,7 +60,6 @@ export default function AdmissionWizard() {
     { id: 'program_selection', title: 'Academic Pursuit', icon: <GraduationCap size={18} /> },
     { id: 'academic_registry', title: 'Scholastic History', icon: <FileText size={18} />, categories: ['academic', 'financial'] },
     { id: 'institutional_context', title: 'Cultural Integration', icon: <Heart size={18} />, categories: ['membership'] },
-    { id: 'credentials_setup', title: 'Portal Credentials', icon: <ShieldCheck size={18} />, categories: ['credentials'] },
     { id: 'document_upload', title: 'Evidence Bunker', icon: <Upload size={18} />, categories: ['documents'] },
     { id: 'final_review', title: 'Final Transmission', icon: <CheckCircle size={18} /> },
   ];
