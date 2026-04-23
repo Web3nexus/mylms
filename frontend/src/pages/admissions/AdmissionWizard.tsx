@@ -456,8 +456,12 @@ export default function AdmissionWizard() {
                         Continue to Registry
                      </button>
                   ) : (
-                    <button onClick={() => fetchApplication()} className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm">
-                      Sync Status Now
+                    <button 
+                      onClick={() => fetchApplication()} 
+                      disabled={loading}
+                      className="w-full bg-white border border-border-soft text-mylms-purple py-3 rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-offwhite transition-all shadow-sm disabled:opacity-50"
+                    >
+                      {loading ? 'Re-validating Protocol...' : 'Sync Status Now'}
                     </button>
                   )}
                 </div>
