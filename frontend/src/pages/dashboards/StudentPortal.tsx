@@ -30,7 +30,7 @@ interface TranscriptData {
 export default function StudentPortal() {
   const { user, token } = useAuthStore();
   const [scholarships, setScholarships] = useState<any[]>([]);
-  const [transcriptData, setTranscriptData] = useState<TranscriptData | null>(null);
+  const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // Degree total credit hours fallback
@@ -39,16 +39,16 @@ export default function StudentPortal() {
   useEffect(() => {
     const fetchPortalData = async () => {
       try {
-        const [transcriptRes, scholarshipsRes] = await Promise.allSettled([
-          client.get('/transcript'),
+        const [dashRes, scholarshipRes] = await Promise.allSettled([
+          client.get('/student/dashboard-home'),
           client.get('/scholarships'),
         ]);
 
-        if (transcriptRes.status === 'fulfilled') {
-          setTranscriptData(transcriptRes.value.data);
+        if (dashRes.status === 'fulfilled') {
+          setDashboardData(dashRes.value.data);
         }
-        if (scholarshipsRes.status === 'fulfilled') {
-          setScholarships(scholarshipsRes.value.data.slice(0, 3));
+        if (scholarshipRes.status === 'fulfilled') {
+          setScholarships(scholarshipRes.value.data.slice(0, 3));
         }
       } catch (err) {
         console.error('Error fetching portal data:', err);
@@ -59,9 +59,11 @@ export default function StudentPortal() {
     fetchPortalData();
   }, [token]);
 
-  const cgpa = transcriptData?.cgpa ?? 0;
-  const creditsEarned = transcriptData?.total_credits_earned ?? 0;
-  const totalCreditsRequired = transcriptData?.total_degree_credits ?? DEFAULT_DEGREE_CREDITS;
+  const stats = dashboardData?.stats;
+  const cgpa = stats?.cgpa ?? 0;
+  const creditsEarned = stats?.credits_earned ?? 0;
+  const totalCreditsRequired = stats?.credits_required ?? DEFAULT_DEGREE_CREDITS;
+  const countdown = dashboardData?.countdown;
   const degreeProgress = Math.min((creditsEarned / totalCreditsRequired) * 100, 100);
 
   // Determine academic standing label
@@ -81,7 +83,7 @@ export default function StudentPortal() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-10 gap-6">
         <div className="flex-1">
            <h1 className="text-2xl md:text-3xl font-serif font-black text-mylms-purple uppercase tracking-tight leading-tight">
-             {transcriptData?.program_name || 'Bachelor\'s Degree in Computer Science'}
+             {stats?.program_name || 'Degree Registry Active'}
            </h1>
         </div>
         <div className="w-full md:w-auto flex items-center gap-6 md:gap-10 bg-white px-6 md:px-8 py-4 rounded-xl border border-border-soft shadow-sm">
@@ -89,17 +91,17 @@ export default function StudentPortal() {
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Term begins in</p>
               <div className="flex items-center justify-between md:justify-start gap-4 text-xl md:text-2xl font-serif font-black text-mylms-purple">
                  <div className="flex flex-col items-center">
-                    <span>06</span>
+                    <span>{countdown?.days ?? '00'}</span>
                     <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-1">Days</span>
                  </div>
                  <span className="text-sm opacity-20">:</span>
                  <div className="flex flex-col items-center">
-                    <span>18</span>
+                    <span>{countdown?.hours ?? '00'}</span>
                     <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-1">Hrs</span>
                  </div>
                  <span className="text-sm opacity-20">:</span>
                  <div className="flex flex-col items-center">
-                    <span>54</span>
+                    <span>{countdown?.mins ?? '00'}</span>
                     <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-1">Mins</span>
                  </div>
               </div>
@@ -153,10 +155,10 @@ export default function StudentPortal() {
                 </div>
                 <div className="mt-4 p-4 md:p-6 bg-mylms-purple/5 border border-mylms-purple/10 rounded-xl flex justify-between items-center">
                    <div>
-                      <p className="text-[11px] md:text-sm font-black text-mylms-purple uppercase tracking-tight leading-tight">Courses to Finalize</p>
-                      <p className="text-[8px] font-bold text-text-secondary uppercase tracking-widest mt-1">Protocol status</p>
+                      <p className="text-[11px] md:text-sm font-black text-mylms-purple uppercase tracking-tight leading-tight">Active Registrations</p>
+                      <p className="text-[8px] font-bold text-text-secondary uppercase tracking-widest mt-1">Semester Status</p>
                    </div>
-                   <p className="text-xl md:text-3xl font-serif font-black text-mylms-purple">2 <span className="text-sm opacity-30">/ 2</span></p>
+                   <p className="text-xl md:text-3xl font-serif font-black text-mylms-purple">{stats?.active_courses_count ?? 0}</p>
                 </div>
              </div>
           </div>
@@ -215,23 +217,27 @@ export default function StudentPortal() {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-border-soft">
-                      {transcriptData?.transcript.map((course, i) => (
-                         <tr key={i} className="hover:bg-offwhite/50 transition-colors">
-                            <td className="px-8 py-6">
-                               <p className="text-sm font-black text-text-main uppercase tracking-tight leading-tight mb-1">{course.course_name}</p>
-                               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{course.course_code}</p>
-                            </td>
-                            <td className="px-8 py-6">
-                               <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                  <span className="text-[10px] font-black text-text-main uppercase tracking-widest">Registered</span>
-                               </div>
-                            </td>
-                            <td className="px-8 py-6">
-                               <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Registry</span>
-                            </td>
-                         </tr>
-                      )) || (
+                      {dashboardData?.transcript?.map((semester: any) => 
+                         semester.courses.map((course: any, i: number) => (
+                          <tr key={`${semester.semester_id}-${course.course_id}`} className="hover:bg-offwhite/50 transition-colors">
+                             <td className="px-8 py-6">
+                                <p className="text-sm font-black text-text-main uppercase tracking-tight leading-tight mb-1">{course.title}</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{course.course_code}</p>
+                             </td>
+                             <td className="px-8 py-6">
+                                <div className="flex items-center gap-2">
+                                   <div className={`w-2 h-2 rounded-full ${course.grade ? 'bg-green-500' : 'bg-blue-500 animate-pulse'}`}></div>
+                                   <span className="text-[10px] font-black text-text-main uppercase tracking-widest">
+                                      {course.grade ? `Graded: ${course.letter}` : 'In Progress'}
+                                   </span>
+                                </div>
+                             </td>
+                             <td className="px-8 py-6">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{semester.semester_name}</span>
+                             </td>
+                          </tr>
+                         ))
+                      ) || (
                          <tr>
                            <td colSpan={3} className="px-8 py-12 text-center text-[10px] font-black text-gray-300 uppercase tracking-widest">No active courses found for this term.</td>
                          </tr>

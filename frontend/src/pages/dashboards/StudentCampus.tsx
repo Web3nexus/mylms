@@ -16,6 +16,7 @@ import { useAuthStore } from '../../store/authStore';
 import client from '../../api/client';
 
 export default function StudentCampus() {
+  const [dashboardData, setDashboardData] = useState<any>(null);
   const { token, user } = useAuthStore();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,10 +24,19 @@ export default function StudentCampus() {
   useEffect(() => {
     const fetchCampusData = async () => {
       try {
-        const res = await client.get('/registration/my-courses', { 
-           headers: { Authorization: `Bearer ${token}` } 
-        });
-        setCourses(res.data.registrations?.map((r: any) => r.course) || []);
+        const [dashRes, courseRes] = await Promise.allSettled([
+          client.get('/student/dashboard-home'),
+          client.get('/registration/my-courses', { 
+             headers: { Authorization: `Bearer ${token}` } 
+          })
+        ]);
+
+        if (dashRes.status === 'fulfilled') {
+          setDashboardData(dashRes.value.data);
+        }
+        if (courseRes.status === 'fulfilled') {
+           setCourses(courseRes.value.data.registrations?.map((r: any) => r.course) || []);
+        }
       } catch (err) {
         console.error('Error fetching campus data:', err);
       } finally {
@@ -79,11 +89,25 @@ export default function StudentCampus() {
                   </div>
                </div>
                
-               <div className="py-16 md:py-24 text-center bg-offwhite rounded-2xl border border-border-soft">
-                  <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-                     <Layout size={24} className="text-gray-200 md:w-8 md:h-8" />
-                  </div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] px-4 leading-relaxed">No activities require actions in your registry</p>
+               <div className="space-y-4">
+                  {dashboardData?.events?.length > 0 ? (
+                    dashboardData.events.map((ev: any, i: number) => (
+                      <div key={i} className="bg-offwhite p-6 rounded-xl border-l-4 border-mylms-rose flex justify-between items-center group hover:bg-white transition-all">
+                         <div>
+                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">{new Date(ev.start_date).toDateString()}</p>
+                            <p className="text-[10px] font-black text-text-main uppercase tracking-tight">{ev.title}</p>
+                         </div>
+                         <div className="bg-white px-3 py-1 rounded text-[8px] font-black uppercase text-mylms-rose border border-border-soft">{ev.event_type}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-16 md:py-24 text-center bg-offwhite rounded-2xl border border-border-soft">
+                       <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                          <Layout size={24} className="text-gray-200 md:w-8 md:h-8" />
+                       </div>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] px-4 leading-relaxed">No activities require actions in your registry</p>
+                    </div>
+                  )}
                </div>
             </div>
 
@@ -133,15 +157,23 @@ export default function StudentCampus() {
             <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-8">
                <h4 className="text-[10px] font-black uppercase text-text-main tracking-[0.3em] mb-8 pb-4 border-b border-border-soft">Latest Announcements</h4>
                <div className="space-y-6">
-                  {[
-                    { date: '2 Apr, 04:29', title: 'Final Exams Notice (Undergrad)', color: 'text-mylms-rose' },
-                    { date: '26 Mar, 06:24', title: 'Course Evaluations (Week 8)', color: 'text-mylms-purple' }
-                  ].map((ann, i) => (
-                    <div key={i} className="group cursor-pointer">
-                       <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">{ann.date}</p>
-                       <p className={`text-[10px] font-bold uppercase tracking-tight transition-colors leading-tight ${ann.color}`}>{ann?.title}</p>
+                  {dashboardData?.announcements?.length > 0 ? (
+                    dashboardData.announcements.map((ann: any, i: number) => (
+                      <div key={i} className="group cursor-pointer">
+                         <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">
+                            {new Date(ann.updated_at).toLocaleDateString([], { day: 'numeric', month: 'short' })}
+                         </p>
+                         <p className={`text-[10px] font-bold uppercase tracking-tight transition-colors leading-tight text-mylms-purple group-hover:text-mylms-rose`}>
+                            {ann.title}
+                         </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="group cursor-pointer">
+                       <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1">Notice</p>
+                       <p className="text-[10px] font-bold uppercase tracking-tight text-gray-400">No active registry announcements.</p>
                     </div>
-                  ))}
+                  )}
                </div>
                <button className="w-full text-[8px] font-black text-gray-400 uppercase tracking-widest mt-8 hover:text-mylms-purple transition-all text-center">View all Registry notices</button>
             </div>
