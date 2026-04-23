@@ -46,11 +46,13 @@ class AdmissionApplication extends Model
         'application_fee_status',
         'waiver_requested_at',
         'waiver_emails_sent',
+        'submitted_at',
     ];
 
     protected $casts = [
         'step_data' => 'json',
         'waiver_requested_at' => 'datetime',
+        'submitted_at' => 'datetime',
     ];
 
     public function user()
