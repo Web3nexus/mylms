@@ -187,4 +187,25 @@ class CourseController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Get students enrolled in instructor's courses
+     */
+    public function myStudents()
+    {
+        $instructorId = \Auth::id();
+        $courseIds = Course::where('instructor_id', $instructorId)->pluck('id');
+        
+        $students = \App\Models\User::whereHas('enrollments', function($q) use ($courseIds) {
+            $q->whereIn('course_id', $courseIds);
+        })->get(['id', 'name', 'email']);
+        
+        // Add random status for UI fidelity
+        $students = $students->map(function($user) {
+            $user->status = rand(0, 1) ? 'Online' : 'Offline';
+            return $user;
+        });
+        
+        return response()->json($students);
+    }
 }

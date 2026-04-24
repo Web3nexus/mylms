@@ -27,16 +27,10 @@ export default function InstructorMessaging() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await client.get('/my-courses', {
+        const res = await client.get('/instructor/students', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        // Simplification: just getting some students from the courses
-        // In a real app, this would be a refined student directory for the instructor
-        setStudents([
-            { id: 1, name: 'John Smith', email: 'john@example.com', status: 'Online' },
-            { id: 2, name: 'Sarah Parker', email: 'sarah@example.com', status: 'Offline' },
-            { id: 3, name: 'Michael Ross', email: 'mike@example.com', status: 'Online' }
-        ]);
+        setStudents(res.data);
       } catch (err) {
         console.error('Error fetching students:', err);
       } finally {

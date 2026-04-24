@@ -245,7 +245,6 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     // Instructor Default Tools
     if (isInstructor) {
       sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
-      sidebarLinks.push({ name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> });
       sidebarLinks.push({ name: 'Propose Course', path: '/courses/create', icon: <PlusCircle size={18} /> });
       sidebarLinks.push({ name: 'Performance', path: '/office/analytics', icon: <TrendingUp size={18} /> });
       sidebarLinks.push({ name: 'Discussions', path: '/office/communications', icon: <Inbox size={18} /> });

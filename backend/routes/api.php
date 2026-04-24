@@ -76,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Manage Courses (Instructors)
     Route::get('/my-courses', [CourseController::class, 'myCourses']);
     Route::get('/instructor/stats', [CourseController::class, 'stats']);
+    Route::get('/instructor/students', [CourseController::class, 'myStudents']);
     Route::post('/courses', [CourseController::class, 'store']);
     Route::put('/courses/{course}', [CourseController::class, 'update']);
     Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
