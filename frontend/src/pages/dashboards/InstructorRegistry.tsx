@@ -10,7 +10,9 @@ import {
   BookOpen,
   ArrowRight,
   Layers,
-  BarChart
+  BarChart,
+  Settings,
+  HelpCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import client from '../../api/client';
@@ -181,22 +183,31 @@ export default function InstructorRegistry() {
                       </div>
                    </div>
                  </div>
-                 <div className="flex gap-4 w-full md:w-auto mt-8 md:mt-0 relative z-10">
-                   <Link 
-                     to={`/courses/${course?.slug}/curriculum`}
-                     className="btn-purple px-10 py-3.5 shadow-xl flex items-center gap-3"
-                   >
-                     Curriculum
-                     <ArrowRight size={14} />
-                   </Link>
-                   <Link 
-                     to={`/courses/${course?.slug}/gradebook`}
-                     className="btn-minimal px-10 py-3.5 shadow-sm flex items-center gap-3 uppercase tracking-[0.2em] font-black text-[9px]"
-                   >
-                     <Award size={16} className="text-mylms-rose" />
-                     Gradebook
-                   </Link>
-                 </div>
+                    <Link 
+                      to={`/courses/${course?.slug}/curriculum`}
+                      className="btn-purple px-6 py-3.5 shadow-xl flex items-center gap-3 text-[10px]"
+                    >
+                      Curriculum
+                      <ArrowRight size={14} />
+                    </Link>
+                    <Link 
+                      to={`/courses/${course?.slug}/assignments`}
+                      className="bg-white border-2 border-border-soft text-text-main px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:border-mylms-purple hover:text-mylms-purple transition-all shadow-sm flex items-center gap-3"
+                    >
+                      <Settings size={14} /> Assignments
+                    </Link>
+                    <Link 
+                      to={`/courses/${course?.slug}/quizzes`}
+                      className="bg-white border-2 border-border-soft text-text-main px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:border-mylms-rose hover:text-mylms-rose transition-all shadow-sm flex items-center gap-3"
+                    >
+                      <HelpCircle size={14} className="text-mylms-rose" /> Quizzes
+                    </Link>
+                    <Link 
+                      to={`/courses/${course?.slug}/gradebook`}
+                      className="bg-white border-2 border-border-soft text-text-main px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:border-mylms-purple hover:text-mylms-purple transition-all shadow-sm flex items-center gap-3"
+                    >
+                      <Award size={14} className="text-mylms-rose" /> Gradebook
+                    </Link>
               </div>
             ))
           )}

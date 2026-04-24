@@ -16,13 +16,14 @@ export default function CurriculumManager() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newLesson, setNewLesson] = useState({
+  const [newLesson, setNewLesson] = useState<any>({
     title: '',
-    content_type: 'text' as 'text' | 'video',
+    content_type: 'text',
     content_data: '',
     description: '',
     is_free: false,
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const token = useAuthStore(state => state.token);
 
@@ -45,14 +46,27 @@ export default function CurriculumManager() {
 
   const handleAddLesson = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('title', newLesson.title);
+    formData.append('content_type', newLesson.content_type);
+    formData.append('content_data', newLesson.content_data);
+    formData.append('description', newLesson.description);
+    formData.append('is_free', newLesson.is_free ? '1' : '0');
+    formData.append('order', (lessons.length + 1).toString());
+    
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
+
     try {
-      await client.post(`/courses/${course.id}/lessons`, {
-        ...newLesson,
-        order: lessons.length + 1
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      await client.post(`/courses/${course.id}/lessons`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       setNewLesson({ title: '', content_type: 'text', content_data: '', description: '', is_free: false });
+      setSelectedFile(null);
       setShowAddForm(false);
       fetchCourseAndLessons();
     } catch (err) {
@@ -121,6 +135,8 @@ export default function CurriculumManager() {
                       >
                         <option value="text">Textual Content</option>
                         <option value="video">Video Lecture (URL)</option>
+                        <option value="pdf">Academic PDF / Document</option>
+                        <option value="link">External Resources / Link</option>
                       </select>
                     </div>
                     
@@ -137,17 +153,33 @@ export default function CurriculumManager() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Course Content / Data</label>
-                    <textarea 
-                      placeholder={newLesson.content_type === 'text' ? 'Enter lesson content (Markdown supported)...' : 'Enter Video URL (YouTube/Vimeo)...'}
-                      required
-                      rows={6}
-                      value={newLesson.content_data}
-                      onChange={e => setNewLesson({...newLesson, content_data: e.target.value})}
-                      className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-blue-900 focus:border-blue-900 outline-none transition-colors font-mono text-xs leading-relaxed"
-                    />
-                  </div>
+                  {newLesson.content_type === 'pdf' && (
+                    <div className="p-6 bg-blue-50/30 border-2 border-dashed border-blue-200 rounded-xl">
+                       <label className="block text-[10px] font-bold text-blue-900 uppercase tracking-widest mb-3">Upload PDF Source</label>
+                       <input 
+                         type="file" 
+                         accept=".pdf"
+                         onChange={e => setSelectedFile(e.target.files?.[0] || null)}
+                         className="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-blue-900 file:text-white hover:file:bg-blue-800 transition-all"
+                       />
+                    </div>
+                  )}
+
+                  {(newLesson.content_type === 'text' || newLesson.content_type === 'video' || newLesson.content_type === 'link') && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                        {newLesson.content_type === 'text' ? 'Lesson Content' : newLesson.content_type === 'video' ? 'Video Lecture URL' : 'External Web URL'}
+                      </label>
+                      <textarea 
+                        placeholder={newLesson.content_type === 'text' ? 'Enter lesson content (Markdown supported)...' : 'Enter Resource URL...'}
+                        required
+                        rows={6}
+                        value={newLesson.content_data}
+                        onChange={e => setNewLesson({...newLesson, content_data: e.target.value})}
+                        className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-blue-900 focus:border-blue-900 outline-none transition-colors font-mono text-xs leading-relaxed"
+                      />
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex justify-end pt-2">

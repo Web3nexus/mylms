@@ -2,26 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Modules\Courses\Models\Category;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $categories = [
-            ['name' => 'Computer Science', 'slug' => 'computer-science'],
-            ['name' => 'Business & Finance', 'slug' => 'business-finance'],
-            ['name' => 'Health & Medicine', 'slug' => 'health-medicine'],
-            ['name' => 'Arts & Design', 'slug' => 'arts-design'],
-            ['name' => 'Language Learning', 'slug' => 'language-learning'],
+        $departments = [
+            ['name' => 'Faculty of Computer Science', 'description' => 'Software engineering, AI, and computing systems.'],
+            ['name' => 'Department of Business Administration', 'description' => 'Management, finance, and global trade.'],
+            ['name' => 'Faculty of Law & Jurisprudence', 'description' => 'Legal studies and international law.'],
+            ['name' => 'School of Health Sciences', 'description' => 'Medical research and nursing.'],
+            ['name' => 'Architecture & Design', 'description' => 'Urban planning and structural design.'],
+            ['name' => 'Department of Applied Physics', 'description' => 'Theoretical and experimental physics.'],
         ];
 
-        foreach ($categories as $category) {
-            \App\Modules\Courses\Models\Category::create($category);
+        foreach ($departments as $dept) {
+            Category::updateOrCreate(['name' => $dept['name']], $dept);
         }
     }
 }

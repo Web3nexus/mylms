@@ -149,11 +149,7 @@ export default function InstructorAnalytics() {
               </h3>
               
               <div className="space-y-8">
-                 {[
-                   { label: 'Platform Usage', value: 78, color: 'bg-mylms-purple' },
-                   { label: 'Resource Downloads', value: 64, color: 'bg-mylms-rose' },
-                   { label: 'Forum Interactions', value: 42, color: 'bg-blue-900' }
-                 ].map((metric, i) => (
+                 {analyticsData.engagement.metrics?.map((metric: any, i: number) => (
                    <div key={i} className="space-y-4">
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                          <span className="text-gray-300">{metric.label}</span>
@@ -161,12 +157,16 @@ export default function InstructorAnalytics() {
                       </div>
                       <div className="h-2 bg-offwhite rounded-full overflow-hidden shadow-inner">
                          <div 
-                           className={`h-full ${metric.color} transition-all duration-1000 ease-out`}
+                           className={`h-full ${i % 2 === 0 ? 'bg-mylms-purple' : 'bg-mylms-rose'} transition-all duration-1000 ease-out`}
                            style={{ width: `${metric.value}%` }}
                          ></div>
                       </div>
                    </div>
-                 ))}
+                 )) || (
+                    <div className="p-10 text-center text-gray-300 font-black uppercase text-[10px] tracking-widest">
+                        Awaiting Metric Synchronization...
+                    </div>
+                 )}
               </div>
 
               <div className="mt-12 p-6 bg-mylms-purple rounded-2xl flex items-center gap-6">

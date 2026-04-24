@@ -83,6 +83,8 @@ import CourseRegistrationPage from './pages/registration/CourseRegistrationPage'
 import CourseCertificate from './pages/credentials/CourseCertificate'
 import PaymentSuccess from './pages/finance/PaymentSuccess'
 import PaymentFailed from './pages/finance/PaymentFailed'
+import AssignmentBuilder from './pages/courses/AssignmentBuilder'
+import QuizBuilder from './pages/courses/QuizBuilder'
 
 // New MyLMS Pages
 import SelfServiceForms from './pages/student/SelfServiceForms'
@@ -481,6 +483,8 @@ function App() {
             <Route path="/office/analytics" element={<InstructorAnalytics />} />
             <Route path="/office/communications" element={<InstructorMessaging />} />
             <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
+            <Route path="/courses/:slug/assignments" element={<AssignmentBuilder />} />
+            <Route path="/courses/:slug/quizzes" element={<QuizBuilder />} />
             <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
             <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
             <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />

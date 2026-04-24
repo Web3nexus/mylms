@@ -34,14 +34,21 @@ class LessonController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'content_type' => 'required|in:text,video',
-            'content_data' => 'nullable|string',
+            'content_type' => 'required|in:text,video,pdf,link',
+            'content_data' => 'nullable|string', // Markdown, Video URL, or External Link
             'order' => 'integer',
             'is_free' => 'boolean',
+            'file' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
+        $filePath = null;
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('course_materials', 'public');
+        }
+
         $lesson = $course->lessons()->create([
-            ...$validated,
+            ...collect($validated)->except('file')->toArray(),
+            'file_path' => $filePath,
             'slug' => Str::slug($validated['title']),
         ]);
 
@@ -103,17 +110,22 @@ class LessonController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'content_type' => 'sometimes|in:text,video',
+            'content_type' => 'sometimes|in:text,video,pdf,link',
             'content_data' => 'nullable|string',
             'order' => 'integer',
             'is_free' => 'boolean',
+            'file' => 'nullable|file|mimes:pdf|max:10240',
         ]);
+
+        if ($request->hasFile('file')) {
+            $validated['file_path'] = $request->file('file')->store('course_materials', 'public');
+        }
 
         if (isset($validated['title'])) {
             $validated['slug'] = Str::slug($validated['title']);
         }
 
-        $lesson->update($validated);
+        $lesson->update(collect($validated)->except('file')->toArray());
 
         return response()->json($lesson);
     }
