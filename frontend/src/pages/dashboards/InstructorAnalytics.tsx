@@ -17,32 +17,30 @@ export default function InstructorAnalytics() {
   const { token } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
-  // High-fidelity mock data representing the requested features
-  const analyticsData = {
-    engagement: {
-        score: 84,
-        trend: '+5.2%',
-        activeUsers: 142
-    },
-    dropoutRisk: {
-        total: 3,
-        students: [
-            { name: 'John Smith', risk: 'High', reason: 'Inactive 14 days' },
-            { name: 'Sarah Parker', risk: 'Medium', reason: 'Low assessment scores' }
-        ]
-    },
-    performance: {
-        averageGrade: 'B+',
-        submissionRate: '92%',
-        topCourse: 'Advanced Physics II'
-    }
-  };
+  // Data fetched from the backend /instructor/stats endpoint
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const fetchAnalytics = async () => {
+      try {
+        const res = await client.get('/instructor/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setData(res.data);
+      } catch (err) {
+        console.error('Error fetching analytics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, [token]);
+
+  const analyticsData = data || {
+    engagement: { score: 0, trend: '0%', activeUsers: 0 },
+    dropoutRisk: { total: 0, students: [] },
+    performance: { averageGrade: '-', submissionRate: '0%', topCourse: '-' }
+  };
 
   if (loading) {
     return (

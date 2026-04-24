@@ -115,6 +115,7 @@ import MobileOptimizationPrompt from './components/MobileOptimizationPrompt'
 import InactivityLogout from './components/layout/InactivityLogout'
 import { useAppConfig } from './hooks/useAppConfig'
 import InstructorAnalytics from './pages/dashboards/InstructorAnalytics'
+import InstructorMessaging from './pages/dashboards/InstructorMessaging'
 
 function Home() {
   return <PublicPage />;
@@ -183,7 +184,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const dashboardRoutes = ['/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses/'];
+  const dashboardRoutes = ['/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses'];
   const isDashboardRoute = isAuthenticated && dashboardRoutes.some(route => location.pathname.startsWith(route));
 
   // Sidebar link definitions mirroring MyLMS structure
@@ -247,7 +248,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       sidebarLinks.push({ name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> });
       sidebarLinks.push({ name: 'Propose Course', path: '/courses/create', icon: <PlusCircle size={18} /> });
       sidebarLinks.push({ name: 'Performance', path: '/office/analytics', icon: <TrendingUp size={18} /> });
-      sidebarLinks.push({ name: 'Discussions', path: '/admin/communications', icon: <Inbox size={18} /> });
+      sidebarLinks.push({ name: 'Discussions', path: '/office/communications', icon: <Inbox size={18} /> });
     }
 
     // Permission-Based Admin Tools
@@ -479,6 +480,7 @@ function App() {
             <Route path="/courses" element={<CourseList />} />
             <Route path="/courses/create" element={<CourseCreate />} />
             <Route path="/office/analytics" element={<InstructorAnalytics />} />
+            <Route path="/office/communications" element={<InstructorMessaging />} />
             <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
             <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
             <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />

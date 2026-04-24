@@ -114,6 +114,13 @@ export function CourseCatalogWidget() {
            facultyName.toLowerCase().includes(term);
   });
 
+  const isDashboard = !!user && (
+    location.pathname.startsWith('/portal') || 
+    location.pathname.startsWith('/office') || 
+    location.pathname.startsWith('/admin') ||
+    location.pathname === '/courses'
+  );
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-32 bg-white min-h-[60vh]">
       <div className="w-16 h-16 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-8 shadow-2xl"></div>
@@ -126,60 +133,70 @@ export function CourseCatalogWidget() {
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16 bg-offwhite min-h-screen transition-all selection:bg-mylms-rose/20">
       
-      {/* Catalog Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-24 gap-10 md:gap-16 border-b border-border-soft pb-10 md:pb-16 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/3 rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
-        <div>
-           <div className="flex items-center gap-4 mb-6 md:mb-10 group/sub">
-              <span className="w-12 h-px bg-mylms-rose group-hover/sub:w-20 transition-all duration-500"></span>
-              <span className="text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px]">{branding?.institutional_name || 'Global Academy'} Registry</span>
-           </div>
-           <h1 className="text-4xl md:text-8xl font-black text-text-main tracking-tighter mb-6 md:mb-10 leading-[0.9] italic">
-             {(branding?.courses_hero_title || 'Educational Pathways').split(' ').map((word: string, i: number) => (
-               <span key={i}>
-                 {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
-               </span>
-             ))}
-           </h1>
-           <p className="text-text-secondary font-medium text-base md:text-lg max-w-xl opacity-60 font-sans italic">
-             {branding?.courses_hero_desc || `Explore our world-class academic programs designed for global impact. All programs are verified through the ${branding?.institutional_name || 'Global Academy'} Academic Office.`}
-           </p>
-        </div>
-        
-        <div className="w-full md:w-auto mt-8 md:mt-0">
-          <div className="relative group/search">
-            <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-mylms-purple group-hover/search:text-mylms-rose transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Search Catalog..." 
-              value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
-              className="w-full md:w-[380px] bg-white border-2 border-border-soft text-mylms-purple py-4 px-14 rounded-[20px] shadow-xl focus:outline-none focus:ring-2 focus:ring-mylms-rose/20 focus:border-mylms-rose transition-all font-bold text-[11px] uppercase tracking-widest"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Ribbon */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16 md:mb-24">
-         {[
-            { label: "Active Programs", val: courses.length, icon: <Layers size={22} />, color: "purple" },
-            { label: "Faculty Members", val: "420+", icon: <Users size={22} />, color: "rose" },
-            { label: "Global Ranking", val: "#12", icon: <Sparkles size={22} />, color: "purple" },
-            { label: "Industry Partners", val: "85+", icon: <Zap size={22} />, color: "rose" },
-         ].map((stat: any, i: number) => (
-            <div key={i} className="bg-white p-8 md:p-10 rounded-[32px] border border-border-soft flex items-center gap-6 shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
-               <div className="absolute top-0 right-0 w-20 h-20 bg-offwhite rounded-bl-full opacity-50 group-hover:bg-mylms-purple/3 transition-all"></div>
-               <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-offwhite text-mylms-${stat.color} flex items-center justify-center group-hover:bg-mylms-${stat.color} group-hover:text-white transition-all duration-500 shadow-inner`}>
-                  {stat.icon}
+      {/* Catalog Header - Hidden in Dashboard */}
+      {!isDashboard && (
+        <>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-24 gap-10 md:gap-16 border-b border-border-soft pb-10 md:pb-16 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-mylms-rose/3 rounded-full blur-[100px] -translate-y-20 translate-x-10"></div>
+            <div>
+               <div className="flex items-center gap-4 mb-6 md:mb-10 group/sub">
+                  <span className="w-12 h-px bg-mylms-rose group-hover/sub:w-20 transition-all duration-500"></span>
+                  <span className="text-mylms-rose font-black uppercase tracking-[0.4em] text-[10px]">{branding?.institutional_name || 'Global Academy'} Registry</span>
                </div>
-               <div className="relative z-10">
-                  <p className="text-2xl md:text-3xl font-black text-text-main tracking-tighter">{stat.val}</p>
-                  <p className="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em]">{stat.label}</p>
-               </div>
+               <h1 className="text-4xl md:text-8xl font-black text-text-main tracking-tighter mb-6 md:mb-10 leading-[0.9] italic">
+                 {(branding?.courses_hero_title || 'Educational Pathways').split(' ').map((word: string, i: number) => (
+                   <span key={i}>
+                     {i % 2 === 1 ? <span className="text-transparent bg-clip-text bg-linear-to-r from-mylms-purple to-mylms-rose">{word}</span> : word}{' '}
+                   </span>
+                 ))}
+               </h1>
+               <p className="text-text-secondary font-medium text-base md:text-lg max-w-xl opacity-60 font-sans italic">
+                 {branding?.courses_hero_desc || `Explore our world-class academic programs designed for global impact. All programs are verified through the ${branding?.institutional_name || 'Global Academy'} Academic Office.`}
+               </p>
             </div>
-         ))}
-      </div>
+            
+            <div className="w-full md:w-auto mt-8 md:mt-0">
+              <div className="relative group/search">
+                <Search size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-mylms-purple group-hover/search:text-mylms-rose transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Search Catalog..." 
+                  value={searchTerm}
+                  onChange={(e: any) => setSearchTerm(e.target.value)}
+                  className="w-full md:w-[380px] bg-white border-2 border-border-soft text-mylms-purple py-4 px-14 rounded-[20px] shadow-xl focus:outline-none focus:ring-2 focus:ring-mylms-rose/20 focus:border-mylms-rose transition-all font-bold text-[11px] uppercase tracking-widest"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16 md:mb-24">
+             {[
+                { label: "Active Programs", val: courses.length, icon: <Layers size={22} />, color: "purple" },
+                { label: "Faculty Members", val: "420+", icon: <Users size={22} />, color: "rose" },
+                { label: "Global Ranking", val: "#12", icon: <Sparkles size={22} />, color: "purple" },
+                { label: "Industry Partners", val: "85+", icon: <Zap size={22} />, color: "rose" },
+             ].map((stat: any, i: number) => (
+                <div key={i} className="bg-white p-8 md:p-10 rounded-[32px] border border-border-soft flex items-center gap-6 shadow-sm hover:shadow-2xl transition-all group overflow-hidden relative">
+                   <div className="absolute top-0 right-0 w-20 h-20 bg-offwhite rounded-bl-full opacity-50 group-hover:bg-mylms-purple/3 transition-all"></div>
+                   <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-offwhite text-mylms-${stat.color} flex items-center justify-center group-hover:bg-mylms-${stat.color} group-hover:text-white transition-all duration-500 shadow-inner`}>
+                      {stat.icon}
+                   </div>
+                   <div className="relative z-10">
+                      <p className="text-2xl md:text-3xl font-black text-text-main tracking-tighter">{stat.val}</p>
+                      <p className="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em]">{stat.label}</p>
+                   </div>
+                </div>
+             ))}
+          </div>
+        </>
+      )}
+
+      {isDashboard && (
+        <div className="mb-12 border-b border-border-soft pb-8">
+           <h2 className="text-3xl font-black text-text-main uppercase tracking-tighter">Academic Catalog Registry</h2>
+           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 italic">Authorized Institutional Directory</p>
+        </div>
+      )}
 
       {/* Course Grid */}
       {filteredCourses.length === 0 ? (
@@ -259,33 +276,35 @@ export function CourseCatalogWidget() {
         </div>
       )}
 
-      {/* Admissions CTA */}
-      <div className="mt-24 md:mt-40 p-12 md:p-32 bg-mylms-purple rounded-[60px] md:rounded-[80px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-          <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-mylms-rose rounded-full blur-[180px] opacity-20 group-hover:opacity-30 transition-opacity duration-1000"></div>
-          
-          <div className="relative z-10 flex flex-col lg:row items-center justify-between gap-12 md:gap-16 text-center lg:text-left">
-             <div className="max-w-3xl">
-                <div className="flex items-center justify-center lg:justify-start gap-4 mb-8 md:mb-10">
-                   <span className="w-12 h-px bg-mylms-rose"></span>
-                   <span className="text-mylms-rose font-black uppercase tracking-[0.5em] text-[10px]">Academic Readiness Protocol</span>
-                </div>
-                <h2 className="text-4xl md:text-8xl font-black text-white mb-8 md:mb-10 italic uppercase tracking-tighter leading-[0.85]">
-                  Your Future <br /> 
-                  <span className="text-white/40">Starts Here.</span>
-                </h2>
-                <p className="text-white/60 text-base md:text-xl font-sans font-bold uppercase tracking-tight leading-relaxed max-w-2xl px-4 md:px-0">
-                   THE 2024 ACADEMIC CYCLE IS NOW ACTIVE. SECURE YOUR PLACEMENT WITHIN OUR GLOBAL FACULTY NETWORK TODAY.
-                </p>
-             </div>
-             
-             <div className="flex flex-col sm:flex-row gap-6">
-                <Link to="/apply" className="bg-white text-mylms-purple px-10 py-5 rounded-full font-black text-[11px] uppercase tracking-[0.3em] hover:bg-mylms-rose hover:text-white transition-all shadow-2xl flex items-center justify-center gap-4 group/btn active:scale-95">
-                   Initial Application <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
-             </div>
-          </div>
-      </div>
+      {/* Admissions CTA - Hidden in Dashboard */}
+      {!isDashboard && (
+        <div className="mt-24 md:mt-40 p-12 md:p-32 bg-mylms-purple rounded-[60px] md:rounded-[80px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+            <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-mylms-rose rounded-full blur-[180px] opacity-20 group-hover:opacity-30 transition-opacity duration-1000"></div>
+            
+            <div className="relative z-10 flex flex-col lg:row items-center justify-between gap-12 md:gap-16 text-center lg:text-left">
+               <div className="max-w-3xl">
+                  <div className="flex items-center justify-center lg:justify-start gap-4 mb-8 md:mb-10">
+                     <span className="w-12 h-px bg-mylms-rose"></span>
+                     <span className="text-mylms-rose font-black uppercase tracking-[0.5em] text-[10px]">Academic Readiness Protocol</span>
+                  </div>
+                  <h2 className="text-4xl md:text-8xl font-black text-white mb-8 md:mb-10 italic uppercase tracking-tighter leading-[0.85]">
+                    Your Future <br /> 
+                    <span className="text-white/40">Starts Here.</span>
+                  </h2>
+                  <p className="text-white/60 text-base md:text-xl font-sans font-bold uppercase tracking-tight leading-relaxed max-w-2xl px-4 md:px-0">
+                     THE 2024 ACADEMIC CYCLE IS NOW ACTIVE. SECURE YOUR PLACEMENT WITHIN OUR GLOBAL FACULTY NETWORK TODAY.
+                  </p>
+               </div>
+               
+               <div className="flex flex-col sm:flex-row gap-6">
+                  <Link to="/apply" className="bg-white text-mylms-purple px-10 py-5 rounded-full font-black text-[11px] uppercase tracking-[0.3em] hover:bg-mylms-rose hover:text-white transition-all shadow-2xl flex items-center justify-center gap-4 group/btn active:scale-95">
+                     Initial Application <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+               </div>
+            </div>
+        </div>
+      )}
 
     </div>
   );
