@@ -64,6 +64,29 @@ class PageController extends Controller
     }
 
     /**
+     * Instructor: Specialized Announcement Creation
+     */
+    public function storeAnnouncement(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+        ]);
+
+        $page = CMSPage::create([
+            'title' => $validated['title'],
+            'slug' => 'announcement-' . Str::slug($validated['title']) . '-' . time(),
+            'is_published' => true,
+            'puck_json' => [
+                'content' => [['type' => 'text', 'props' => ['text' => $validated['content']]]],
+                'root' => ['props' => ['title' => $validated['title']]]
+            ],
+        ]);
+
+        return response()->json($page, 201);
+    }
+
+    /**
      * Admin: Save visual Puck state
      */
     public function update(Request $request, $id)

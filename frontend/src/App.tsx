@@ -108,7 +108,9 @@ import TopicViewer from './pages/student/TopicViewer'
 // Specialized Dashboards
 import StudentPortal from './pages/dashboards/StudentPortal'
 import StudentCampus from './pages/dashboards/StudentCampus'
-import InstructorRegistry from './pages/dashboards/InstructorRegistry'
+import InstructorDashboard from './pages/dashboards/InstructorRegistry'
+import InstructorMessaging from './pages/dashboards/InstructorMessaging'
+import InstructorAnnouncements from './pages/dashboards/InstructorAnnouncements'
 import AdminOperations from './pages/dashboards/AdminOperations'
 import BrandingManager from './pages/admin/BrandingManager'
 import CommunicationManager from './pages/admin/CommunicationManager'
@@ -127,7 +129,6 @@ import MobileOptimizationPrompt from './components/MobileOptimizationPrompt'
 import InactivityLogout from './components/layout/InactivityLogout'
 import { useAppConfig } from './hooks/useAppConfig'
 import InstructorAnalytics from './pages/dashboards/InstructorAnalytics'
-import InstructorMessaging from './pages/dashboards/InstructorMessaging'
 
 function Home() {
   return <PublicPage />;
@@ -273,9 +274,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
       // Communication Section
       sidebarLinks.push({ name: 'Communication', isHeader: true });
-      sidebarLinks.push({ name: 'Announcements', path: '/office/communications', icon: <Mail size={18} /> });
+      sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
       sidebarLinks.push({ name: 'Student Messaging', path: '/office/communications', icon: <MessageCircle size={18} /> });
-      sidebarLinks.push({ name: 'Forum Moderation', path: '/office/communications', icon: <Inbox size={18} /> });
+      sidebarLinks.push({ name: 'Forum Moderation', path: '/courses', icon: <Inbox size={18} /> });
 
       // Analytics Section
       sidebarLinks.push({ name: 'Analytics', isHeader: true });
@@ -517,11 +518,12 @@ function App() {
           </Route>
    
           <Route element={<ProtectedRoute roles={['instructor']} />}>
-            <Route path="/office/portal" element={<InstructorRegistry />} />
+            <Route path="/office/portal" element={<InstructorDashboard />} />
             <Route path="/courses" element={<CourseList />} />
-            <Route path="/courses/create" element={<CourseCreate />} />
             <Route path="/office/analytics" element={<InstructorAnalytics />} />
             <Route path="/office/communications" element={<InstructorMessaging />} />
+            <Route path="/office/announcements" element={<InstructorAnnouncements />} />
+            <Route path="/courses/create" element={<CourseCreate />} />
             <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
             <Route path="/courses/:slug/assignments" element={<AssignmentBuilder />} />
             <Route path="/courses/:slug/quizzes" element={<QuizBuilder />} />

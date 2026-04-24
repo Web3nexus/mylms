@@ -36,6 +36,7 @@ Route::get('/branding', [BrandingController::class, 'index']);
 
 // Public CMS Routes
 Route::get('/pages/{slug}', [PageController::class, 'show']);
+Route::post('/announcements', [PageController::class, 'storeAnnouncement']);
 
 // Auth Routes
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
