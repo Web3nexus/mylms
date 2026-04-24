@@ -31,7 +31,17 @@ import {
   ChevronLeft,
   Terminal,
   Mail,
-  Briefcase
+  Briefcase,
+  MessageCircle,
+  CheckSquare,
+  BarChart3,
+  Users,
+  Settings2,
+  FilePlus,
+  UploadCloud,
+  Users2,
+  PieChart,
+  Activity
 } from 'lucide-react'
 
 // Auth & API
@@ -190,7 +200,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const isDashboardRoute = isAuthenticated && dashboardRoutes.some(route => location.pathname.startsWith(route));
 
   // Sidebar link definitions mirroring MyLMS structure
-  type NavItem = { name: string; path: string; icon: React.ReactNode };
+  type NavItem = { name: string; path?: string; icon?: React.ReactNode; isHeader?: boolean };
   let sidebarLinks: NavItem[] = [];
   
   const userRole = user?.role?.toLowerCase();
@@ -247,9 +257,31 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     // Instructor Default Tools
     if (isInstructor) {
       sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
-      sidebarLinks.push({ name: 'Propose Course', path: '/courses/create', icon: <PlusCircle size={18} /> });
-      sidebarLinks.push({ name: 'Performance', path: '/office/analytics', icon: <TrendingUp size={18} /> });
-      sidebarLinks.push({ name: 'Discussions', path: '/office/communications', icon: <Inbox size={18} /> });
+      
+      // Teaching Tools Section
+      sidebarLinks.push({ name: 'Teaching Tools', isHeader: true });
+      sidebarLinks.push({ name: 'Course Management', path: '/courses', icon: <Library size={18} /> });
+      sidebarLinks.push({ name: 'Curriculum & Media', path: '/courses/create', icon: <UploadCloud size={18} /> });
+      sidebarLinks.push({ name: 'Assignment Setup', path: '/courses', icon: <FilePlus size={18} /> });
+      sidebarLinks.push({ name: 'Quiz Builder', path: '/courses', icon: <HelpCircle size={18} /> });
+
+      // Grading Section
+      sidebarLinks.push({ name: 'Grading System', isHeader: true });
+      sidebarLinks.push({ name: 'Gradebook', path: '/office/portal', icon: <CheckSquare size={18} /> });
+      sidebarLinks.push({ name: 'Rubrics & Bulk', path: '/office/portal', icon: <Layers size={18} /> });
+      sidebarLinks.push({ name: 'Peer Oversight', path: '/office/portal', icon: <Users2 size={18} /> });
+
+      // Communication Section
+      sidebarLinks.push({ name: 'Communication', isHeader: true });
+      sidebarLinks.push({ name: 'Announcements', path: '/office/communications', icon: <Mail size={18} /> });
+      sidebarLinks.push({ name: 'Student Messaging', path: '/office/communications', icon: <MessageCircle size={18} /> });
+      sidebarLinks.push({ name: 'Forum Moderation', path: '/office/communications', icon: <Inbox size={18} /> });
+
+      // Analytics Section
+      sidebarLinks.push({ name: 'Analytics', isHeader: true });
+      sidebarLinks.push({ name: 'Performance Tracking', path: '/office/analytics', icon: <PieChart size={18} /> });
+      sidebarLinks.push({ name: 'Engagement Reports', path: '/office/analytics', icon: <BarChart3 size={18} /> });
+      sidebarLinks.push({ name: 'Dropout Risks', path: '/office/analytics', icon: <Activity size={18} /> });
     }
 
     // Permission-Based Admin Tools
@@ -345,16 +377,24 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             </div>
             
             <div className="flex-1 overflow-y-auto px-4 space-y-1">
-              {sidebarLinks.map((link) => (
-                <Link 
-                  key={link.name} 
-                  to={link.path} 
-                  onClick={() => setIsMobileSidebarOpen(false)}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname.startsWith(link.path) ? 'bg-offwhite text-text-main border-l-2 border-mylms-rose' : 'hover:bg-gray-50'}`}
-                >
-                  <span className={isSidebarCollapsed ? 'mx-auto' : ''}>{link.icon}</span>
-                  {!isSidebarCollapsed && <span>{link.name}</span>}
-                </Link>
+              {sidebarLinks.map((link, idx) => (
+                link.isHeader ? (
+                  !isSidebarCollapsed && (
+                    <div key={`header-${idx}`} className="px-4 pt-6 pb-2 text-[8px] font-black text-gray-400 uppercase tracking-[0.3em] border-t border-gray-50 mt-4 first:mt-0 first:pt-0 first:border-0">
+                      {link.name}
+                    </div>
+                  )
+                ) : (
+                  <Link 
+                    key={link.name} 
+                    to={link.path || '#'} 
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                    className={`flex items-center gap-4 px-4 py-2.5 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname === link.path ? 'bg-mylms-purple/5 text-mylms-purple border-l-2 border-mylms-purple' : 'hover:bg-gray-50 text-text-secondary'}`}
+                  >
+                    <span className={isSidebarCollapsed ? 'mx-auto' : ''}>{link.icon}</span>
+                    {!isSidebarCollapsed && <span>{link.name}</span>}
+                  </Link>
+                )
               ))}
             </div>
 
