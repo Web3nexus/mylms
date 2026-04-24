@@ -349,7 +349,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           )}
 
           <aside className={`
-            fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 h-screen shadow-sm shrink-0 border-r border-border-soft bg-white text-text-secondary transition-all duration-300
+            fixed inset-y-0 left-0 z-50 lg:sticky lg:top-0 h-screen shadow-sm shrink-0 border-r border-border-soft bg-white text-text-secondary transition-all duration-300 flex flex-col
             ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             ${isSidebarCollapsed ? 'w-20' : 'w-64'}
           `}>
@@ -453,7 +453,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         )}
 
         {/* CONTENT */}
-        <main className={`grow ${!isDashboardRoute ? 'animate-in fade-in duration-700' : ''}`}>
+        <main className={`grow ${!isDashboardRoute ? 'animate-in fade-in duration-700' : 'pb-40'}`}>
           {children}
         </main>
 
