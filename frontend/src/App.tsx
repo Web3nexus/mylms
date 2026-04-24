@@ -112,7 +112,9 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import DashboardHeader from './components/layout/DashboardHeader'
 import MobileOptimizationPrompt from './components/MobileOptimizationPrompt'
+import InactivityLogout from './components/layout/InactivityLogout'
 import { useAppConfig } from './hooks/useAppConfig'
+import InstructorAnalytics from './pages/dashboards/InstructorAnalytics'
 
 function Home() {
   return <PublicPage />;
@@ -181,7 +183,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const dashboardRoutes = ['/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding'];
+  const dashboardRoutes = ['/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses/'];
   const isDashboardRoute = isAuthenticated && dashboardRoutes.some(route => location.pathname.startsWith(route));
 
   // Sidebar link definitions mirroring MyLMS structure
@@ -243,6 +245,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     if (isInstructor) {
       sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
       sidebarLinks.push({ name: 'Academic Catalog', path: '/courses', icon: <Library size={18} /> });
+      sidebarLinks.push({ name: 'Propose Course', path: '/courses/create', icon: <PlusCircle size={18} /> });
+      sidebarLinks.push({ name: 'Performance', path: '/office/analytics', icon: <TrendingUp size={18} /> });
+      sidebarLinks.push({ name: 'Discussions', path: '/admin/communications', icon: <Inbox size={18} /> });
     }
 
     // Permission-Based Admin Tools
@@ -287,6 +292,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         '--mylms-secondary': (branding as any)?.secondary_color || '#BA1200'
       }}
     >
+      <InactivityLogout />
       <MobileOptimizationPrompt />
       {/* SIDEBAR (Auth Only) */}
       {isDashboardRoute && (
@@ -470,11 +476,14 @@ function App() {
    
           <Route element={<ProtectedRoute roles={['instructor']} />}>
             <Route path="/office/portal" element={<InstructorRegistry />} />
+            <Route path="/courses" element={<CourseList />} />
             <Route path="/courses/create" element={<CourseCreate />} />
+            <Route path="/office/analytics" element={<InstructorAnalytics />} />
             <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
             <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
             <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
             <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
+            <Route path="/admin/communications" element={<CommunicationManager />} />
           </Route>
 
           <Route element={<ProtectedRoute roles={['advisor']} />}>
@@ -494,7 +503,6 @@ function App() {
             <Route path="/admin/cms/edit/:slug" element={<LandingEditor />} />
             <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />
             <Route path="/branding" element={<BrandingManager />} />
-            <Route path="/admin/communications" element={<CommunicationManager />} />
             <Route path="/admin/communications/templates" element={<EmailTemplateManager />} />
             <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
             <Route path="/admin/command-center" element={<CommandCenter />} />

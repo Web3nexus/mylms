@@ -45,7 +45,7 @@ export default function CourseCreate() {
       await client.post('/courses', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      navigate('/dashboard');
+      navigate('/office/portal');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create course. Please try again.');
     } finally {
@@ -64,7 +64,7 @@ export default function CourseCreate() {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Create New Course</h1>
           <p className="text-gray-500 mt-1">Submit a new course proposal to the academic catalog.</p>
         </div>
-        <Link to="/dashboard" className="text-sm font-semibold text-blue-900 hover:underline">
+        <Link to="/office/portal" className="text-sm font-semibold text-blue-900 hover:underline">
           Back to Dashboard
         </Link>
       </div>

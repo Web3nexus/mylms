@@ -19,23 +19,23 @@ export default function InstructorRegistry() {
   const { user, token } = useAuthStore();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Mocked for display, but ideally coming from an /instructor/dashboard endpoint
-  const stats = {
-    activeCohorts: courses.length,
-    totalStudents: 124,
-    passRate: "92%",
-    pendingEvaluations: 8,
-    facultyId: `FAC-${user?.id.toString().padStart(6, '0')}`
-  };
+  const [stats, setStats] = useState({
+    activeCohorts: 0,
+    totalStudents: 0,
+    passRate: "0%",
+    pendingEvaluations: 0,
+    facultyId: 'FAC-000000'
+  });
 
   useEffect(() => {
     const fetchInstructorData = async () => {
       try {
-        const res = await client.get('/my-courses', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCourses(res.data.data);
+        const [coursesRes, statsRes] = await Promise.all([
+          client.get('/my-courses', { headers: { Authorization: `Bearer ${token}` } }),
+          client.get('/instructor/stats', { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+        setCourses(coursesRes.data.data);
+        setStats(statsRes.data);
       } catch (err) {
         console.error('Error fetching instructor data:', err);
       } finally {
@@ -145,7 +145,7 @@ export default function InstructorRegistry() {
             <div className="p-40 text-center flex flex-col items-center opacity-60">
                <Layers size={48} className="text-gray-100 mb-8" />
                <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.4em] mb-12 leading-loose">The registry identifies no authorized programs for these credentials.</p>
-               <button className="btn-minimal px-12 py-3.5 shadow-md uppercase tracking-widest text-[9px] font-black">Initiate Proposal</button>
+               <Link to="/courses/create" className="btn-minimal px-12 py-3.5 shadow-md uppercase tracking-widest text-[9px] font-black">Initiate Proposal</Link>
             </div>
           ) : (
             courses.filter(Boolean).filter(c => c && c?.title).map((course: any) => (

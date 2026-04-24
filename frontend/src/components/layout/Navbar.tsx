@@ -32,6 +32,14 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
   const { isAuthenticated, user, logout, token } = useAuthStore();
   const location = useLocation();
 
+  // Resolve portal path based on role
+  const portalPath = (() => {
+    const role = user?.role?.toLowerCase();
+    if (role === 'admin' || role === 'staff') return '/admin/portal';
+    if (role === 'instructor') return '/office/portal';
+    return '/portal';
+  })();
+
   const handleLogout = async () => {
     try {
       if (token) await client.post('/auth/logout');
@@ -173,7 +181,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
             <div className="flex items-center gap-6">
                <NotificationDropdown />
                <Link 
-                 to="/portal" 
+                 to={portalPath} 
                  className="bg-mylms-purple text-white px-6 py-2.5 rounded-lg font-black uppercase tracking-widest text-[9px] hover:opacity-90 transition-all flex items-center gap-2 shadow-lg"
                >
                   <User size={14} /> Portal
@@ -225,7 +233,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, isDashboardRoute }: 
              <div className="pt-8 border-t border-border-soft flex flex-col gap-4">
                 {isAuthenticated ? (
                   <>
-                    <Link to="/portal" className="btn-purple py-4 text-center text-sm">Dashboard Portal</Link>
+                    <Link to={portalPath} className="btn-purple py-4 text-center text-sm">Dashboard Portal</Link>
                     <button onClick={handleLogout} className="text-mylms-rose font-black uppercase text-[10px] tracking-widest py-2">Sign Out System</button>
                   </>
                 ) : (
