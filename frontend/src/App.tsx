@@ -111,6 +111,14 @@ import StudentCampus from './pages/dashboards/StudentCampus'
 import InstructorDashboard from './pages/dashboards/InstructorRegistry'
 import InstructorMessaging from './pages/dashboards/InstructorMessaging'
 import InstructorAnnouncements from './pages/dashboards/InstructorAnnouncements'
+import { 
+  InstructorCoursesHub,
+  CurriculumMediaHub,
+  AssignmentSetupHub,
+  QuizBuilderHub,
+  GradingHub,
+  ForumModerationHub
+} from './pages/dashboards/InstructorHubs'
 import AdminOperations from './pages/dashboards/AdminOperations'
 import BrandingManager from './pages/admin/BrandingManager'
 import CommunicationManager from './pages/admin/CommunicationManager'
@@ -261,28 +269,28 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       
       // Teaching Tools Section
       sidebarLinks.push({ name: 'Teaching Tools', isHeader: true });
-      sidebarLinks.push({ name: 'Course Management', path: '/courses', icon: <Library size={18} /> });
-      sidebarLinks.push({ name: 'Curriculum & Media', path: '/courses/create', icon: <UploadCloud size={18} /> });
-      sidebarLinks.push({ name: 'Assignment Setup', path: '/courses', icon: <FilePlus size={18} /> });
-      sidebarLinks.push({ name: 'Quiz Builder', path: '/courses', icon: <HelpCircle size={18} /> });
+      sidebarLinks.push({ name: 'Course Management', path: '/office/courses', icon: <Library size={18} /> });
+      sidebarLinks.push({ name: 'Curriculum & Media', path: '/office/curriculum', icon: <UploadCloud size={18} /> });
+      sidebarLinks.push({ name: 'Assignment Setup', path: '/office/assignments', icon: <FilePlus size={18} /> });
+      sidebarLinks.push({ name: 'Quiz Builder', path: '/office/quizzes', icon: <HelpCircle size={18} /> });
 
       // Grading Section
       sidebarLinks.push({ name: 'Grading System', isHeader: true });
-      sidebarLinks.push({ name: 'Gradebook', path: '/office/portal', icon: <CheckSquare size={18} /> });
-      sidebarLinks.push({ name: 'Rubrics & Bulk', path: '/office/portal', icon: <Layers size={18} /> });
-      sidebarLinks.push({ name: 'Peer Oversight', path: '/office/portal', icon: <Users2 size={18} /> });
+      sidebarLinks.push({ name: 'Gradebook', path: '/office/gradebook', icon: <CheckSquare size={18} /> });
+      sidebarLinks.push({ name: 'Rubrics & Bulk', path: '/office/rubrics', icon: <Layers size={18} /> });
+      sidebarLinks.push({ name: 'Peer Oversight', path: '/office/peer-reviews', icon: <Users2 size={18} /> });
 
       // Communication Section
       sidebarLinks.push({ name: 'Communication', isHeader: true });
       sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
       sidebarLinks.push({ name: 'Student Messaging', path: '/office/communications', icon: <MessageCircle size={18} /> });
-      sidebarLinks.push({ name: 'Forum Moderation', path: '/courses', icon: <Inbox size={18} /> });
+      sidebarLinks.push({ name: 'Forum Moderation', path: '/office/forums', icon: <Inbox size={18} /> });
 
       // Analytics Section
       sidebarLinks.push({ name: 'Analytics', isHeader: true });
-      sidebarLinks.push({ name: 'Performance Tracking', path: '/office/analytics', icon: <PieChart size={18} /> });
-      sidebarLinks.push({ name: 'Engagement Reports', path: '/office/analytics', icon: <BarChart3 size={18} /> });
-      sidebarLinks.push({ name: 'Dropout Risks', path: '/office/analytics', icon: <Activity size={18} /> });
+      sidebarLinks.push({ name: 'Performance Tracking', path: '/office/analytics/performance', icon: <PieChart size={18} /> });
+      sidebarLinks.push({ name: 'Engagement Reports', path: '/office/analytics/engagement', icon: <BarChart3 size={18} /> });
+      sidebarLinks.push({ name: 'Dropout Risks', path: '/office/analytics/risks', icon: <Activity size={18} /> });
     }
 
     // Permission-Based Admin Tools
@@ -390,13 +398,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                     key={link.name} 
                     to={link.path || '#'} 
                     onClick={() => setIsMobileSidebarOpen(false)}
-                    className={`flex items-center gap-4 px-4 py-2.5 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname === link.path ? 'bg-mylms-purple/5 text-mylms-purple border-l-2 border-mylms-purple' : 'hover:bg-gray-50 text-text-secondary'}`}
+                    className={`flex items-center gap-4 px-4 py-2.5 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname === link.path ? 'bg-mylms-purple/5 text-mylms-purple border-l-2 border-mylms-purple shadow-sm' : 'hover:bg-gray-50 text-text-secondary'}`}
                   >
                     <span className={isSidebarCollapsed ? 'mx-auto' : ''}>{link.icon}</span>
                     {!isSidebarCollapsed && <span>{link.name}</span>}
                   </Link>
                 )
               ))}
+              <div className="h-20 shrink-0" /> {/* Spacer for bottom items fix */}
             </div>
 
             <div className="p-4 mt-auto">
@@ -519,10 +528,21 @@ function App() {
    
           <Route element={<ProtectedRoute roles={['instructor']} />}>
             <Route path="/office/portal" element={<InstructorDashboard />} />
-            <Route path="/courses" element={<CourseList />} />
+            <Route path="/office/courses" element={<InstructorCoursesHub />} />
+            <Route path="/office/curriculum" element={<CurriculumMediaHub />} />
+            <Route path="/office/assignments" element={<AssignmentSetupHub />} />
+            <Route path="/office/quizzes" element={<QuizBuilderHub />} />
+            <Route path="/office/gradebook" element={<GradingHub />} />
+            <Route path="/office/rubrics" element={<GradingHub />} />
+            <Route path="/office/peer-reviews" element={<GradingHub />} />
+            <Route path="/office/forums" element={<ForumModerationHub />} />
             <Route path="/office/analytics" element={<InstructorAnalytics />} />
+            <Route path="/office/analytics/performance" element={<InstructorAnalytics />} />
+            <Route path="/office/analytics/engagement" element={<InstructorAnalytics />} />
+            <Route path="/office/analytics/risks" element={<InstructorAnalytics />} />
             <Route path="/office/communications" element={<InstructorMessaging />} />
             <Route path="/office/announcements" element={<InstructorAnnouncements />} />
+            <Route path="/courses" element={<CourseList />} />
             <Route path="/courses/create" element={<CourseCreate />} />
             <Route path="/courses/:slug/curriculum" element={<CurriculumManager />} />
             <Route path="/courses/:slug/assignments" element={<AssignmentBuilder />} />

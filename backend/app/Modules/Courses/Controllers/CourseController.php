@@ -134,6 +134,20 @@ class CourseController extends Controller
     }
 
     /**
+     * Provide list of courses assigned to the instructor.
+     */
+    public function instructorCourses()
+    {
+        $courses = Course::where('instructor_id', Auth::id())
+            ->with(['semester', 'category'])
+            ->withCount('enrollments')
+            ->latest()
+            ->get();
+            
+        return response()->json($courses);
+    }
+
+    /**
      * Provide instructor-specific dashboard statistics.
      */
     public function stats()
