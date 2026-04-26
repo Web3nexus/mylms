@@ -62,10 +62,28 @@ class DatabaseSeeder extends Seeder
             'duration_years' => 2,
         ]);
 
+        // 3. Create Default Academic Levels
+        $levels = [
+            ['name' => 'Associate Degree', 'code' => 'AD'],
+            ['name' => 'Bachelor (Honours)', 'code' => 'BSc'],
+            ['name' => 'Master Degree', 'code' => 'MSc'],
+            ['name' => 'Doctor of Philosophy', 'code' => 'PhD'],
+        ];
+
+        foreach ($levels as $level) {
+            \App\Models\Level::firstOrCreate([
+                'name' => $level['name'],
+                'faculty_id' => $faculty->id
+            ], [
+                'code' => $level['code']
+            ]);
+        }
+
         $this->call(CMSPageSeeder::class);
         $this->call(LandingPageSeeder::class);
         $this->call(AcademicProgramsSeeder::class);
         $this->call(AdmissionFieldsSeeder::class);
+        $this->call(SessionSemesterSeeder::class);
 
         echo "Seeding completed successfully.\n";
     }
