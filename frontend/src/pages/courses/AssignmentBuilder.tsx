@@ -20,6 +20,7 @@ export default function AssignmentBuilder() {
   const { token } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState<any>(null);
+  const [assessments, setAssessments] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -33,20 +34,25 @@ export default function AssignmentBuilder() {
     rubric_id: ''
   });
 
-  useEffect(() => {
-    fetchCourse();
-  }, [slug]);
-
-  const fetchCourse = async () => {
+  const fetchCourseAndAssessments = async () => {
     try {
-      const res = await client.get(`/courses/${slug}`);
-      setCourse(res.data);
+      const [courseRes, assessRes] = await Promise.all([
+        client.get(`/courses/${slug}`),
+        client.get(`/courses/${slug}/assessments`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      setCourse(courseRes.data);
+      // Filter out quizzes for the Assignment Builder
+      setAssessments(assessRes.data.filter((a: any) => a.type !== 'quiz'));
     } catch (err) {
-      console.error('Error fetching course:', err);
+      console.error('Error fetching data:', err);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCourseAndAssessments();
+  }, [slug]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,10 +60,22 @@ export default function AssignmentBuilder() {
       await client.post(`/courses/${course.id}/assessments`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert('Academic Performance Metric Synchronized.');
+      alert('Assignment created successfully.');
       setShowForm(false);
+      setFormData({
+        title: '',
+        type: 'assignment',
+        description: '',
+        due_date: '',
+        points: 100,
+        allow_late: false,
+        peer_review: false,
+        rubric_id: ''
+      });
+      fetchCourseAndAssessments();
     } catch (err) {
       console.error('Failed to create assessment:', err);
+      alert('Failed to create assignment. Please try again.');
     }
   };
 
@@ -177,27 +195,30 @@ export default function AssignmentBuilder() {
         </div>
       )}
 
-      {/* Placeholder for list of assessments */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 opacity-40 grayscale pointer-events-none select-none">
-          <div className="bg-white p-10 rounded-3xl border border-border-soft flex items-center gap-8">
-              <div className="w-16 h-16 rounded-2xl bg-offwhite flex items-center justify-center text-mylms-purple">
-                  <Layout size={32} />
+      {/* Actual List of Assessments */}
+      {assessments.length === 0 ? (
+        <div className="p-20 text-center bg-white rounded-3xl border-2 border-dashed border-border-soft">
+          <FileText size={48} className="mx-auto text-gray-100 mb-6" />
+          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No assignments have been created yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {assessments.map(assessment => (
+              <div key={assessment.id} className="bg-white p-10 rounded-3xl border border-border-soft flex items-center gap-8 shadow-sm hover:shadow-xl transition-all group">
+                  <div className={`w-16 h-16 rounded-2xl bg-offwhite flex items-center justify-center ${assessment.type === 'peer_assignment' ? 'text-mylms-rose' : 'text-mylms-purple'}`}>
+                      {assessment.type === 'peer_assignment' ? <Users size={32} /> : <FileText size={32} />}
+                  </div>
+                  <div>
+                      <h3 className="font-black uppercase text-xl leading-none mb-2 tracking-tighter group-hover:text-mylms-purple transition-colors">{assessment.title}</h3>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                         {assessment.type.replace('_', ' ')} • {assessment.points} Points 
+                         {assessment.due_date && ` • Due ${new Date(assessment.due_date).toLocaleDateString()}`}
+                      </p>
+                  </div>
               </div>
-              <div>
-                  <h3 className="font-black uppercase text-xl leading-none mb-2 tracking-tighter">Mid-Term Syllabus Evaluation</h3>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">Synchronized on April 12, 2024</p>
-              </div>
-          </div>
-          <div className="bg-white p-10 rounded-3xl border border-border-soft flex items-center gap-8">
-              <div className="w-16 h-16 rounded-2xl bg-offwhite flex items-center justify-center text-mylms-rose">
-                  <BookOpen size={32} />
-              </div>
-              <div>
-                  <h3 className="font-black uppercase text-xl leading-none mb-2 tracking-tighter">Peer Review: Global Markets</h3>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">Synchronized on April 20, 2024</p>
-              </div>
-          </div>
-      </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -351,16 +351,23 @@ class AdmissionController extends Controller
     public function review(Request $request, AdmissionApplication $application)
     {
         $validated = $request->validate([
-            'status'       => 'required|in:review,approved,rejected',
-            'review_notes' => 'nullable|string',
+            'status'         => 'required|in:review,approved,rejected',
+            'review_notes'   => 'nullable|string',
+            'scholarship_id' => 'nullable|exists:scholarships,id',
         ]);
 
-        $application->update([
+        $updateData = [
             'status'       => $validated['status'],
             'review_notes' => $validated['review_notes'],
             'reviewed_at'  => now(),
             'reviewed_by'  => Auth::id(),
-        ]);
+        ];
+
+        if (array_key_exists('scholarship_id', $validated)) {
+            $updateData['scholarship_id'] = $validated['scholarship_id'];
+        }
+
+        $application->update($updateData);
 
         // If approved, send email inline (no queue dependency) and create offer
         if ($validated['status'] === 'approved') {
@@ -379,6 +386,10 @@ class AdmissionController extends Controller
             ]);
 
             $this->generateStudentId($application->user);
+            
+            if ($application->scholarship_id) {
+                $application->user->update(['scholarship_id' => $application->scholarship_id]);
+            }
         } else {
             // Notify immediately for rejections / info reviews
             $application->user->notify(new AdmissionStatusUpdated($application));

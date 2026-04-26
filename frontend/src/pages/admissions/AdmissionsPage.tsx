@@ -36,43 +36,7 @@ export function AdmissionsInner() {
         if (res.data?.length > 0) setActiveFaculty(res.data[0].id);
       })
       .catch(() => {
-        // Fallback sample data if API is unreachable
-        const sample: Faculty[] = [
-          { id: 1, name: 'Faculty of Business & Management', departments: [
-            { id: 1, name: 'Business Administration', programs: [
-              { id: 1, name: 'Bachelor of Business Administration (BBA)' },
-              { id: 2, name: 'Master of Business Administration (MBA)' },
-              { id: 3, name: 'Certificate in Entrepreneurship' },
-            ]},
-            { id: 2, name: 'Finance & Economics', programs: [
-              { id: 4, name: 'B.Sc. Finance' },
-              { id: 5, name: 'M.Sc. Financial Analysis' },
-            ]},
-          ]},
-          { id: 2, name: 'Faculty of Technology & Computing', departments: [
-            { id: 3, name: 'Computer Science', programs: [
-              { id: 6, name: 'B.Sc. Computer Science' },
-              { id: 7, name: 'M.Sc. Artificial Intelligence' },
-              { id: 8, name: 'Certificate in Web Development' },
-            ]},
-            { id: 4, name: 'Information Systems', programs: [
-              { id: 9, name: 'B.Sc. Information Systems' },
-              { id: 10, name: 'M.Sc. Cybersecurity' },
-            ]},
-          ]},
-          { id: 3, name: 'Faculty of Social Sciences', departments: [
-            { id: 5, name: 'Psychology', programs: [
-              { id: 11, name: 'B.Sc. Psychology' },
-              { id: 12, name: 'M.Sc. Clinical Psychology' },
-            ]},
-            { id: 6, name: 'International Relations', programs: [
-              { id: 13, name: 'B.A. International Relations' },
-              { id: 14, name: 'M.A. Diplomacy & Global Affairs' },
-            ]},
-          ]},
-        ];
-        setFaculties(sample);
-        setActiveFaculty(sample[0].id);
+        setFaculties([]);
       })
       .finally(() => setLoading(false));
   }, []);

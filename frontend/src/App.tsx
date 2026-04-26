@@ -60,6 +60,7 @@ import CourseList from './pages/courses/CourseList'
 import PublicVerification from './pages/credentials/PublicVerification'
 import VerifyEmail from './pages/VerifyEmail'
 import ScholarshipDirectory from './pages/scholarships/ScholarshipDirectory'
+import StudentScholarship from './pages/student/StudentScholarship'
 import AdmissionApplication from './pages/admissions/AdmissionApplication'
 import AdmissionsPage from './pages/admissions/AdmissionsPage'
 import AdmissionDashboard from './pages/admissions/AdmissionDashboard'
@@ -79,6 +80,7 @@ import AdmissionsReview from './pages/admin/AdmissionsReview'
 import AdmissionRegistryManager from './pages/admin/AdmissionRegistryManager'
 import StudentDirectory from './pages/admin/StudentDirectory'
 import AdminStaffDirectory from './pages/admin/AdminStaffDirectory'
+import AdminInstructorDirectory from './pages/admin/AdminInstructorDirectory'
 import InstructorGradebook from './pages/courses/InstructorGradebook'
 import CourseCreate from './pages/courses/CourseCreate'
 import CurriculumManager from './pages/courses/CurriculumManager'
@@ -241,7 +243,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'My Courses', path: '/register-courses', icon: <Library size={18} /> },
         { name: 'Transcript', path: '/transcript', icon: <TrendingUp size={18} /> },
         { name: 'Self Service', path: '/portal/forms', icon: <Layers size={18} /> },
-        { name: 'Scholarships', path: '/scholarships', icon: <Award size={18} /> },
+        { name: 'My Scholarship', path: '/student/scholarship', icon: <Award size={18} /> },
       ]
     } else {
       // Applicants/Candidates
@@ -316,6 +318,11 @@ function MainLayout({ children }: { children: React.ReactNode }) {
        sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <ShieldCheck size={18} /> });
     }
     
+    if (isAdmin || permissions.includes('staff_registry')) {
+      sidebarLinks.push({ name: 'Administrative Staff', path: '/admin/staff', icon: <Briefcase size={18} /> });
+      sidebarLinks.push({ name: 'Instructor Registry', path: '/admin/instructors', icon: <Users2 size={18} /> });
+    }
+
     if (isAdmin) {
       sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
       sidebarLinks.push({ name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> });
@@ -503,8 +510,10 @@ function App() {
             <Route path="/portal" element={user?.student_id ? <StudentPortal /> : <Navigate to="/apply/dashboard" replace />} />
             <Route path="/apply/dashboard" element={<AdmissionDashboard />} />
             <Route path="/apply/wizard" element={<AdmissionWizard />} />
+            <Route path="/apply" element={<AdmissionsPage />} />
             <Route path="/register-courses" element={<CourseRegistrationPage />} />
             <Route path="/transcript" element={<StudentTranscript />} />
+            <Route path="/student/scholarship" element={<StudentScholarship />} />
             <Route path="/billing" element={<StudentBillingPortal />} />
             <Route path="/portal/forms" element={<SelfServiceForms />} />
             <Route path="/portal/links" element={<UsefulLinks />} />
@@ -550,7 +559,6 @@ function App() {
             <Route path="/courses/:slug/gradebook" element={<InstructorGradebook />} />
             <Route path="/courses/:slug/rubrics" element={<RubricCreator />} />
             <Route path="/courses/:slug/assessment-manager" element={<AssessmentCreator />} />
-            <Route path="/admin/communications" element={<CommunicationManager />} />
           </Route>
 
           <Route element={<ProtectedRoute roles={['advisor']} />}>
@@ -564,12 +572,14 @@ function App() {
             <Route path="/admin/admissions/registry" element={<AdmissionRegistryManager />} />
             <Route path="/admin/students" element={<StudentDirectory />} />
             <Route path="/admin/staff" element={<AdminStaffDirectory />} />
+            <Route path="/admin/instructors" element={<AdminInstructorDirectory />} />
             <Route path="/admin/finance" element={<AdminFinanceDashboard />} />
             <Route path="/admin/finance/settings" element={<PaymentSettings />} />
             <Route path="/admin/pages" element={<CMSPageManager />} />
             <Route path="/admin/cms/edit/:slug" element={<LandingEditor />} />
             <Route path="/admin/cms/guided/:slug" element={<GuidedPageEditor />} />
             <Route path="/branding" element={<BrandingManager />} />
+            <Route path="/admin/communications" element={<CommunicationManager />} />
             <Route path="/admin/communications/templates" element={<EmailTemplateManager />} />
             <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
             <Route path="/admin/command-center" element={<CommandCenter />} />

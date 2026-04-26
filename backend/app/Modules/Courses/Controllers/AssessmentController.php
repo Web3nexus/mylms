@@ -177,10 +177,12 @@ class AssessmentController extends Controller
         
         if ($assessment->type === 'assignment' || $assessment->type === 'peer_assignment') {
             $validated = $request->validate([
-                'file_submission' => 'required|file|max:10240', // 10MB limit
+                'file_submission' => 'required|file|mimes:doc,docx|max:10240', // 10MB limit, Word only
             ]);
 
-            $path = $request->file('file_submission')->store('submissions', 'public');
+            $courseId = $assessment->course_id;
+            $userId = $user->id;
+            $path = $request->file('file_submission')->store("courses/{$courseId}/students/{$userId}/submissions", 'public');
 
             $submission = Submission::create([
                 'user_id' => $user->id,

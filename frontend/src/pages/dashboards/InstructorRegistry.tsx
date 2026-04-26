@@ -1,42 +1,50 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  PlusCircle, 
-  Award, 
-  Clock, 
-  ShieldCheck,
+import {
+  PlusCircle,
+  Award,
+  Clock,
   ClipboardList,
   Users,
   BookOpen,
   ArrowRight,
   Layers,
-  BarChart,
+  BarChart3,
+  HelpCircle,
   Settings,
-  HelpCircle
+  GraduationCap,
+  MessageCircle,
+  FileText,
+  Mic2,
+  ChevronRight,
+  Loader2,
+  Activity
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import client from '../../api/client';
 
-export default function InstructorRegistry() {
+export default function InstructorDashboard() {
   const { user, token } = useAuthStore();
+  const headers = { Authorization: `Bearer ${token}` };
+
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     activeCohorts: 0,
     totalStudents: 0,
-    passRate: "0%",
+    passRate: '0%',
     pendingEvaluations: 0,
     facultyId: 'FAC-000000'
   });
 
   useEffect(() => {
-    const fetchInstructorData = async () => {
+    const fetchData = async () => {
       try {
         const [coursesRes, statsRes] = await Promise.all([
-          client.get('/my-courses', { headers: { Authorization: `Bearer ${token}` } }),
-          client.get('/instructor/stats', { headers: { Authorization: `Bearer ${token}` } })
+          client.get('/my-courses', { headers }),
+          client.get('/instructor/stats', { headers })
         ]);
-        setCourses(coursesRes.data.data);
+        setCourses(coursesRes.data?.data || coursesRes.data || []);
         setStats(statsRes.data);
       } catch (err) {
         console.error('Error fetching instructor data:', err);
@@ -44,176 +52,329 @@ export default function InstructorRegistry() {
         setLoading(false);
       }
     };
-    fetchInstructorData();
+    fetchData();
   }, [token]);
 
-  if (loading) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-offwhite">
-        <div className="w-12 h-12 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-6"></div>
-        <p className="text-mylms-purple font-black uppercase tracking-[0.3em] text-[10px]">Accessing Faculty Registry...</p>
-      </div>
-    );
-  }
+  // Quick-action tools — always visible regardless of courses
+  const quickActions = [
+    {
+      label: 'Create Course',
+      desc: 'Propose a new course in your department',
+      icon: <PlusCircle size={22} />,
+      to: '/courses/create',
+      color: 'bg-mylms-purple text-white',
+      highlight: true,
+    },
+    {
+      label: 'Course Management',
+      desc: 'View and manage all assigned courses',
+      icon: <BookOpen size={22} />,
+      to: '/office/courses',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Curriculum & Media',
+      desc: 'Upload lessons, videos and materials',
+      icon: <Layers size={22} />,
+      to: '/office/curriculum',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Assignment Setup',
+      desc: 'Create and manage assignments',
+      icon: <Settings size={22} />,
+      to: '/office/assignments',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Quiz Builder',
+      desc: 'Build MCQ, true/false & theory quizzes',
+      icon: <HelpCircle size={22} />,
+      to: '/office/quizzes',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Gradebook',
+      desc: 'Grade assignments and submissions',
+      icon: <Award size={22} />,
+      to: '/office/gradebook',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Forum Moderation',
+      desc: 'Moderate student discussion forums',
+      icon: <MessageCircle size={22} />,
+      to: '/office/forums',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Announcements',
+      desc: 'Post course announcements',
+      icon: <Mic2 size={22} />,
+      to: '/office/announcements',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Student Messaging',
+      desc: 'Message your students directly',
+      icon: <FileText size={22} />,
+      to: '/office/communications',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Performance Analytics',
+      desc: 'View student performance & trends',
+      icon: <BarChart3 size={22} />,
+      to: '/office/analytics/performance',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Engagement Reports',
+      desc: 'Track student engagement rates',
+      icon: <Activity size={22} />,
+      to: '/office/analytics/engagement',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Peer Reviews',
+      desc: 'Manage peer assessment tasks',
+      icon: <Users size={22} />,
+      to: '/office/peer-reviews',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto py-10 px-12 min-h-screen transition-all">
-      
-      {/* Faculty Awareness Header Area */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-10 border-b border-border-soft pb-12">
+    <div className="max-w-7xl mx-auto py-8 px-6 lg:px-12 min-h-screen">
+
+      {/* Header */}
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-           <div className="flex items-center gap-3 mb-4 text-mylms-purple font-black uppercase tracking-[0.4em] text-[10px]">
-              <ClipboardList className="opacity-50" size={16} />
-              MyLMS Faculty Desk
-           </div>
-           <h1 className="text-4xl font-black text-text-main tracking-tighter mb-4 uppercase leading-none">Faculty Portal</h1>
-           <p className="text-text-secondary font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
-              <ShieldCheck size={12} className="text-mylms-rose" />
-              Credentials: {stats.facultyId} — Authorized Instructor
-           </p>
+          <div className="flex items-center gap-2 mb-2 text-mylms-purple font-semibold text-sm">
+            <ClipboardList size={16} />
+            Faculty Portal
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            Welcome back, {user?.name?.split(' ')[0] || 'Instructor'}
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            ID: {stats.facultyId} &mdash; Manage your courses, assignments and students below.
+          </p>
         </div>
-        
-        <div className="flex gap-4">
-           <Link to="/courses/create" className="btn-purple flex items-center gap-3 px-10 py-3.5 shadow-xl">
-              <PlusCircle size={16} />
-              Propose Syllabus
-           </Link>
-        </div>
+        <Link
+          to="/courses/create"
+          className="flex items-center gap-2 px-5 py-2.5 bg-mylms-purple text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-mylms-purple/90 transition-colors"
+        >
+          <PlusCircle size={16} />
+          Create New Course
+        </Link>
       </div>
 
-      {/* High Fidelity Faculty Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
-          <div className="bg-white p-8 rounded-2xl border border-border-soft shadow-sm relative group overflow-hidden hover:border-mylms-purple/20 transition-all">
-             <div className="absolute top-0 right-0 w-16 h-16 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
-             <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em] mb-8">Curriculum Load</p>
-             <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-black text-text-main font-mono tracking-tighter">{stats.activeCohorts}</span>
-                <span className="text-[9px] font-black text-mylms-purple uppercase tracking-widest opacity-60">Programs</span>
-             </div>
-          </div>
-          
-          <div className="bg-white p-8 rounded-2xl border border-border-soft shadow-sm relative group overflow-hidden hover:border-mylms-purple/20 transition-all">
-             <div className="absolute top-0 right-0 w-16 h-16 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
-             <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em] mb-8">Cohort Aggregate</p>
-             <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-black text-text-main font-mono tracking-tighter">{stats.totalStudents}</span>
-                <span className="text-[9px] font-black text-mylms-rose uppercase tracking-widest opacity-60">Verified</span>
-             </div>
-          </div>
-
-          <div className="bg-white p-8 rounded-2xl border border-border-soft shadow-sm relative group overflow-hidden border-t-8 border-t-mylms-purple hover:border-mylms-purple/40 transition-all">
-             <p className="text-[9px] font-black text-mylms-purple uppercase tracking-[0.3em] mb-8">Performance Index</p>
-             <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-black text-text-main font-mono tracking-tighter">{stats.passRate}</span>
-                <span className="text-[9px] font-black text-green-600 uppercase tracking-widest">Qualified</span>
-             </div>
-             <div className="mt-4 flex items-center gap-2">
-                <BarChart size={12} className="text-mylms-rose" />
-                <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest font-display">Historical Stability</span>
-             </div>
-          </div>
-
-          <div className="bg-white p-8 rounded-2xl border border-border-soft shadow-sm relative group overflow-hidden hover:border-mylms-purple/20 transition-all">
-             <div className="absolute top-0 right-0 w-16 h-16 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
-             <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em] mb-8">Pending Evaluations</p>
-             <div className="flex items-baseline gap-3 text-mylms-rose">
-                <span className="text-4xl font-black font-mono tracking-tighter">{stats.pendingEvaluations}</span>
-                <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Submissions</span>
-             </div>
-             <div className="mt-4 flex items-center gap-2">
-                <Clock size={12} className="text-mylms-rose animate-pulse" />
-                <span className="text-[8px] font-black text-mylms-rose uppercase tracking-widest font-display">Action Required</span>
-             </div>
-          </div>
-      </div>
-
-      {/* Curriculum Registry Hub */}
-      <div className="bg-white rounded-2xl border border-border-soft shadow-sm overflow-hidden mb-16 group hover:border-mylms-purple/20 transition-all border-t-8 border-t-mylms-purple">
-        <div className="px-10 py-10 border-b border-border-soft bg-offwhite flex justify-between items-center group-hover:bg-white transition-all">
-           <div>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-text-main flex items-center gap-4 leading-none">
-                <BookOpen size={18} className="text-mylms-purple" />
-                Instructional Inventory
-              </h3>
-              <p className="text-[9px] font-black text-gray-300 uppercase mt-4 tracking-widest">Authorized MyLMS Registry</p>
-           </div>
-           <div className="flex items-center gap-4">
-              <span className="text-[8px] font-black text-mylms-rose uppercase tracking-widest border border-mylms-rose/20 px-3 py-1 rounded-lg bg-mylms-rose/5 shadow-sm">VERIFIED_SYNC</span>
-           </div>
-        </div>
-
-        <div className="divide-y divide-offwhite bg-white">
-          {courses.length === 0 ? (
-            <div className="p-40 text-center flex flex-col items-center opacity-60">
-               <Layers size={48} className="text-gray-100 mb-8" />
-               <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.4em] mb-12 leading-loose">The registry identifies no authorized programs for these credentials.</p>
-               <Link to="/courses/create" className="btn-minimal px-12 py-3.5 shadow-md uppercase tracking-widest text-[9px] font-black">Initiate Proposal</Link>
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: 'My Courses', value: stats.activeCohorts, icon: <BookOpen size={18} />, color: 'text-mylms-purple' },
+          { label: 'Total Students', value: stats.totalStudents, icon: <Users size={18} />, color: 'text-blue-600' },
+          { label: 'Pass Rate', value: stats.passRate, icon: <BarChart3 size={18} />, color: 'text-emerald-600' },
+          { label: 'Pending Grades', value: stats.pendingEvaluations, icon: <Clock size={18} />, color: 'text-rose-600', alert: (stats.pendingEvaluations ?? 0) > 0 },
+        ].map((stat, i) => (
+          <div key={i} className={`bg-white rounded-xl border shadow-sm p-5 ${stat.alert ? 'border-rose-200' : 'border-gray-200'}`}>
+            <div className={`flex items-center gap-2 mb-3 ${stat.color}`}>
+              {stat.icon}
+              <span className="text-xs font-semibold text-gray-500">{stat.label}</span>
             </div>
-          ) : (
-            courses.filter(Boolean).filter(c => c && c?.title).map((course: any) => (
-              <div key={course.id} className="p-10 flex flex-col md:flex-row items-center gap-12 group/row transition-all hover:bg-offwhite/50 relative border-l-8 border-transparent hover:border-l-mylms-purple">
-                 <div className="w-16 h-16 bg-white border border-border-soft rounded-2xl flex items-center justify-center text-2xl font-black text-mylms-purple shadow-sm relative z-10 font-display group-hover/row:bg-mylms-purple group-hover/row:text-white transition-all duration-500">
-                   {course?.title?.charAt(0) ?? '?'}
-                 </div>
-                 <div className="flex-1 relative z-10">
-                   <div className="flex items-center gap-6 mb-4">
-                      <span className="text-[8px] font-black uppercase tracking-widest text-gray-300">REG_ID: ML-CRS-{course.id.toString().padStart(6, '0')}</span>
-                   </div>
-                   <h2 className="text-3xl font-black text-text-main leading-tight group-hover/row:text-mylms-purple transition-colors tracking-tighter uppercase">
-                    {course?.title}
-                   </h2>
-                   <div className="mt-8 flex items-center gap-12">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex justify-between items-end">
-                           <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Syllabus Completion</p>
-                           <span className="text-[10px] font-black text-mylms-purple uppercase tracking-widest font-mono">100%</span>
-                        </div>
-                        <div className="h-1 w-64 bg-offwhite rounded-full overflow-hidden border border-gray-50 shadow-inner">
-                           <div className="h-full bg-mylms-rose w-full transition-all"></div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 border-l border-border-soft pl-12 group/cohort hover:translate-x-1 transition-transform">
-                         <div className="w-10 h-10 bg-offwhite rounded-xl flex items-center justify-center border border-border-soft text-mylms-purple shadow-inner group-hover/cohort:bg-mylms-purple group-hover/cohort:text-white transition-all">
-                            <Users size={16} />
-                         </div>
-                         <div>
-                            <p className="text-[10px] font-black text-text-main uppercase tracking-tight leading-none">42 Records</p>
-                            <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-2 opacity-60">Verified Cohort</p>
-                         </div>
-                      </div>
-                   </div>
-                 </div>
-                    <Link 
-                      to={`/courses/${course?.slug}/curriculum`}
-                      className="btn-purple px-6 py-3.5 shadow-xl flex items-center gap-3 text-[10px]"
-                    >
-                      Curriculum
-                      <ArrowRight size={14} />
-                    </Link>
-                    <Link 
-                      to={`/courses/${course?.slug}/assignments`}
-                      className="bg-white border-2 border-border-soft text-text-main px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:border-mylms-purple hover:text-mylms-purple transition-all shadow-sm flex items-center gap-3"
-                    >
-                      <Settings size={14} /> Assignments
-                    </Link>
-                    <Link 
-                      to={`/courses/${course?.slug}/quizzes`}
-                      className="bg-white border-2 border-border-soft text-text-main px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:border-mylms-rose hover:text-mylms-rose transition-all shadow-sm flex items-center gap-3"
-                    >
-                      <HelpCircle size={14} className="text-mylms-rose" /> Quizzes
-                    </Link>
-                    <Link 
-                      to={`/courses/${course?.slug}/gradebook`}
-                      className="bg-white border-2 border-border-soft text-text-main px-6 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:border-mylms-purple hover:text-mylms-purple transition-all shadow-sm flex items-center gap-3"
-                    >
-                      <Award size={14} className="text-mylms-rose" /> Gradebook
-                    </Link>
-              </div>
-            ))
-          )}
+            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+            {stat.alert && (
+              <p className="text-xs text-rose-500 font-medium mt-1 flex items-center gap-1">
+                <Clock size={11} /> Action required
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
 
+      {/* Quick Actions Grid */}
+      <div className="mb-8">
+        <h2 className="text-base font-bold text-gray-900 mb-4">Teaching Tools</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {quickActions.map((action, i) => (
+            <Link
+              key={i}
+              to={action.to}
+              className={`group flex items-start gap-3 p-4 rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5 ${action.color} ${action.highlight ? 'shadow-md' : 'shadow-sm hover:border-mylms-purple/40'}`}
+            >
+              <div className={`shrink-0 mt-0.5 ${action.highlight ? 'text-white/80' : 'text-mylms-purple'}`}>
+                {action.icon}
+              </div>
+              <div>
+                <p className={`text-sm font-semibold leading-tight ${action.highlight ? 'text-white' : 'text-gray-900'}`}>
+                  {action.label}
+                </p>
+                <p className={`text-xs mt-0.5 leading-tight ${action.highlight ? 'text-white/70' : 'text-gray-500'}`}>
+                  {action.desc}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
+
+      {/* My Courses Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <GraduationCap size={18} className="text-mylms-purple" />
+              My Courses
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">Manage individual course content, assignments, and students</p>
+          </div>
+          <Link
+            to="/office/courses"
+            className="text-sm text-mylms-purple font-semibold hover:underline flex items-center gap-1"
+          >
+            View all <ChevronRight size={14} />
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="py-20 text-center">
+            <Loader2 size={24} className="animate-spin text-mylms-purple mx-auto mb-3" />
+            <p className="text-sm text-gray-500">Loading your courses...</p>
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="py-20 text-center">
+            <BookOpen size={36} className="text-gray-200 mx-auto mb-4" />
+            <p className="text-gray-500 font-medium text-sm">You haven't created any courses yet.</p>
+            <Link to="/courses/create" className="mt-4 inline-flex items-center gap-2 text-mylms-purple text-sm font-semibold hover:underline">
+              <PlusCircle size={15} /> Create your first course
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Course</th>
+                  <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Students</th>
+                  <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {courses.filter(Boolean).filter(c => c?.title).map((course: any) => (
+                  <tr key={course.id} className="hover:bg-gray-50/60 transition-colors group">
+                    {/* Course Info */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-mylms-purple font-bold text-sm shrink-0">
+                          {course?.title?.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{course.title}</p>
+                          <p className="text-xs text-gray-500 font-mono mt-0.5">{course.code || `CRS-${course.id}`}</p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Students */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-700">
+                        <Users size={14} className="text-gray-400" />
+                        {course.enrollments_count ?? 0}
+                      </div>
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${
+                        course.is_published
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                          : 'bg-amber-50 text-amber-700 border border-amber-100'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${course.is_published ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        {course.is_published ? 'Published' : 'Draft'}
+                      </span>
+                    </td>
+
+                    {/* Per-Course Actions */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          to={`/courses/${course.slug}/curriculum`}
+                          className="px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg text-gray-700 hover:border-mylms-purple hover:text-mylms-purple transition-colors"
+                          title="Curriculum"
+                        >
+                          Curriculum
+                        </Link>
+                        <Link
+                          to={`/courses/${course.slug}/assignments`}
+                          className="px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg text-gray-700 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                          title="Assignments"
+                        >
+                          Assignments
+                        </Link>
+                        <Link
+                          to={`/courses/${course.slug}/quizzes`}
+                          className="px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg text-gray-700 hover:border-purple-400 hover:text-purple-600 transition-colors"
+                          title="Quizzes"
+                        >
+                          Quizzes
+                        </Link>
+                        <Link
+                          to={`/courses/${course.slug}/gradebook`}
+                          className="px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 rounded-lg text-gray-700 hover:border-emerald-400 hover:text-emerald-600 transition-colors"
+                          title="Gradebook"
+                        >
+                          Gradebook
+                        </Link>
+                        <Link
+                          to={`/courses/${course.slug}/curriculum`}
+                          className="p-1.5 border border-gray-200 rounded-lg text-gray-400 hover:text-mylms-purple hover:border-mylms-purple/30 transition-colors"
+                          title="Open course"
+                        >
+                          <ArrowRight size={14} />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Instructor Assignment Info */}
+      {user && (
+        <div className="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <GraduationCap size={16} className="text-mylms-purple" />
+            My Department & Level Assignment
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+              <p className="text-xs text-gray-500 font-medium mb-1">Faculty</p>
+              <p className="font-semibold text-gray-900">{(user as any).faculty?.name || '—'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+              <p className="text-xs text-gray-500 font-medium mb-1">Department</p>
+              <p className="font-semibold text-gray-900">{(user as any).department?.name || '—'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+              <p className="text-xs text-gray-500 font-medium mb-1">Assigned Level</p>
+              <p className="font-semibold text-gray-900">{(user as any).level?.name || '—'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+              <p className="text-xs text-gray-500 font-medium mb-1">Role</p>
+              <p className="font-semibold text-gray-900 capitalize">{user.role}</p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-4">
+            Contact an Admin if your department or level assignment needs to be updated.
+          </p>
+        </div>
+      )}
 
     </div>
   );

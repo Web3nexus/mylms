@@ -92,11 +92,22 @@ class AdmissionWizardController extends Controller
              return response()->json(['message' => 'Application cannot be submitted in its current state.'], 422);
         }
 
-        // Final verification of required data could go here (e.g. checking if all 5 JSON keys exist)
+        // Check if auto-assign scholarship is enabled
+        $autoAssign = \App\Models\SystemSetting::getVal('scholarship_auto_approval', true);
+        $scholarshipId = null;
+
+        if ($autoAssign) {
+            $randomScholarship = \App\Models\Scholarship::inRandomOrder()->first();
+            if ($randomScholarship) {
+                $scholarshipId = $randomScholarship->id;
+            }
+        }
         
         $application->update([
             'status' => AdmissionApplication::STATUS_PENDING,
-            'submitted_at' => now()
+            'submitted_at' => now(),
+            'scholarship_id' => $scholarshipId,
+            'scholarship_status' => $scholarshipId ? AdmissionApplication::SCHOLARSHIP_PENDING : AdmissionApplication::SCHOLARSHIP_NOT_APPLIED
         ]);
 
         return response()->json(['message' => 'Your application has been submitted successfully!', 'application' => $application]);

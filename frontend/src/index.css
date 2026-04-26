@@ -163,3 +163,40 @@ h3:not([style*="color"]) {
   @apply shadow-[0_50px_120px_-20px_rgba(75,52,93,0.1)];
 }
 
+/* ============================================================
+   PUCK EDITOR FULL-HEIGHT FIX
+   ============================================================ */
+
+/* Puck root wrapper — must fill the flex parent */
+[class*="Puck-root"],
+[class*="PuckLayout"],
+div[data-puck] {
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 !important;
+}
+
+/* Puck inner canvas area */
+[class*="Puck-frame"],
+[class*="PuckLayout-inner"],
+[class*="PuckLayout-canvas"],
+[class*="Puck-canvas"] {
+  flex: 1 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+/* Stop global heading styles leaking into Puck's sidebar UI */
+[class*="Puck"] h1,
+[class*="Puck"] h2,
+[class*="Puck"] h3,
+[class*="Puck"] h4 {
+  text-transform: none !important;
+  font-style: normal !important;
+  letter-spacing: normal !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  font-weight: inherit !important;
+}

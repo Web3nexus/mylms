@@ -17,7 +17,7 @@ class CourseController extends Controller
     {
         $page = $request->get('page', 1);
         $courses = \Illuminate\Support\Facades\Cache::remember('public_courses_page_' . $page, 300, function () {
-            return Course::with(['instructor', 'category'])
+            return Course::with(['instructor', 'department'])
                 ->where('status', 'published')
                 ->latest()
                 ->paginate(12);
@@ -33,7 +33,8 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
+            'department_id' => 'required|exists:departments,id',
+            'category_id' => 'nullable|exists:categories,id',
             'description' => 'required|string',
             'price' => 'nullable|numeric|min:0',
             'status' => 'sometimes|in:draft,published',
@@ -45,7 +46,7 @@ class CourseController extends Controller
             'slug' => \Illuminate\Support\Str::slug($validated['title']),
         ]);
 
-        return response()->json($course->load(['instructor', 'category']), 201);
+        return response()->json($course->load(['instructor', 'department']), 201);
     }
 
     /**
@@ -53,7 +54,7 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        return response()->json($course->load(['instructor', 'category']));
+        return response()->json($course->load(['instructor', 'department']));
     }
 
     /**
@@ -68,6 +69,7 @@ class CourseController extends Controller
 
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
+            'department_id' => 'sometimes|exists:departments,id',
             'category_id' => 'sometimes|exists:categories,id',
             'description' => 'sometimes|string',
             'price' => 'nullable|numeric|min:0',
@@ -76,7 +78,7 @@ class CourseController extends Controller
 
         $course->update($validated);
 
-        return response()->json($course->load(['instructor', 'category']));
+        return response()->json($course->load(['instructor', 'department']));
     }
 
     /**
@@ -98,7 +100,7 @@ class CourseController extends Controller
     {
         return response()->json(
             Course::where('instructor_id', Auth::id())
-                ->with('category')
+                ->with('department')
                 ->latest()
                 ->paginate(10)
         );
@@ -126,7 +128,7 @@ class CourseController extends Controller
     public function myEnrollments()
     {
         $enrollments = Enrollment::where('user_id', Auth::id())
-            ->with(['course.instructor', 'course.category'])
+            ->with(['course.instructor', 'course.department'])
             ->latest()
             ->paginate(10);
             
@@ -139,7 +141,7 @@ class CourseController extends Controller
     public function instructorCourses()
     {
         $courses = Course::where('instructor_id', Auth::id())
-            ->with(['semester', 'category'])
+            ->with(['semester', 'department'])
             ->withCount('enrollments')
             ->latest()
             ->get();

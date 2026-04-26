@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 
-interface Category {
+interface Department {
   id: number;
   name: string;
 }
@@ -11,13 +11,13 @@ interface Category {
 export default function CourseCreate() {
   const [formData, setFormData] = useState({
     title: '',
-    category_id: '',
+    department_id: '',
     description: '',
     price: '0.00',
     status: 'draft' as 'draft' | 'published',
   });
   
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -25,15 +25,18 @@ export default function CourseCreate() {
   const token = useAuthStore((state) => state.token);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchDepartments = async () => {
       try {
-        const res = await client.get('/categories');
-        setCategories(res.data);
+        const res = await client.get('/admin/departments', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = Array.isArray(res.data) ? res.data : (res.data?.data ?? []);
+        setDepartments(data);
       } catch (err) {
-        console.error('Error fetching categories:', err);
+        console.error('Error fetching departments:', err);
       }
     };
-    fetchCategories();
+    fetchDepartments();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,14 +101,14 @@ export default function CourseCreate() {
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5 uppercase tracking-wide text-[11px]">Academic Department</label>
               <select
-                name="category_id"
+                name="department_id"
                 required
-                value={formData.category_id}
+                value={formData.department_id}
                 onChange={handleChange}
                 className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-blue-900 focus:border-blue-900 transition-colors outline-none font-medium text-gray-700 cursor-pointer"
               >
                 <option value="">Select a department...</option>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat?.name}</option>)}
+                {departments.map(dept => <option key={dept.id} value={dept.id}>{dept?.name}</option>)}
               </select>
             </div>
 

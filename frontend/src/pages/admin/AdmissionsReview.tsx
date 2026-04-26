@@ -17,7 +17,8 @@ import {
   Mail,
   MapPin,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  Award
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
@@ -38,6 +39,7 @@ interface Application {
   created_at: string;
   updated_at: string;
   review_notes?: string;
+  scholarship_id?: number | null;
 }
 
 export default function AdmissionsReview() {
@@ -48,11 +50,33 @@ export default function AdmissionsReview() {
   const [reviewNote, setReviewNote] = useState('');
   const [activeDataTab, setActiveDataTab] = useState<'personal' | 'contact' | 'academic' | 'financial'>('personal');
   
+  const [scholarships, setScholarships] = useState<any[]>([]);
+  const [selectedScholarshipId, setSelectedScholarshipId] = useState<string>('');
+
   const token = useAuthStore(state => state.token);
 
   useEffect(() => {
     fetchApplications();
+    fetchScholarships();
   }, []);
+
+  const fetchScholarships = async () => {
+    try {
+      const res = await client.get('/scholarships');
+      // API may return paginated { data: [...] } or a plain array
+      const list = Array.isArray(res.data) ? res.data : (res.data?.data ?? []);
+      setScholarships(list);
+    } catch (err) {
+      console.error('Error fetching scholarships:', err);
+    }
+  };
+
+  // Sync selected scholarship when viewing a new app
+  useEffect(() => {
+    if (selectedApp) {
+      setSelectedScholarshipId(selectedApp.scholarship_id ? selectedApp.scholarship_id.toString() : '');
+    }
+  }, [selectedApp]);
 
   const fetchApplications = async () => {
     try {
@@ -71,7 +95,8 @@ export default function AdmissionsReview() {
     try {
       await client.post(`/admissions/applications/${id}/review`, {
         status,
-        review_notes: reviewNote
+        review_notes: reviewNote,
+        scholarship_id: selectedScholarshipId ? parseInt(selectedScholarshipId) : null
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -220,6 +245,25 @@ export default function AdmissionsReview() {
                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Target Program</p>
                      <p className="text-sm font-black text-text-main uppercase">{selectedApp.program?.name}</p>
                   </div>
+               </div>
+
+               {/* Scholarship Assignment */}
+               <div className="mb-12 relative z-10 bg-offwhite p-8 rounded-2xl border border-border-soft">
+                   <p className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-3 pl-1">
+                      <Award size={18} className="text-mylms-purple" />
+                      Scholarship Award
+                   </p>
+                   <select 
+                     value={selectedScholarshipId}
+                     onChange={(e) => setSelectedScholarshipId(e.target.value)}
+                     className="w-full p-4 bg-white border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main text-sm shadow-sm appearance-none uppercase tracking-widest cursor-pointer"
+                   >
+                      <option value="">-- No Scholarship Awarded --</option>
+                      {scholarships.map(s => (
+                         <option key={s.id} value={s.id}>{s.title} ({s.amount ? `${s.currency === 'USD' ? '$' : s.currency}${Number(s.amount).toLocaleString()}` : 'FULL RIDE'})</option>
+                      ))}
+                   </select>
+                   <p className="text-[10px] font-black uppercase text-gray-400 mt-4 tracking-widest ml-2">Assigning a scholarship will lock it to the student's profile upon approval.</p>
                </div>
 
                {/* Data Tabs */}

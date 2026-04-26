@@ -25,6 +25,19 @@
             <span class="label">Status</span>
             <span class="value" style="color: #10b981;">Provisionally Admitted</span>
         </div>
+        @if($application->scholarship)
+        <div class="data-row" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+            <span class="label" style="color: #6366f1;">Scholarship Awarded</span>
+            <span class="value" style="color: #4f46e5; font-weight: bold;">
+                {{ $application->scholarship->title }}
+                @if($application->scholarship->amount)
+                    ({{ $application->scholarship->currency === 'USD' ? '$' : $application->scholarship->currency }}{{ number_format($application->scholarship->amount) }})
+                @else
+                    (Full Ride)
+                @endif
+            </span>
+        </div>
+        @endif
     </div>
 
     <p>Your official matriculation number is now active. Please proceed to the portal to finalize your enrollment, satisfy any pending institutional fees, and synchronize your academic calendar.</p>

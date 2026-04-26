@@ -16,6 +16,7 @@ class Course extends Model
         'title',
         'slug',
         'instructor_id',
+        'department_id',
         'category_id',
         'description',
         'thumbnail',
@@ -25,6 +26,11 @@ class Course extends Model
         'credit_hours',
         'semester_id',
     ];
+
+    public function department()
+    {
+        return $this->belongsTo(\App\Modules\Academic\Models\Department::class);
+    }
 
     protected $casts = [
         'price' => 'decimal:2',

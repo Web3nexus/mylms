@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useAppConfig } from '../../hooks/useAppConfig';
 import AcademicCalendarManager from './AcademicCalendarManager';
 import AdmissionRegistryManager from './AdmissionRegistryManager';
+import InstructorAssignmentManager from './InstructorAssignmentManager';
 import { 
   Settings, 
   Layers, 
@@ -66,11 +67,12 @@ export default function AcademicManager() {
   const { appName } = useAppConfig();
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [loading, setLoading] = useState(true);
+  const [levels, setLevels] = useState<any[]>([]);
   const [newFaculty, setNewFaculty] = useState({ name: '', description: '', code: '' });
   const [newDept, setNewDept] = useState({ name: '', code: '' });
   const [newProg, setNewProg] = useState({ 
     name: '', 
-    degree_level: 'BSc', 
+    degree_level: '', 
     duration_years: 4,
     pricing_type: 'hybrid',
     tuition_fee: '0',
@@ -125,7 +127,7 @@ export default function AcademicManager() {
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
-      await Promise.all([fetchStructure(), fetchSettings()]);
+      await Promise.all([fetchStructure(), fetchSettings(), fetchLevels()]);
       setLoading(false);
     };
     initData();
@@ -150,6 +152,21 @@ export default function AcademicManager() {
       setSettings(res.data);
     } catch (err) {
       console.error('Error fetching settings:', err);
+    }
+  };
+
+  const fetchLevels = async () => {
+    try {
+      const res = await client.get('/admin/levels', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = Array.isArray(res.data) ? res.data : (res.data?.data ?? []);
+      setLevels(data);
+      if (data.length > 0 && !newProg.degree_level) {
+        setNewProg(prev => ({ ...prev, degree_level: data[0].name }));
+      }
+    } catch (err) {
+      console.error('Error fetching levels:', err);
     }
   };
 
@@ -270,7 +287,7 @@ export default function AcademicManager() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewProg({ 
-        name: '', degree_level: 'BSc', duration_years: 4, pricing_type: 'hybrid',
+        name: '', degree_level: levels[0]?.name || '', duration_years: 4, pricing_type: 'hybrid',
         tuition_fee: '0', application_fee: '0', certificate_fee: '0',
         is_scholarship_eligible: true, is_external: false, external_provider: ''
       });
@@ -333,7 +350,7 @@ export default function AcademicManager() {
       });
       setNewProg({ 
         name: '', 
-        degree_level: 'BSc', 
+        degree_level: levels[0]?.name || '', 
         duration_years: 4,
         pricing_type: 'hybrid',
         tuition_fee: '0',
@@ -439,7 +456,7 @@ export default function AcademicManager() {
     }
   };
 
-  const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry' | 'settings'>('hierarchy');
+  const [activeTab, setActiveTab] = useState<'hierarchy' | 'calendar' | 'registry' | 'assignments' | 'settings'>('hierarchy');
 
   if (loading) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center bg-offwhite">
@@ -490,6 +507,13 @@ export default function AcademicManager() {
                 <Settings size={16} />
                 Institutional Settings
              </button>
+             <button 
+                onClick={() => setActiveTab('assignments')}
+                className={`text-[11px] font-black uppercase tracking-[0.3em] pb-4 border-b-2 transition-all flex items-center gap-3 ${activeTab === 'assignments' ? 'border-mylms-rose text-text-main' : 'border-transparent text-gray-300 hover:text-text-main'}`}
+             >
+                <GraduationCap size={16} />
+                Instructor Assignments
+             </button>
            </div>
         </div>
         
@@ -510,6 +534,8 @@ export default function AcademicManager() {
         <AcademicCalendarManager />
       ) : activeTab === 'registry' ? (
         <AdmissionRegistryManager />
+      ) : activeTab === 'assignments' ? (
+        <InstructorAssignmentManager />
       ) : activeTab === 'settings' ? (
         <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
            <div className="bg-white rounded-[40px] border border-border-soft shadow-2xl p-12 relative overflow-hidden">
@@ -786,7 +812,7 @@ export default function AcademicManager() {
                                       onClick={() => {
                                         setNewProg({ 
                                           name: '', 
-                                          degree_level: 'BSc', 
+                                          degree_level: levels[0]?.name || '',
                                           duration_years: 4,
                                           pricing_type: 'hybrid',
                                           tuition_fee: '0',
@@ -903,11 +929,13 @@ export default function AcademicManager() {
                             <div>
                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 pl-1">Degree Level</label>
                                <select value={newProg.degree_level} onChange={e => setNewProg({...newProg, degree_level: e.target.value})} className="w-full p-6 bg-offwhite border-2 border-border-soft rounded-[24px] outline-none focus:border-mylms-purple font-black text-xs uppercase appearance-none">
-                                  <option value="Associate">Associate Degree</option>
-                                  <option value="Bachelor">Bachelor (Standard)</option>
-                                  <option value="BSc">Bachelor (Honours)</option>
-                                  <option value="Master">Master Degree</option>
-                                  <option value="PhD">Doctor of Philosophy</option>
+                                  {levels.length === 0 ? (
+                                    <option value="">No Levels Defined</option>
+                                  ) : (
+                                    levels.map(l => (
+                                      <option key={l.id} value={l.name}>{l.name} ({l.code})</option>
+                                    ))
+                                  )}
                                </select>
                             </div>
                             <div>

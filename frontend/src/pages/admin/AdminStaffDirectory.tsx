@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Users, 
   UserPlus, 
@@ -6,16 +6,16 @@ import {
   Mail, 
   ShieldCheck, 
   Briefcase, 
-  Clock, 
   CheckCircle,
-  XCircle,
   Plus,
-  Edit
+  Edit,
+  Search,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
-import { useAppConfig } from '../../hooks/useAppConfig';
 
 interface StaffMember {
   id: number;
@@ -27,15 +27,18 @@ interface StaffMember {
 }
 
 export default function AdminStaffDirectory() {
-  const { appName } = useAppConfig();
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: 'Password123!',
-    role: 'instructor',
+    role: 'staff',
     permissions: [] as string[]
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -53,6 +56,7 @@ export default function AdminStaffDirectory() {
   
   const { token } = useAuthStore();
   const headers = { Authorization: `Bearer ${token}` };
+  const { confirm, notify } = useNotificationStore();
 
   useEffect(() => {
     fetchStaff();
@@ -60,7 +64,7 @@ export default function AdminStaffDirectory() {
 
   const fetchStaff = async () => {
     try {
-      const res = await client.get('/admin/staff', { headers });
+      const res = await client.get('/admin/staff?type=staff', { headers });
       setStaff(res.data);
     } catch (err) {
       console.error('Error fetching staff:', err);
@@ -74,17 +78,17 @@ export default function AdminStaffDirectory() {
     try {
       if (isEditing && editingId) {
         await client.put(`/admin/staff/${editingId}`, formData, { headers });
-        notify("Personnel Registry: Record successfully updated.", "success");
+        notify("Staff member updated successfully.", "success");
       } else {
         await client.post('/admin/staff', formData, { headers });
-        notify("Personnel Registry: Staff member successfully onboarded.", "success");
+        notify("Staff member added successfully.", "success");
       }
       setShowModal(false);
       resetForm();
       fetchStaff();
     } catch (err: any) {
       console.error('Error saving staff:', err);
-      notify(err.response?.data?.message || 'Personnel Registry Error: Failed to commit record.', "error");
+      notify(err.response?.data?.message || 'Failed to save staff record.', "error");
     }
   };
 
@@ -93,8 +97,8 @@ export default function AdminStaffDirectory() {
       name: '',
       email: '',
       password: 'Password123!',
-      role: 'instructor',
-      permissions: []
+      role: 'staff',
+      permissions: [] as string[]
     });
     setIsEditing(false);
     setEditingId(null);
@@ -111,244 +115,327 @@ export default function AdminStaffDirectory() {
     });
   };
 
-  const { confirm, notify } = useNotificationStore();
-
   const handleDelete = async (id: number) => {
     const confirmed = await confirm({
-      title: 'Purge Personnel Record',
-      message: 'Are you sure you want to permanently remove this staff member from the institutional registry? This action is irreversible and will revoke all access immediately.',
-      confirmText: 'Purge Record',
-      cancelText: 'Abort Protocol',
+      title: 'Delete Staff Member',
+      message: 'Are you sure you want to permanently delete this staff member? They will lose all system access.',
+      confirmText: 'Delete User',
+      cancelText: 'Cancel',
       type: 'danger'
     });
 
     if (!confirmed) return;
     try {
       await client.delete(`/admin/staff/${id}`, { headers });
-      notify("Personnel Registry: Record successfully purged.", "success");
+      notify("Staff member deleted successfully.", "success");
       fetchStaff();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting staff:', err);
-      notify('Personnel Registry Error: Failed to purge record.', "error");
+      notify(err.response?.data?.message || 'Failed to delete staff member.', "error");
     }
   };
 
+  // Filtering and Pagination
+  const filteredStaff = useMemo(() => {
+    return staff.filter(member => 
+      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [staff, searchQuery]);
+
+  const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
+  
+  const paginatedStaff = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredStaff.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredStaff, currentPage, itemsPerPage]);
+
   if (loading) return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center bg-offwhite">
-      <div className="w-12 h-12 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-6"></div>
-      <p className="text-mylms-purple font-black uppercase tracking-[0.3em] text-[10px]">Accessing Personnel Registry...</p>
+    <div className="min-h-[60vh] flex flex-col items-center justify-center bg-gray-50">
+      <div className="w-10 h-10 border-4 border-mylms-rose border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p className="text-gray-500 font-semibold text-sm">Loading Staff Directory...</p>
     </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto py-12 px-8">
-      
+    <div className="max-w-7xl mx-auto py-8 px-6 lg:px-12">
       {/* Header Area */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-           <div className="flex items-center gap-3 mb-4 text-mylms-purple font-black uppercase tracking-[0.4em] text-[10px]">
-              <Users className="opacity-50" size={16} />
-              Institutional Personnel Registry
+           <div className="flex items-center gap-2 mb-2 text-mylms-purple font-semibold text-sm">
+              <Users size={16} />
+              <span>Staff Management</span>
            </div>
-           <h1 className="text-5xl font-black text-text-main tracking-tighter mb-4 uppercase leading-none">University Staffing</h1>
-           <p className="text-text-secondary font-bold text-[10px] uppercase tracking-widest flex items-center gap-2">
-              <ShieldCheck size={12} className="text-mylms-rose" />
-              MyLMS Security: Staff Gatekeeper Active
-           </p>
+            <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none">Administrative Staff</h1>
+            <p className="text-text-secondary font-bold text-xs uppercase tracking-widest mt-4">University personnel and platform administrators.</p>
         </div>
         
         <button 
           onClick={() => setShowModal(true)}
-          className="btn-purple flex items-center gap-4 px-10 py-5 shadow-2xl hover:scale-105 transition-all text-[10px] tracking-[0.2em]"
+          className="bg-mylms-purple hover:bg-mylms-purple/90 text-white flex items-center gap-2 px-6 py-3 rounded-lg shadow-sm transition-all text-sm font-semibold"
         >
-          <UserPlus size={18} />
-          Onboard New Personnel
+          <UserPlus size={16} />
+          Add Staff Member
         </button>
       </div>
 
-      {/* Staff Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {staff.map((member) => (
-          <div key={member.id} className="bg-white p-10 rounded-3xl border border-border-soft shadow-sm hover:border-mylms-purple/30 transition-all group relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-24 h-24 bg-offwhite rounded-bl-full group-hover:bg-mylms-purple/5 transition-all"></div>
-             
-             <div className="flex items-center gap-6 mb-10 relative z-10">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner border ${
-                  member.role === 'admin' ? 'bg-mylms-rose/5 border-mylms-rose/10 text-mylms-rose' : 'bg-mylms-purple/5 border-mylms-purple/10 text-mylms-purple'
-                }`}>
-                  {member?.name.charAt(0)}
-                </div>
-                <div>
-                   <h4 className="text-xl font-black text-text-main tracking-tighter uppercase mb-1">{member?.name}</h4>
-                   <p className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${
-                     member.role === 'admin' ? 'text-mylms-rose' : 'text-mylms-purple opacity-60'
-                   }`}>
-                      {member.role === 'admin' ? <ShieldCheck size={12} /> : <Briefcase size={12} />}
-                      {member.role}
-                   </p>
-                </div>
-             </div>
-
-             <div className="space-y-4 mb-10 relative z-10">
-                <div className="flex items-center gap-3 text-text-secondary text-[11px] font-bold py-3 px-4 bg-offwhite rounded-xl border border-gray-50">
-                   <Mail size={14} className="text-gray-300" />
-                   {member?.email}
-                </div>
-                <div className="flex items-center gap-3 text-text-secondary text-[10px] font-bold px-4">
-                   <Clock size={14} className="text-gray-300" />
-                   Joined: {new Date(member.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </div>
-             </div>
-
-             <div className="flex items-center justify-between border-t border-offwhite pt-8 relative z-10">
-                <span className="text-[9px] font-black text-green-500 uppercase tracking-widest flex items-center gap-2">
-                   <CheckCircle size={14} />
-                   Active Record
-                </span>
-                 <div className="flex items-center gap-3">
-                    <button 
-                      onClick={() => {
-                        setFormData({ 
-                          name: member.name, 
-                          email: member.email, 
-                          role: member.role, 
-                          password: '',
-                          permissions: member.permissions || [] 
-                        });
-                        setIsEditing(true);
-                        setEditingId(member.id);
-                        setShowModal(true);
-                      }}
-                      className="p-3 text-gray-300 hover:text-mylms-purple hover:bg-mylms-purple/5 rounded-xl transition-all"
-                      title="Edit Personnel"
-                    >
-                       <Edit size={18} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(member.id)}
-                      className="p-3 text-gray-300 hover:text-mylms-rose hover:bg-mylms-rose/5 rounded-xl transition-all"
-                      title="Purge Record"
-                    >
-                       <Trash2 size={18} />
-                    </button>
-                 </div>
-             </div>
-          </div>
-        ))}
+      {/* Toolbar (Search) */}
+      <div className="mb-6 flex items-center bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+        <div className="relative flex-1 max-w-md">
+           <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+           <input 
+             type="text" 
+             placeholder="Search by name, email, or role..." 
+             value={searchQuery}
+             onChange={(e) => {
+               setSearchQuery(e.target.value);
+               setCurrentPage(1); // Reset to first page on search
+             }}
+             className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-2 focus:ring-mylms-purple/20 outline-none"
+           />
+        </div>
       </div>
 
-      {/* Creation Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-8">
-           <div className="absolute inset-0 bg-mylms-purple/40 backdrop-blur-md" onClick={resetForm}></div>
-           <div className="bg-white w-full max-w-xl rounded-[40px] shadow-2xl relative z-110 overflow-hidden animate-in zoom-in-95 duration-300 border border-border-soft">
-              <div className="p-12">
-                 <h3 className="text-3xl font-black text-text-main uppercase tracking-tighter mb-4">
-                    {isEditing ? 'Modify Personnel Record' : 'Personnel Onboarding'}
-                 </h3>
-                 <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-10 opacity-60">
-                    {appName} Security: {isEditing ? 'Edit Protocol' : 'New Staff Protocol'}
-                 </p>
+      {/* Staff Data Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/80 border-b border-gray-100">
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {paginatedStaff.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm">
+                    No staff members found matching your search.
+                  </td>
+                </tr>
+              ) : (
+                paginatedStaff.map((member) => (
+                  <tr key={member.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                          member.role === 'admin' ? 'bg-rose-50 text-mylms-rose' : 'bg-purple-50 text-mylms-purple'
+                        }`}>
+                          {member.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{member.name}</p>
+                          <div className="flex items-center gap-1 mt-0.5 text-xs text-gray-500">
+                            <Mail size={12} />
+                            {member.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${
+                         member.role === 'admin' 
+                           ? 'bg-rose-50 text-mylms-rose' 
+                           : member.role === 'staff' 
+                             ? 'bg-orange-50 text-orange-600'
+                             : 'bg-purple-50 text-mylms-purple'
+                      }`}>
+                        {member.role === 'admin' ? <ShieldCheck size={12} /> : <Briefcase size={12} />}
+                        <span className="capitalize">{member.role}</span>
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+                        <CheckCircle size={12} />
+                        Active
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {new Date(member.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => {
+                            setFormData({ 
+                              name: member.name, 
+                              email: member.email, 
+                              role: member.role, 
+                              password: '',
+                              permissions: member.permissions || [] 
+                            });
+                            setIsEditing(true);
+                            setEditingId(member.id);
+                            setShowModal(true);
+                          }}
+                          className="p-2 text-gray-400 hover:text-mylms-purple hover:bg-mylms-purple/10 rounded-lg transition-all"
+                          title="Edit Staff Member"
+                        >
+                           <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(member.id)}
+                          className="p-2 text-gray-400 hover:text-mylms-rose hover:bg-rose-50 rounded-lg transition-all"
+                          title="Delete User"
+                        >
+                           <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <span className="text-xs text-gray-500">
+              Showing <span className="font-semibold text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-semibold text-gray-900">{Math.min(currentPage * itemsPerPage, filteredStaff.length)}</span> of <span className="font-semibold text-gray-900">{filteredStaff.length}</span> results
+            </span>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-md border border-gray-200 text-gray-500 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-1.5 rounded-md border border-gray-200 text-gray-500 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
-                 <form onSubmit={handleSave} className="space-y-8">
-                    <div className="space-y-3">
-                       <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Legal Name</label>
+      {/* Creation / Edit Drawer Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-end">
+           <div className="absolute inset-0 bg-gray-900/30 backdrop-blur-sm" onClick={resetForm}></div>
+           
+           <div className="bg-white w-full max-w-md h-full shadow-2xl relative z-[110] flex flex-col animate-in slide-in-from-right-8 duration-300">
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                 <div>
+                   <h3 className="text-xl font-bold text-gray-900">
+                      {isEditing ? 'Edit Staff Member' : 'Add New Staff'}
+                   </h3>
+                   <p className="text-sm text-gray-500 mt-1">
+                      {isEditing ? 'Update personnel details and roles.' : 'Create a new staff account.'}
+                   </p>
+                 </div>
+                 <button onClick={resetForm} className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
+                   <ChevronRight size={20} />
+                 </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6">
+                 <form id="staff-form" onSubmit={handleSave} className="space-y-5">
+                    <div className="space-y-1.5">
+                       <label className="text-sm font-semibold text-gray-700">Full Name</label>
                        <input 
                          type="text"
                          required
-                         value={formData?.name}
+                         value={formData.name}
                          onChange={e => setFormData({...formData, name: e.target.value})}
-                         className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
-                         placeholder="e.g. Professor X"
+                         className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-mylms-purple/20 focus:border-mylms-purple transition-all text-sm text-gray-900"
+                         placeholder="e.g. Jane Doe"
                        />
                     </div>
-                    <div className="space-y-3">
-                       <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Institutional Email</label>
+                    <div className="space-y-1.5">
+                       <label className="text-sm font-semibold text-gray-700">Email Address</label>
                        <input 
                          type="email"
                          required
-                         value={formData?.email}
+                         value={formData.email}
                          onChange={e => setFormData({...formData, email: e.target.value})}
-                         className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
+                         className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-mylms-purple/20 focus:border-mylms-purple transition-all text-sm text-gray-900"
                          placeholder="staff@mylms.edu"
                        />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                       <div className="space-y-3">
-                          <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Personnel Role</label>
-                          <select 
-                            value={formData.role}
-                            onChange={e => setFormData({...formData, role: e.target.value})}
-                            className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner appearance-none cursor-pointer"
-                          >
-                             <option value="instructor">Instructor</option>
-                             <option value="staff">Administrative Staff</option>
-                             <option value="admin">Administrator</option>
-                          </select>
-                       </div>
-                       <div className="space-y-3">
-                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                              {isEditing ? 'New Password (Optional)' : 'Initial Password'}
-                           </label>
-                           <input 
-                             type="text"
-                             required={!isEditing}
-                             value={formData.password}
-                             onChange={e => setFormData({...formData, password: e.target.value})}
-                             className="w-full p-5 bg-offwhite border border-border-soft rounded-2xl outline-none focus:border-mylms-purple transition-all font-black text-sm tracking-tight text-text-main shadow-inner"
-                             placeholder={isEditing ? 'Leave blank to keep current' : ''}
-                           />
-                        </div>
+                    <div className="space-y-1.5">
+                       <label className="text-sm font-semibold text-gray-700">System Role</label>
+                       <select
+                  required
+                  className="w-full p-4 bg-offwhite border border-border-soft rounded-xl outline-none focus:border-mylms-purple font-black text-text-main uppercase text-xs tracking-widest appearance-none shadow-inner"
+                  value={formData.role}
+                  onChange={e => setFormData({...formData, role: e.target.value})}
+                >
+                  <option value="staff">Standard Staff</option>
+                  <option value="admin">Administrator</option>
+                </select>
                     </div>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-gray-700">
+                           {isEditing ? 'New Password (Optional)' : 'Initial Password'}
+                        </label>
+                        <input 
+                          type="text"
+                          required={!isEditing}
+                          value={formData.password}
+                          onChange={e => setFormData({...formData, password: e.target.value})}
+                          className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-mylms-purple/20 focus:border-mylms-purple transition-all text-sm text-gray-900"
+                          placeholder={isEditing ? 'Leave blank to keep current' : ''}
+                        />
+                     </div>
 
                     {formData.role !== 'admin' && (
-                       <div className="space-y-6 animate-in slide-in-from-top-4 duration-500 bg-offwhite p-8 rounded-3xl border border-border-soft">
-                          <div>
-                             <h4 className="text-[10px] font-black text-mylms-purple uppercase tracking-[0.4em] mb-2">Feature Permissions</h4>
-                             <p className="text-[9px] font-medium text-gray-400 uppercase tracking-widest leading-loose">Select administrative modules available for this staff account.</p>
-                          </div>
+                       <div className="pt-4 border-t border-gray-100">
+                          <h4 className="text-sm font-semibold text-gray-900 mb-1">Feature Permissions</h4>
+                          <p className="text-xs text-gray-500 mb-4">Select administrative modules available for this account.</p>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
                              {AVAILABLE_FEATURES.map(feature => (
-                                <button
+                                <label
                                   key={feature.key}
-                                  type="button"
-                                  onClick={() => togglePermission(feature.key)}
-                                  className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all text-left ${
+                                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                                     formData.permissions?.includes(feature.key)
-                                      ? 'bg-white border-mylms-purple shadow-md scale-[1.02]'
-                                      : 'bg-white/50 border-transparent opacity-60 hover:opacity-100 hover:border-gray-200'
+                                      ? 'bg-mylms-purple/5 border-mylms-purple/30'
+                                      : 'bg-white border-gray-200 hover:border-gray-300'
                                   }`}
                                 >
-                                   <span className={`text-[10px] font-black uppercase tracking-widest ${feature.color}`}>
+                                   <div className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
+                                      formData.permissions?.includes(feature.key) ? 'bg-mylms-purple border-mylms-purple text-white' : 'border-gray-300 bg-white'
+                                   }`}>
+                                      {formData.permissions?.includes(feature.key) && <CheckCircle size={14} />}
+                                   </div>
+                                   <span className="text-sm font-medium text-gray-700">
                                       {feature.label}
                                    </span>
-                                   {formData.permissions?.includes(feature.key) && (
-                                      <CheckCircle size={14} className="text-mylms-purple" />
-                                   )}
-                                </button>
+                                </label>
                              ))}
                           </div>
                        </div>
                     )}
-
-                    <div className="flex items-center gap-6 pt-6">
-                       <button 
-                        type="button" 
-                        onClick={resetForm}
-                        className="flex-1 py-5 border border-border-soft rounded-full text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] hover:bg-offwhite transition-all"
-                       >
-                          Cancel Protocol
-                       </button>
-                       <button 
-                        type="submit"
-                        className="flex-1 py-5 bg-mylms-purple text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl hover:bg-mylms-purple/90 transition-all flex items-center justify-center gap-3"
-                       >
-                          {isEditing ? 'Commit Changes' : 'Complete Registry'}
-                          {isEditing ? <Edit size={16} /> : <Plus size={16} />}
-                       </button>
-                    </div>
                  </form>
+              </div>
+
+              <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center gap-3">
+                 <button 
+                  type="button" 
+                  onClick={resetForm}
+                  className="flex-1 py-2.5 px-4 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+                 >
+                    Cancel
+                 </button>
+                 <button 
+                  form="staff-form"
+                  type="submit"
+                  className="flex-1 py-2.5 px-4 bg-mylms-purple text-white rounded-lg text-sm font-semibold hover:bg-mylms-purple/90 transition-colors shadow-sm flex items-center justify-center gap-2"
+                 >
+                    {isEditing ? 'Save Changes' : 'Add Staff'}
+                    {isEditing ? <Edit size={16} /> : <Plus size={16} />}
+                 </button>
               </div>
            </div>
         </div>

@@ -47,6 +47,7 @@ class AdmissionApplication extends Model
         'waiver_requested_at',
         'waiver_emails_sent',
         'submitted_at',
+        'scholarship_id',
     ];
 
     protected $casts = [
@@ -78,5 +79,10 @@ class AdmissionApplication extends Model
     public function offer()
     {
         return $this->hasOne(AdmissionOffer::class, 'application_id');
+    }
+
+    public function scholarship()
+    {
+        return $this->belongsTo(\App\Models\Scholarship::class);
     }
 }

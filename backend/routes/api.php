@@ -71,8 +71,21 @@ Route::get('/programs-by-level/{level}', [EnrollmentController::class, 'getProgr
 // Public Certificate Verification (Sprint 12)
 Route::get('/verify/{code}', [CredentialController::class, 'verify']);
 
+// File Upload (Protected)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/upload', [\App\Http\Controllers\FileUploadController::class, 'upload']);
+    Route::get('/files/download/{path}', [\App\Http\Controllers\FileUploadController::class, 'download'])->where('path', '.*');
+});
+
 // Instructor/Student Routes (Protected)
 Route::middleware('auth:sanctum')->group(function () {
+    // Academic Metadata Helpers
+    Route::get('/admin/levels', function () {
+        return response()->json(\App\Models\Level::orderBy('name')->get(['id', 'name', 'code']));
+    });
+    Route::get('/admin/departments', function () {
+        return response()->json(\App\Modules\Academic\Models\Department::orderBy('name')->get(['id', 'name', 'faculty_id']));
+    });
     
     // Manage Courses (Instructors)
     Route::get('/my-courses', [CourseController::class, 'myCourses']);
@@ -137,8 +150,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/finance/dashboard', [FinanceController::class, 'dashboardMetrics']);
     Route::post('/finance/invoices/generate', [FinanceController::class, 'generateSemesterInvoice']);
 
-    // ---- ADMIN-ONLY ROUTES (role guard enforced) ----
-    Route::middleware('role:admin')->group(function () {
+    // ---- SUPER ADMIN-ONLY ROUTES ----
+    Route::middleware('role:super_admin,admin')->group(function () {
         // Student Directory
         Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
         Route::post('/admin/students/bulk-delete', [StudentDirectoryController::class, 'bulkDestroy']);
@@ -188,6 +201,14 @@ Route::middleware('auth:sanctum')->group(function () {
         // Payment & Security Settings (Sprint 22)
         Route::get('/admin/finance/settings', [\App\Modules\Admin\Controllers\PaymentSettingsController::class, 'index']);
         Route::post('/admin/finance/settings', [\App\Modules\Admin\Controllers\PaymentSettingsController::class, 'update']);
+
+        // Instructor Assignment Management
+        Route::get('/admin/instructor-assignments', [\App\Modules\Academic\Controllers\InstructorAssignmentController::class, 'index']);
+        Route::get('/admin/instructor-assignments/instructor/{instructor}', [\App\Modules\Academic\Controllers\InstructorAssignmentController::class, 'byInstructor']);
+        Route::post('/admin/instructor-assignments', [\App\Modules\Academic\Controllers\InstructorAssignmentController::class, 'store']);
+        Route::put('/admin/instructor-assignments/{assignment}', [\App\Modules\Academic\Controllers\InstructorAssignmentController::class, 'update']);
+        Route::delete('/admin/instructor-assignments/{assignment}', [\App\Modules\Academic\Controllers\InstructorAssignmentController::class, 'destroy']);
+
     });
 
     // Student Enrollments (legacy)
@@ -239,6 +260,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // Student Official Transcript (Sprint 10/20)
     Route::get('/transcript', [StudentTranscriptController::class, 'index']);
     Route::get('/transcript/download', [StudentTranscriptController::class, 'download']);
+
+    // Student Personal Scholarship
+    Route::get('/student/my-scholarship', function (\Illuminate\Http\Request $request) {
+        $user = clone $request->user();
+        if ($user->scholarship_id) {
+            $scholarship = \App\Models\Scholarship::find($user->scholarship_id);
+            return response()->json(['scholarship' => $scholarship]);
+        }
+        return response()->json(['scholarship' => null]);
+    });
 
     // Collaboration & Discussion Forums (Sprint 21)
     Route::get('/courses/{course}/forums', [ForumController::class, 'index']);

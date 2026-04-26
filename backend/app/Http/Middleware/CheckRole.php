@@ -13,10 +13,21 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if ($request->user()?->role !== $role) {
-            return response()->json(['message' => 'Forbidden. ' . ucfirst($role) . ' access required.'], 403);
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        // Super Admin has access to everything
+        if ($user->isSuperAdmin()) {
+            return $next($request);
+        }
+
+        if (!in_array($user->role, $roles)) {
+            return response()->json(['message' => 'Forbidden. Specific role access required.'], 403);
         }
 
         return $next($request);

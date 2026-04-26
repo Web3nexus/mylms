@@ -47,16 +47,37 @@ export default function InstructorCourseSelector({ title, subtitle, linkBuilder 
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-6">
-      <div className="mb-12">
-        <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none mb-3">{title}</h1>
-        <p className="text-text-secondary text-xs font-black uppercase tracking-widest opacity-60 italic">{subtitle}</p>
+      <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none mb-3">{title}</h1>
+          <p className="text-text-secondary text-xs font-black uppercase tracking-widest opacity-60 italic">{subtitle}</p>
+        </div>
+        
+        {courses.length > 0 && (
+          <button 
+            onClick={() => {
+              // Quick action: jump to the first course's builder
+              navigate(linkBuilder(courses[0].slug));
+            }}
+            className="px-8 py-3 bg-mylms-purple text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl flex items-center gap-2"
+          >
+            Create New for {courses[0].code || 'Course'}
+            <ArrowRight size={14} />
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
         {courses.length === 0 ? (
           <div className="col-span-full p-20 text-center bg-white rounded-3xl border-2 border-dashed border-border-soft">
             <BookOpen size={48} className="mx-auto text-gray-100 mb-6" />
-            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No assigned courses found in the faculty registry.</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">No assigned courses found in the faculty registry.</p>
+            <button 
+              onClick={() => navigate('/courses/create')}
+              className="px-6 py-3 bg-mylms-purple text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-mylms-purple/90 transition-all shadow-md inline-flex items-center gap-2"
+            >
+              <ArrowRight size={14} /> Create Your First Course
+            </button>
           </div>
         ) : (
           courses.map((course) => (

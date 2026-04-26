@@ -59,14 +59,18 @@ export default function LandingEditor() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-offwhite">
+    <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
       <Loader2 className="w-10 h-10 text-mylms-purple animate-spin" />
     </div>
   );
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-offwhite">
-      <header className="bg-white border-b border-border-soft px-8 py-4 flex justify-between items-center z-50">
+    <div
+      className="fixed inset-0 z-[100] flex flex-col bg-offwhite"
+      style={{ height: '100dvh' }}
+    >
+      {/* Editor Header */}
+      <header className="bg-white border-b border-border-soft px-8 py-4 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-6">
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-text-main transition-colors">
             <ArrowLeft size={20} />
@@ -75,17 +79,17 @@ export default function LandingEditor() {
             <h1 className="text-sm font-black uppercase tracking-widest text-text-main leading-none">Visual Editor</h1>
             <p className="text-[10px] font-bold text-mylms-rose uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
               <span className="w-1 h-1 bg-green-500 rounded-full animate-ping"></span>
-              Live Content Synchronization: /{slug}
+              /{slug}
             </p>
           </div>
         </div>
-        
         <div className="flex items-center gap-4">
-           {saving && <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 animate-pulse">Syncing...</span>}
+          {saving && <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 animate-pulse">Saving...</span>}
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden relative">
+      {/* Puck Editor — fills all remaining height */}
+      <div className="flex-1 min-h-0 overflow-hidden">
         <Puck
           config={config}
           data={data}
