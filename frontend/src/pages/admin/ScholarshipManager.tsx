@@ -54,7 +54,7 @@ export default function ScholarshipManager() {
   const { notify } = useNotificationStore();
   const headers = { Authorization: `Bearer ${token}` };
 
-  const [activeTab, setActiveTab] = useState<'partners' | 'scholarships' | 'awards'>('awards');
+  const [activeTab, setActiveTab] = useState<'partners' | 'scholarships' | 'awards'>('partners');
   const [loading, setLoading] = useState(true);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -160,13 +160,15 @@ export default function ScholarshipManager() {
            </div>
         </div>
 
-        <button 
-          onClick={() => setShowModal(activeTab === 'partners' ? 'add_partner' : 'add_scholarship')}
-          className="btn-purple flex items-center gap-3 px-8 py-4 text-xs group"
-        >
-          <Plus size={16} className="group-hover:rotate-90 transition-transform" />
-          {activeTab === 'partners' ? 'Onboard New Partner' : 'Define New Scholarship'}
-        </button>
+        {activeTab !== 'awards' && (
+          <button 
+            onClick={() => setShowModal(activeTab === 'partners' ? 'add_partner' : 'add_scholarship')}
+            className="btn-purple flex items-center gap-3 px-8 py-4 text-xs group"
+          >
+            <Plus size={16} className="group-hover:rotate-90 transition-transform" />
+            {activeTab === 'partners' ? 'Onboard New Partner' : 'Define New Scholarship'}
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -286,24 +288,44 @@ export default function ScholarshipManager() {
            )}
 
            {activeTab === 'scholarships' && (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {scholarships.map(scholarship => (
-                  <div key={scholarship.id} className="bg-white p-8 rounded-[32px] border border-border-soft shadow-sm hover:shadow-xl transition-all group border-t-8 border-t-mylms-rose">
-                     <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-mylms-rose/5 rounded-xl flex items-center justify-center text-mylms-rose">
-                           <Award size={24} />
-                        </div>
-                        <span className="text-lg font-black text-text-main">{scholarship.currency} {Number(scholarship.amount).toLocaleString()}</span>
+              <>
+                {partners.length === 0 ? (
+                  <div className="col-span-full py-24 bg-white rounded-[40px] border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-center px-10">
+                     <div className="w-20 h-20 bg-offwhite rounded-full flex items-center justify-center text-gray-300 mb-6">
+                        <Building2 size={32} />
                      </div>
-                     <h3 className="text-lg font-black text-text-main uppercase tracking-tight mb-2">{scholarship.title}</h3>
-                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8">Partner: {scholarship.partner?.name || 'Institutional'}</p>
-                     
-                     <button className="w-full py-4 bg-offwhite group-hover:bg-mylms-purple group-hover:text-white transition-all rounded-xl text-[10px] font-black uppercase tracking-widest">
-                        Manage Program
+                     <h3 className="text-xl font-black text-text-main uppercase tracking-tight mb-2">No Funding Partners Detected</h3>
+                     <p className="max-w-md text-sm font-bold text-gray-400 mb-10 leading-relaxed">
+                        To define a scholarship program, you must first onboard a partner organization. Partners represent the foundations, agencies, or individuals funding the awards.
+                     </p>
+                     <button 
+                       onClick={() => setActiveTab('partners')}
+                       className="px-8 py-4 bg-mylms-purple text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg hover:shadow-xl transition-all"
+                     >
+                        Register a Partner First
                      </button>
                   </div>
-                ))}
-             </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {scholarships.map(scholarship => (
+                       <div key={scholarship.id} className="bg-white p-8 rounded-[32px] border border-border-soft shadow-sm hover:shadow-xl transition-all group border-t-8 border-t-mylms-rose">
+                          <div className="flex justify-between items-start mb-6">
+                             <div className="w-12 h-12 bg-mylms-rose/5 rounded-xl flex items-center justify-center text-mylms-rose">
+                                <Award size={24} />
+                             </div>
+                             <span className="text-lg font-black text-text-main">{scholarship.currency} {Number(scholarship.amount).toLocaleString()}</span>
+                          </div>
+                          <h3 className="text-lg font-black text-text-main uppercase tracking-tight mb-2">{scholarship.title}</h3>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8">Partner: {scholarship.partner?.name || 'Institutional'}</p>
+                          
+                          <button className="w-full py-4 bg-offwhite group-hover:bg-mylms-purple group-hover:text-white transition-all rounded-xl text-[10px] font-black uppercase tracking-widest">
+                             Manage Program
+                          </button>
+                       </div>
+                     ))}
+                  </div>
+                )}
+              </>
            )}
         </div>
       )}
