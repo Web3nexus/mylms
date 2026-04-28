@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom'
-import { 
-  Library, 
-  FileText, 
-  CreditCard, 
+import {
+  Library,
+  FileText,
+  CreditCard,
   FolderSearch,
   PlusCircle,
   GraduationCap,
@@ -113,7 +113,7 @@ import StudentCampus from './pages/dashboards/StudentCampus'
 import InstructorDashboard from './pages/dashboards/InstructorRegistry'
 import InstructorMessaging from './pages/dashboards/InstructorMessaging'
 import InstructorAnnouncements from './pages/dashboards/InstructorAnnouncements'
-import { 
+import {
   InstructorCoursesHub,
   CurriculumMediaHub,
   AssignmentSetupHub,
@@ -162,7 +162,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     const verifyAuth = async () => {
       // Run only if token exists and not on auth pages
       if (!token || ['/login', '/register', '/office', '/securegate'].includes(location.pathname)) return;
-      
+
       try {
         await client.get('/auth/me');
       } catch (err: any) {
@@ -173,7 +173,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         }
       }
     };
-    
+
     // Check auth on mount, and then every 5 minutes maximum
     verifyAuth();
   }, [token, logout, navigate]); // Removed location.pathname to solve rate-limit spam业务
@@ -189,14 +189,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     const institutionName = branding?.institutional_name || appName;
     const cleanPath = location.pathname.split('/').pop() || 'Portal';
     const pageName = cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1).replace('-', ' ');
-    
+
     if (location.pathname === '/') {
-       document.title = `${institutionName} | Unified Campus`;
+      document.title = `${institutionName} | Unified Campus`;
     } else {
-       document.title = `${pageName} - ${institutionName}`;
+      document.title = `${pageName} - ${institutionName}`;
     }
   }, [location.pathname, branding?.institutional_name, appName]);
-  
+
   const handleLogout = async () => {
     try {
       if (token) client.post('/auth/logout')
@@ -214,18 +214,18 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   // Sidebar link definitions mirroring MyLMS structure
   type NavItem = { name: string; path?: string; icon?: React.ReactNode; isHeader?: boolean };
   let sidebarLinks: NavItem[] = [];
-  
+
   const userRole = user?.role?.toLowerCase();
-  
+
   // SECURITY DEBUG LOGS (Delete after fixing live server)
   useEffect(() => {
     if (isAuthenticated) {
-       console.log('🛡️ MyLMS SECURITY DEBUG:', {
-         isAuthenticated,
-         role: user?.role,
-         normalizedRole: userRole,
-         pathname: location.pathname
-       });
+      console.log('🛡️ MyLMS SECURITY DEBUG:', {
+        isAuthenticated,
+        role: user?.role,
+        normalizedRole: userRole,
+        pathname: location.pathname
+      });
     }
   }, [isAuthenticated, user, userRole, location.pathname]);
 
@@ -259,7 +259,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     const isInstructor = userRole === 'instructor';
     const permissions = user?.permissions || [];
     const isDeveloper = userRole === 'developer';
-    
+
     sidebarLinks = [];
 
     // --- INSTRUCTOR TOOLS ---
@@ -270,7 +270,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
     }
 
-    // --- RESTRUCTURED ADMIN SIDEBAR (Sprint 24) ---
+
     // 1. Operations
     if (isAdmin || isDeveloper || permissions.length > 0) {
       sidebarLinks.push({ name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> });
@@ -278,8 +278,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
     // 2. Admission Review & Scholarships
     if (isAdmin || isDeveloper || permissions.includes('admissions_portal')) {
-       sidebarLinks.push({ name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> });
-       sidebarLinks.push({ name: 'Scholarships', path: '/admin/scholarships', icon: <Award size={18} /> });
+      sidebarLinks.push({ name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> });
+      sidebarLinks.push({ name: 'Scholarships', path: '/admin/scholarships', icon: <Award size={18} /> });
     }
 
     // 3. Academic Manager
@@ -289,7 +289,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
     // 4. Students
     if (isAdmin || isDeveloper || permissions.includes('student_registry')) {
-       sidebarLinks.push({ name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> });
+      sidebarLinks.push({ name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> });
     }
 
     // 5. Instructor Registry
@@ -304,27 +304,27 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
     // 7. Bursar & Finance
     if (isAdmin || isDeveloper || permissions.includes('finance_bursary')) {
-       sidebarLinks.push({ name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> });
+      sidebarLinks.push({ name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> });
     }
 
     // 8. Payment Settings
     if (isAdmin || isDeveloper) {
-       sidebarLinks.push({ name: 'Payment Settings', path: '/admin/finance/settings', icon: <ShieldCheck size={18} /> });
+      sidebarLinks.push({ name: 'Payment Settings', path: '/admin/finance/settings', icon: <ShieldCheck size={18} /> });
     }
 
     // 9. Branding
     if (isAdmin || isDeveloper || permissions.includes('branding_identity')) {
-       sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <Activity size={18} /> });
+      sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <Activity size={18} /> });
     }
 
     // 10. Communications
     if (isAdmin || isDeveloper) {
-       sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
+      sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
     }
 
     // CMS (Optional/Existing)
     if (isAdmin || isDeveloper || permissions.includes('cms_marketing')) {
-       sidebarLinks.push({ name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> });
+      sidebarLinks.push({ name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> });
     }
 
     // --- Developer ONLY ---
@@ -338,7 +338,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div 
+    <div
       className={`min-h-screen flex font-sans text-text-main selection:bg-mylms-rose/20 ${isCampus ? 'theme-campus' : 'theme-portal'} ${!isDashboardRoute ? 'flex-col bg-offwhite' : 'bg-white'}`}
       style={{
         // @ts-ignore
@@ -353,7 +353,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <>
           {/* Mobile Overlay */}
           {isMobileSidebarOpen && (
-            <div 
+            <div
               className="fixed inset-0 bg-mylms-primary/40 backdrop-blur-sm z-45 lg:hidden animate-in fade-in duration-300"
               onClick={() => setIsMobileSidebarOpen(false)}
             />
@@ -374,12 +374,12 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                   ) : (
                     <>
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg overflow-hidden shadow-inner border border-border-soft transition-all group-hover/card:bg-mylms-purple group-hover/card:text-white ${location.pathname.includes('securegate') ? 'text-mylms-rose' : 'text-mylms-purple'}`}>
-                     {branding?.favicon_url ? (
-                       <img src={branding.favicon_url} className="w-full h-full object-contain" alt="Identity" />
-                     ) : (
-                       location.pathname.includes('securegate') ? 'SG' : location.pathname.includes('office') ? 'SO' : 'ML'
-                     )}
-                  </div>
+                        {branding?.favicon_url ? (
+                          <img src={branding.favicon_url} className="w-full h-full object-contain" alt="Identity" />
+                        ) : (
+                          location.pathname.includes('securegate') ? 'SG' : location.pathname.includes('office') ? 'SO' : 'ML'
+                        )}
+                      </div>
                       <span className="text-[11px] font-black text-text-main tracking-[0.2em] leading-none mt-3 uppercase">{branding?.institutional_name || 'MyLMS'}</span>
                       <span className="text-[7px] font-black text-mylms-rose uppercase tracking-[0.3em] mt-1 opacity-50">{branding?.institutional_motto || 'University Network'}</span>
                     </>
@@ -395,7 +395,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                 </button>
               </div>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto px-4 space-y-1">
               {sidebarLinks.map((link, idx) => (
                 link.isHeader ? (
@@ -405,9 +405,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                     </div>
                   )
                 ) : (
-                  <Link 
-                    key={link.name} 
-                    to={link.path || '#'} 
+                  <Link
+                    key={link.name}
+                    to={link.path || '#'}
                     onClick={() => setIsMobileSidebarOpen(false)}
                     className={`flex items-center gap-4 px-4 py-2.5 rounded-xl transition-all text-[10px] font-black uppercase tracking-[0.15em] ${location.pathname === link.path ? 'bg-mylms-purple/5 text-mylms-purple border-l-2 border-mylms-purple shadow-sm' : 'hover:bg-gray-50 text-text-secondary'}`}
                   >
@@ -424,11 +424,11 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                 {!isSidebarCollapsed ? (
                   <>
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-mylms-purple flex items-center justify-center text-white font-black text-xs">{user?.name?.charAt(0) || 'U'}</div>
-                        <div className="overflow-hidden">
-                          <p className="text-[10px] font-black text-text-main truncate">{user?.name}</p>
-                          <p className="text-[8px] font-black text-mylms-rose uppercase tracking-[0.2em]">{user?.role}</p>
-                        </div>
+                      <div className="w-8 h-8 rounded-lg bg-mylms-purple flex items-center justify-center text-white font-black text-xs">{user?.name?.charAt(0) || 'U'}</div>
+                      <div className="overflow-hidden">
+                        <p className="text-[10px] font-black text-text-main truncate">{user?.name}</p>
+                        <p className="text-[8px] font-black text-mylms-rose uppercase tracking-[0.2em]">{user?.role}</p>
+                      </div>
                     </div>
                     <button onClick={handleLogout} className="w-full py-2 bg-white text-[9px] font-black uppercase border border-border-soft rounded-lg hover:text-mylms-rose transition-all flex items-center justify-center gap-2">
                       <LogOut size={12} /> Logout
@@ -445,20 +445,20 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
       {/* NAVBAR (Public Only) */}
       {!isDashboardRoute && (
-        <Navbar 
-          isMenuOpen={isMenuOpen} 
-          setIsMenuOpen={setIsMenuOpen} 
-          isDashboardRoute={isDashboardRoute} 
+        <Navbar
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+          isDashboardRoute={isDashboardRoute}
         />
       )}
 
       {/* MAIN BODY */}
       <div className={`flex-1 flex flex-col min-w-0 ${isDashboardRoute ? 'h-screen overflow-y-auto bg-offwhite' : ''}`}>
-        
+
         {/* DASHBOARD HEADER */}
         {isDashboardRoute && (
-          <DashboardHeader 
-            systemTime={systemTime} 
+          <DashboardHeader
+            systemTime={systemTime}
             onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
           />
         )}
@@ -507,7 +507,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/verify" element={<PublicVerification />} />
-          
+
           <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
 
           <Route element={<ProtectedRoute roles={['student']} />}>
@@ -538,7 +538,7 @@ function App() {
             <Route path="/courses/:slug/certificate" element={<CourseCertificate />} />
             <Route path="/assessments/:assessmentId" element={<AssessmentPlayer />} />
           </Route>
-   
+
           <Route element={<ProtectedRoute roles={['instructor']} />}>
             <Route path="/office/portal" element={<InstructorDashboard />} />
             <Route path="/office/courses" element={<InstructorCoursesHub />} />
@@ -568,7 +568,7 @@ function App() {
           <Route element={<ProtectedRoute roles={['advisor']} />}>
             <Route path="/office/advisor" element={<AdvisorPortal />} />
           </Route>
-   
+
           <Route element={<ProtectedRoute roles={['admin', 'staff']} />}>
             <Route path="/admin/portal" element={<AdminOperations />} />
             <Route path="/admin/academic" element={<AcademicManager />} />
@@ -589,7 +589,7 @@ function App() {
             <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
             <Route path="/admin/command-center" element={<CommandCenter />} />
           </Route>
-          
+
           <Route path="/:slug" element={<PublicPage />} />
           <Route path="/p/:slug" element={<PublicPage />} />
         </Routes>
