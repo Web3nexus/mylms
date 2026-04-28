@@ -36,6 +36,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
         'is_super_admin',
         'program_id',
         'faculty_id',

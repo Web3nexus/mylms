@@ -13,6 +13,7 @@ class InstructorAssignment extends Model
         'user_id',
         'department_id',
         'level_id',
+        'academic_year',
     ];
 
     public function instructor()

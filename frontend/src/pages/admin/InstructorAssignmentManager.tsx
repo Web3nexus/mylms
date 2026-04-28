@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Plus, Trash2, User, BookOpen, Layers, Loader2,
-  AlertCircle, GraduationCap, X, ChevronDown
+  AlertCircle, GraduationCap, X, ChevronDown, Calendar
 } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
@@ -12,6 +12,7 @@ interface Assignment {
   instructor: { id: number; name: string; email: string };
   department: { id: number; name: string };
   level: { id: number; name: string; code: string } | null;
+  academic_year: string | null;
 }
 
 interface Instructor { id: number; name: string; email: string; role: string; }
@@ -30,7 +31,7 @@ export default function InstructorAssignmentManager() {
   const [loading, setLoading] = useState(true);
   const [showDrawer, setShowDrawer] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ instructor_id: '', department_id: '', level_id: '' });
+  const [form, setForm] = useState({ instructor_id: '', department_id: '', level_id: '', academic_year: '' });
   const [search, setSearch] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +48,7 @@ export default function InstructorAssignmentManager() {
       setAssignments(assignRes.data);
 
       // Only keep instructors from staff list
-      const instructorList = (staffRes.data?.data || staffRes.data || [])
+      const instructorList = (Array.isArray(staffRes.data) ? staffRes.data : staffRes.data?.data || [])
         .filter((u: any) => u.role === 'instructor');
       setInstructors(instructorList);
 
@@ -77,10 +78,11 @@ export default function InstructorAssignmentManager() {
         instructor_id: Number(form.instructor_id),
         department_id: Number(form.department_id),
         level_id: form.level_id ? Number(form.level_id) : null,
+        academic_year: form.academic_year || null,
       }, { headers });
       notify('Instructor assigned successfully.', 'success');
       setShowDrawer(false);
-      setForm({ instructor_id: '', department_id: '', level_id: '' });
+      setForm({ instructor_id: '', department_id: '', level_id: '', academic_year: '' });
       fetchAll();
     } catch (err: any) {
       notify(err.response?.data?.message || 'Failed to assign instructor.', 'error');
@@ -163,20 +165,21 @@ export default function InstructorAssignmentManager() {
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Instructor</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Department</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Level</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Year</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="py-16 text-center">
+                  <td colSpan={5} className="py-16 text-center">
                     <Loader2 size={22} className="animate-spin text-mylms-purple mx-auto mb-2" />
                     <p className="text-sm text-gray-500">Loading assignments...</p>
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-16 text-center">
+                  <td colSpan={5} className="py-16 text-center">
                     <BookOpen size={32} className="text-gray-200 mx-auto mb-3" />
                     <p className="text-sm text-gray-500 font-medium">No assignments found.</p>
                     <button
@@ -215,6 +218,9 @@ export default function InstructorAssignmentManager() {
                       ) : (
                         <span className="text-xs text-gray-400 italic">All Levels</span>
                       )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-xs font-black text-mylms-rose uppercase tracking-widest">{a.academic_year || 'Any'}</p>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
@@ -314,6 +320,29 @@ export default function InstructorAssignmentManager() {
                   <ChevronDown size={16} className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
                 </div>
                 <p className="text-xs text-gray-400 mt-1">Leave blank to allow access to all levels in the department.</p>
+              </div>
+
+              {/* Year Select */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                  <Calendar size={14} /> Year of Enrollment
+                </label>
+                <div className="relative">
+                  <select
+                    value={form.academic_year}
+                    onChange={e => setForm({ ...form, academic_year: e.target.value })}
+                    className="w-full appearance-none px-4 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-mylms-purple/20 focus:border-mylms-purple"
+                  >
+                    <option value="">Any Year</option>
+                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() + i).map(year => (
+                      <option key={year} value={year.toString()}>{year}</option>
+                    ))}
+                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - (i + 1)).map(year => (
+                      <option key={year} value={year.toString()}>{year}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
+                </div>
               </div>
 
               <div className="pt-4 border-t border-gray-100">

@@ -1,11 +1,11 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'staff' | 'instructor' | 'student' | 'advisor';
+  role: 'admin' | 'staff' | 'instructor' | 'student' | 'advisor' | 'developer';
   student_id?: string | null;
   program_id?: number | null;
   permissions?: string[];
@@ -32,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );

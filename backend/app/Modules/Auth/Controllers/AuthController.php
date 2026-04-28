@@ -102,10 +102,18 @@ class AuthController extends Controller
 
         $user = Auth::user();
         
-        // 4. Record Last Login for inactivity tracking
+        // 4. Check Suspension Status
+        if ($user->status === 'suspended') {
+            Auth::logout();
+            return response()->json([
+                'message' => 'Your account has been suspended by the administration. Please contact support.',
+            ], 403);
+        }
+
+        // 5. Record Last Login for inactivity tracking
         $user->update(['last_login_at' => now()]);
 
-        // 5. Final Verification
+        // 6. Final Verification
         if ($context === 'campus' && $user->isStudent() && !$user->student_id) {
             return response()->json([
                 'message' => 'Your Student ID has not been generated yet. Please finalize your admission protocol.',

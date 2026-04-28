@@ -32,14 +32,24 @@ class StaffManagementController extends Controller
             'instructorAssignments.level:id,name,code'
         ]);
 
+        $isDeveloper = $user->role === 'developer';
+
         if (request()->has('type')) {
             if (request()->type === 'instructor') {
                 $query->where('role', User::ROLE_INSTRUCTOR);
             } elseif (request()->type === 'staff') {
-                $query->whereIn('role', [User::ROLE_ADMIN, User::ROLE_STAFF]);
+                if ($isDeveloper) {
+                    $query->whereIn('role', [User::ROLE_ADMIN, User::ROLE_STAFF, 'developer']);
+                } else {
+                    $query->where('role', User::ROLE_STAFF);
+                }
             }
         } else {
-            $query->whereIn('role', [User::ROLE_INSTRUCTOR, User::ROLE_ADMIN, User::ROLE_STAFF]);
+            if ($isDeveloper) {
+                $query->whereIn('role', [User::ROLE_INSTRUCTOR, User::ROLE_ADMIN, User::ROLE_STAFF, 'developer']);
+            } else {
+                $query->whereIn('role', [User::ROLE_INSTRUCTOR, User::ROLE_STAFF]);
+            }
         }
 
         $staff = $query->latest()->get(['id', 'name', 'email', 'role', 'is_super_admin', 'permissions', 'faculty_id', 'level_id', 'created_at']);
@@ -65,7 +75,7 @@ class StaffManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', Password::defaults()],
-            'role' => ['required', 'string', 'in:instructor,admin,staff'],
+            'role' => ['required', 'string', 'in:instructor,admin,staff,developer'],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
             'level_id' => ['nullable', 'exists:levels,id'],
             'permissions' => ['nullable', 'array'],
@@ -122,7 +132,7 @@ class StaffManagementController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email,'.$user->id],
-            'role' => ['required', 'string', 'in:instructor,admin,staff'],
+            'role' => ['required', 'string', 'in:instructor,admin,staff,developer'],
             'faculty_id' => ['nullable', 'exists:faculties,id'],
             'level_id' => ['nullable', 'exists:levels,id'],
             'password' => ['nullable', Password::defaults()],

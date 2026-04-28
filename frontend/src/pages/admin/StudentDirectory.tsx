@@ -11,7 +11,13 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Plus, 
+  Trash2, 
+  User, 
+  BookOpen, 
+  Layers, 
+  ChevronDown
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
@@ -32,6 +38,12 @@ interface Student {
     degree_level: string;
     department?: { name: string; code: string };
   };
+  level?: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  status?: string;
   created_at: string;
 }
 
@@ -49,6 +61,12 @@ export default function StudentDirectory() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
+  const [activityLogs, setActivityLogs] = useState<any[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [suspending, setSuspending] = useState(false);
+  const [suspendReason, setSuspendReason] = useState('');
   const [filter, setFilter] = useState<'all' | 'matriculated' | 'pending'>('all');
   const [stats, setStats] = useState<DirectoryStats>({ total: 0, matriculated: 0, pending: 0 });
   const [currentPage, setCurrentPage] = useState(1);
@@ -155,6 +173,49 @@ export default function StudentDirectory() {
       notify(err.response?.data?.message || 'Failed to delete selected records.', 'error');
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleSuspend = async () => {
+    if (!detailedStudent) return;
+    setSuspending(true);
+    try {
+      await client.post(`/admin/students/${detailedStudent.id}/suspend`, { reason: suspendReason }, { headers });
+      notify('Student account suspended.', 'success');
+      setShowSuspendModal(false);
+      setSuspendReason('');
+      fetchStudentDetails(detailedStudent.id);
+      fetchStudents();
+    } catch (err) {
+      notify('Failed to suspend account.', 'error');
+    } finally {
+      setSuspending(false);
+    }
+  };
+
+  const handleUnsuspend = async () => {
+    if (!detailedStudent) return;
+    try {
+      await client.post(`/admin/students/${detailedStudent.id}/unsuspend`, {}, { headers });
+      notify('Student account reactivated.', 'success');
+      fetchStudentDetails(detailedStudent.id);
+      fetchStudents();
+    } catch (err) {
+      notify('Failed to reactivate account.', 'error');
+    }
+  };
+
+  const fetchActivity = async () => {
+    if (!detailedStudent) return;
+    setLoadingLogs(true);
+    setShowLogsModal(true);
+    try {
+      const res = await client.get(`/admin/students/${detailedStudent.id}/activity`, { headers });
+      setActivityLogs(res.data);
+    } catch (err) {
+      notify('Failed to fetch activity logs.', 'error');
+    } finally {
+      setLoadingLogs(false);
     }
   };
 
@@ -476,11 +537,11 @@ export default function StudentDirectory() {
                              </div>
                           </div>
                           <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                             <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Program Level</p>
-                             <div className="flex items-center gap-2">
-                                <GraduationCap size={16} className="text-gray-400" />
-                                <span className="text-sm font-medium text-gray-900">{detailedStudent.program?.degree_level || 'N/A'}</span>
-                             </div>
+                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Program Level</p>
+                              <div className="flex items-center gap-2">
+                                 <GraduationCap size={16} className="text-gray-400" />
+                                 <span className="text-sm font-medium text-gray-900">{detailedStudent.level?.name || detailedStudent.program?.degree_level || 'N/A'}</span>
+                              </div>
                           </div>
                        </div>
 
@@ -504,8 +565,8 @@ export default function StudentDirectory() {
                                       </span>
                                    </div>
                                    <Link 
-                                     to="/admin/admissions/review" 
-                                     className="w-full py-2 bg-gray-50 group-hover:bg-purple-50 group-hover:text-mylms-purple rounded-lg text-sm font-medium text-gray-600 transition-all flex items-center justify-center gap-2"
+                                      to={`/admin/admissions?userId=${detailedStudent.id}`} 
+                                      className="w-full py-2 bg-gray-50 group-hover:bg-purple-50 group-hover:text-mylms-purple rounded-lg text-sm font-medium text-gray-600 transition-all flex items-center justify-center gap-2"
                                    >
                                       View Application
                                       <ChevronRight size={14} />
@@ -525,16 +586,108 @@ export default function StudentDirectory() {
                        <div className="pt-6 border-t border-gray-100">
                           <h4 className="text-sm font-bold text-gray-900 mb-4">Account Actions</h4>
                           <div className="grid grid-cols-2 gap-3">
-                             <button className="flex items-center justify-center gap-2 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                             <button 
+                               onClick={fetchActivity}
+                               className="flex items-center justify-center gap-2 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                             >
                                 <Search size={14} /> Activity Logs
                              </button>
-                             <button className="flex items-center justify-center gap-2 py-2.5 bg-white border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors shadow-sm">
-                                <X size={14} /> Suspend Account
-                             </button>
+                             {detailedStudent.status === 'suspended' ? (
+                               <button 
+                                 onClick={handleUnsuspend}
+                                 className="flex items-center justify-center gap-2 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition-colors shadow-sm"
+                               >
+                                  <CheckCircle size={14} /> Reactivate
+                               </button>
+                             ) : (
+                               <button 
+                                 onClick={() => setShowSuspendModal(true)}
+                                 className="flex items-center justify-center gap-2 py-2.5 bg-white border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors shadow-sm"
+                               >
+                                  <X size={14} /> Suspend Account
+                               </button>
+                             )}
                           </div>
                        </div>
                     </div>
                  ) : null}
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* Suspend Modal */}
+      {showSuspendModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-mylms-purple/40 backdrop-blur-md p-6">
+           <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-8 border-b border-offwhite flex justify-between items-center bg-red-50/30">
+                 <h2 className="text-xl font-black text-red-600 uppercase tracking-tight">Suspend Account</h2>
+                 <button onClick={() => setShowSuspendModal(false)} className="p-2 hover:bg-white rounded-full transition-all text-gray-400"><X size={24} /></button>
+              </div>
+              <div className="p-8 space-y-6">
+                 <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                   Suspension will revoke the student's access to the campus and portal immediately.
+                 </p>
+                 <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Reason for Suspension</label>
+                    <textarea 
+                      value={suspendReason}
+                      onChange={e => setSuspendReason(e.target.value)}
+                      className="w-full p-4 bg-offwhite border-2 border-transparent focus:border-red-200 rounded-2xl outline-none transition-all font-bold text-sm h-32 resize-none"
+                      placeholder="Enter official reason..."
+                    />
+                 </div>
+                 <button 
+                   onClick={handleSuspend}
+                   disabled={suspending}
+                   className="w-full py-4 bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl shadow-xl flex items-center justify-center gap-3 disabled:opacity-50"
+                 >
+                    {suspending ? <Loader2 className="animate-spin" size={16} /> : 'Confirm Suspension'}
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* Activity Logs Modal */}
+      {showLogsModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-mylms-purple/40 backdrop-blur-md p-6">
+           <div className="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[80vh]">
+              <div className="p-8 border-b border-offwhite flex justify-between items-center">
+                 <h2 className="text-xl font-black text-text-main uppercase tracking-tight">System Audit Logs</h2>
+                 <button onClick={() => setShowLogsModal(false)} className="p-2 hover:bg-offwhite rounded-full transition-all text-gray-400"><X size={24} /></button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-8">
+                 {loadingLogs ? (
+                    <div className="py-20 text-center">
+                       <Loader2 className="animate-spin text-mylms-purple mx-auto mb-4" />
+                       <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Querying Audit Ledger...</p>
+                    </div>
+                 ) : (
+                    <div className="space-y-4">
+                       {activityLogs.map((log, idx) => (
+                          <div key={idx} className="p-5 bg-offwhite rounded-2xl border border-border-soft flex items-start gap-4">
+                             <div className="w-10 h-10 rounded-xl bg-white border border-border-soft flex items-center justify-center text-mylms-purple shrink-0">
+                                <Clock size={18} />
+                             </div>
+                             <div>
+                                <p className="text-xs font-black text-text-main uppercase tracking-tight mb-1">{log.action.replace(/_/g, ' ')}</p>
+                                <p className="text-[10px] text-gray-500 font-medium mb-3">{new Date(log.created_at).toLocaleString()}</p>
+                                {log.new_values && (
+                                   <div className="p-3 bg-white/50 rounded-lg text-[9px] font-mono text-gray-600 break-all">
+                                      {JSON.stringify(log.new_values)}
+                                   </div>
+                                )}
+                             </div>
+                          </div>
+                       ))}
+                       {activityLogs.length === 0 && (
+                          <div className="py-20 text-center border-2 border-dashed border-offwhite rounded-3xl">
+                             <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No activity recorded for this profile.</p>
+                          </div>
+                       )}
+                    </div>
+                 )}
               </div>
            </div>
         </div>

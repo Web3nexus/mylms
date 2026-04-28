@@ -126,6 +126,7 @@ import BrandingManager from './pages/admin/BrandingManager'
 import CommunicationManager from './pages/admin/CommunicationManager'
 import EmailTemplateManager from './pages/admin/EmailTemplateManager'
 import EmailAccountManager from './pages/admin/EmailAccountManager'
+import ScholarshipManager from './pages/admin/ScholarshipManager'
 import CommandCenter from './pages/admin/CommandCenter'
 import PaymentSettings from './pages/admin/PaymentSettings'
 import AdvisorPortal from './pages/advisors/AdvisorPortal'
@@ -257,74 +258,77 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     const isAdmin = userRole === 'admin';
     const isInstructor = userRole === 'instructor';
     const permissions = user?.permissions || [];
+    const isDeveloper = userRole === 'developer';
     
     sidebarLinks = [];
 
-    // Default High-Level Entry
-    if (isAdmin || permissions.length > 0) {
+    // --- INSTRUCTOR TOOLS ---
+    if (isInstructor) {
+      sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
+      sidebarLinks.push({ name: 'Course Management', path: '/office/courses', icon: <Library size={18} /> });
+      sidebarLinks.push({ name: 'Gradebook', path: '/office/gradebook', icon: <CheckSquare size={18} /> });
+      sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
+    }
+
+    // --- RESTRUCTURED ADMIN SIDEBAR (Sprint 24) ---
+    // 1. Operations
+    if (isAdmin || isDeveloper || permissions.length > 0) {
       sidebarLinks.push({ name: 'Operations', path: '/admin/portal', icon: <LayoutDashboard size={18} /> });
     }
 
-    // Instructor Default Tools
-    if (isInstructor) {
-      sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
-      
-      // Teaching Tools Section
-      sidebarLinks.push({ name: 'Teaching Tools', isHeader: true });
-      sidebarLinks.push({ name: 'Course Management', path: '/office/courses', icon: <Library size={18} /> });
-      sidebarLinks.push({ name: 'Curriculum & Media', path: '/office/curriculum', icon: <UploadCloud size={18} /> });
-      sidebarLinks.push({ name: 'Assignment Setup', path: '/office/assignments', icon: <FilePlus size={18} /> });
-      sidebarLinks.push({ name: 'Quiz Builder', path: '/office/quizzes', icon: <HelpCircle size={18} /> });
-
-      // Grading Section
-      sidebarLinks.push({ name: 'Grading System', isHeader: true });
-      sidebarLinks.push({ name: 'Gradebook', path: '/office/gradebook', icon: <CheckSquare size={18} /> });
-      sidebarLinks.push({ name: 'Rubrics & Bulk', path: '/office/rubrics', icon: <Layers size={18} /> });
-      sidebarLinks.push({ name: 'Peer Oversight', path: '/office/peer-reviews', icon: <Users2 size={18} /> });
-
-      // Communication Section
-      sidebarLinks.push({ name: 'Communication', isHeader: true });
-      sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
-      sidebarLinks.push({ name: 'Student Messaging', path: '/office/communications', icon: <MessageCircle size={18} /> });
-      sidebarLinks.push({ name: 'Forum Moderation', path: '/office/forums', icon: <Inbox size={18} /> });
-
-      // Analytics Section
-      sidebarLinks.push({ name: 'Analytics', isHeader: true });
-      sidebarLinks.push({ name: 'Performance Tracking', path: '/office/analytics/performance', icon: <PieChart size={18} /> });
-      sidebarLinks.push({ name: 'Engagement Reports', path: '/office/analytics/engagement', icon: <BarChart3 size={18} /> });
-      sidebarLinks.push({ name: 'Dropout Risks', path: '/office/analytics/risks', icon: <Activity size={18} /> });
+    // 2. Admission Review & Scholarships
+    if (isAdmin || isDeveloper || permissions.includes('admissions_portal')) {
+       sidebarLinks.push({ name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> });
+       sidebarLinks.push({ name: 'Scholarships', path: '/admin/scholarships', icon: <Award size={18} /> });
     }
 
-    // Permission-Based Admin Tools
-    if (isAdmin || permissions.includes('academic_enrollment')) {
+    // 3. Academic Manager
+    if (isAdmin || isDeveloper || permissions.includes('academic_enrollment')) {
       sidebarLinks.push({ name: 'Academic Manager', path: '/admin/academic', icon: <Settings size={18} /> });
     }
-    if (isAdmin || permissions.includes('admissions_portal')) {
-       sidebarLinks.push({ name: 'Admissions Review', path: '/admin/admissions', icon: <Inbox size={18} /> });
-    }
-    if (isAdmin || permissions.includes('student_registry')) {
+
+    // 4. Students
+    if (isAdmin || isDeveloper || permissions.includes('student_registry')) {
        sidebarLinks.push({ name: 'Students', path: '/admin/students', icon: <GraduationCap size={18} /> });
     }
-    if (isAdmin || permissions.includes('cms_marketing')) {
-       sidebarLinks.push({ name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> });
-    }
-    if (isAdmin || permissions.includes('finance_bursary')) {
-       sidebarLinks.push({ name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> });
-       if (isAdmin) {
-         sidebarLinks.push({ name: 'Payment Settings', path: '/admin/finance/settings', icon: <ShieldCheck size={18} /> });
-       }
-    }
-    if (isAdmin || permissions.includes('branding_identity')) {
-       sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <ShieldCheck size={18} /> });
-    }
-    
-    if (isAdmin || permissions.includes('staff_registry')) {
-      sidebarLinks.push({ name: 'Administrative Staff', path: '/admin/staff', icon: <Briefcase size={18} /> });
+
+    // 5. Instructor Registry
+    if (isAdmin || isDeveloper || permissions.includes('staff_registry')) {
       sidebarLinks.push({ name: 'Instructor Registry', path: '/admin/instructors', icon: <Users2 size={18} /> });
     }
 
-    if (isAdmin) {
-      sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
+    // 6. Administrative Manager (Staff)
+    if (isAdmin || isDeveloper || permissions.includes('staff_registry')) {
+      sidebarLinks.push({ name: 'Administrative Manager', path: '/admin/staff', icon: <Briefcase size={18} /> });
+    }
+
+    // 7. Bursar & Finance
+    if (isAdmin || isDeveloper || permissions.includes('finance_bursary')) {
+       sidebarLinks.push({ name: 'Bursar & Finance', path: '/admin/finance', icon: <CreditCard size={18} /> });
+    }
+
+    // 8. Payment Settings
+    if (isAdmin || isDeveloper) {
+       sidebarLinks.push({ name: 'Payment Settings', path: '/admin/finance/settings', icon: <ShieldCheck size={18} /> });
+    }
+
+    // 9. Branding
+    if (isAdmin || isDeveloper || permissions.includes('branding_identity')) {
+       sidebarLinks.push({ name: 'Branding', path: '/branding', icon: <Activity size={18} /> });
+    }
+
+    // 10. Communications
+    if (isAdmin || isDeveloper) {
+       sidebarLinks.push({ name: 'Communications', path: '/admin/communications', icon: <Mail size={18} /> });
+    }
+
+    // CMS (Optional/Existing)
+    if (isAdmin || isDeveloper || permissions.includes('cms_marketing')) {
+       sidebarLinks.push({ name: 'CMS & Content', path: '/admin/pages', icon: <Layers size={18} /> });
+    }
+
+    // --- Developer ONLY ---
+    if (isDeveloper) {
       sidebarLinks.push({ name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> });
     }
 
@@ -569,6 +573,7 @@ function App() {
             <Route path="/admin/portal" element={<AdminOperations />} />
             <Route path="/admin/academic" element={<AcademicManager />} />
             <Route path="/admin/admissions" element={<AdmissionsReview />} />
+            <Route path="/admin/scholarships" element={<ScholarshipManager />} />
             <Route path="/admin/admissions/registry" element={<AdmissionRegistryManager />} />
             <Route path="/admin/students" element={<StudentDirectory />} />
             <Route path="/admin/staff" element={<AdminStaffDirectory />} />

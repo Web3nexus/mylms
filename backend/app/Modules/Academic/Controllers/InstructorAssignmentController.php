@@ -18,13 +18,18 @@ class InstructorAssignmentController extends Controller
      */
     public function index()
     {
-        $assignments = InstructorAssignment::with([
-            'instructor:id,name,email',
-            'department:id,name,faculty_id',
-            'level:id,name,code'
-        ])->get();
+        try {
+            $assignments = InstructorAssignment::with([
+                'instructor:id,name,email',
+                'department:id,name,faculty_id',
+                'level:id,name,code'
+            ])->latest()->get();
 
-        return response()->json($assignments);
+            return response()->json($assignments);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Instructor Assignment Fetch Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Internal server error while fetching assignments.'], 500);
+        }
     }
 
     /**
@@ -61,6 +66,7 @@ class InstructorAssignmentController extends Controller
             'instructor_id' => 'required|exists:users,id',
             'department_id' => 'required|exists:departments,id',
             'level_id' => 'nullable|exists:levels,id',
+            'academic_year' => 'nullable|string|max:255',
         ]);
 
         // Verify instructor is actually an instructor
@@ -73,6 +79,7 @@ class InstructorAssignmentController extends Controller
             'user_id'       => $validated['instructor_id'],
             'department_id' => $validated['department_id'],
             'level_id'      => $validated['level_id'] ?? null,
+            'academic_year' => $validated['academic_year'] ?? null,
         ]);
 
         // Audit log
@@ -107,6 +114,7 @@ class InstructorAssignmentController extends Controller
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'level_id' => 'nullable|exists:levels,id',
+            'academic_year' => 'nullable|string|max:255',
         ]);
 
         $oldValues = [

@@ -60,12 +60,22 @@ export default function AdmissionsReview() {
     fetchScholarships();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('userId');
+    if (userId && applications.length > 0) {
+       const app = applications.find(a => a.user_id === Number(userId));
+       if (app) setSelectedApp(app);
+    }
+  }, [applications]);
+
   const fetchScholarships = async () => {
     try {
-      const res = await client.get('/scholarships');
-      // API may return paginated { data: [...] } or a plain array
-      const list = Array.isArray(res.data) ? res.data : (res.data?.data ?? []);
-      setScholarships(list);
+      const res = await client.get('/admin/scholarships/admin', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Admin list is a plain array
+      setScholarships(res.data);
     } catch (err) {
       console.error('Error fetching scholarships:', err);
     }

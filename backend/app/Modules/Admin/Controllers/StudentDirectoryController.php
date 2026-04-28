@@ -15,7 +15,7 @@ class StudentDirectoryController extends Controller
     public function index(Request $request)
     {
         $query = User::where('role', 'student')
-            ->with(['program.department'])
+            ->with(['program.department', 'level'])
             ->withCount('admissionApplications');
 
         // Filter by student_id presence
@@ -65,7 +65,7 @@ class StudentDirectoryController extends Controller
     public function show($id)
     {
         $student = User::where('role', 'student')
-            ->with(['program.department', 'admissionApplications.program', 'admissionApplications.faculty'])
+            ->with(['program.department', 'level', 'admissionApplications.program', 'admissionApplications.faculty'])
             ->findOrFail($id);
 
         return response()->json($student);
@@ -86,5 +86,59 @@ class StudentDirectoryController extends Controller
             ->delete();
 
         return response()->json(['message' => 'Selected students have been removed.']);
+    }
+
+    /**
+     * Suspend a student account.
+     */
+    public function suspend(User $student, Request $request)
+    {
+        if ($student->role !== User::ROLE_STUDENT) {
+            return response()->json(['message' => 'Only student accounts can be suspended via this protocol.'], 422);
+        }
+
+        $student->update(['status' => 'suspended']);
+
+        \App\Models\AdminAudit::create([
+            'user_id' => auth()->id(),
+            'action' => 'SUSPEND_STUDENT',
+            'model_type' => 'user',
+            'model_id' => $student->id,
+            'new_values' => ['status' => 'suspended', 'reason' => $request->reason],
+            'ip_address' => $request->ip(),
+        ]);
+
+        return response()->json(['message' => 'Student account suspended.']);
+    }
+
+    /**
+     * Unsuspend a student account.
+     */
+    public function unsuspend(User $student, Request $request)
+    {
+        $student->update(['status' => 'active']);
+
+        \App\Models\AdminAudit::create([
+            'user_id' => auth()->id(),
+            'action' => 'UNSUSPEND_STUDENT',
+            'model_type' => 'user',
+            'model_id' => $student->id,
+            'new_values' => ['status' => 'active'],
+            'ip_address' => $request->ip(),
+        ]);
+
+        return response()->json(['message' => 'Student account reactivated.']);
+    }
+
+    /**
+     * Get student activity logs.
+     */
+    public function activityLog($id)
+    {
+        $logs = \App\Models\AdminAudit::where('model_type', 'user')
+            ->where('model_id', $id)
+            ->latest()
+            ->get();
+        return response()->json($logs);
     }
 }

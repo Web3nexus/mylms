@@ -10,6 +10,7 @@ class Scholarship extends Model
     use HasFactory;
 
     protected $fillable = [
+        'scholarship_partner_id',
         'title',
         'provider',
         'amount',
@@ -20,6 +21,16 @@ class Scholarship extends Model
         'tags',
         'hash',
     ];
+
+    public function partner()
+    {
+        return $this->belongsTo(ScholarshipPartner::class, 'scholarship_partner_id');
+    }
+
+    public function awards()
+    {
+        return $this->hasMany(AvailedScholarship::class);
+    }
 
     protected $casts = [
         'amount' => 'decimal:2',

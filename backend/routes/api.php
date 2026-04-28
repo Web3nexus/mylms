@@ -154,8 +154,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:super_admin,admin')->group(function () {
         // Student Directory
         Route::get('/admin/students', [StudentDirectoryController::class, 'index']);
-        Route::post('/admin/students/bulk-delete', [StudentDirectoryController::class, 'bulkDestroy']);
         Route::get('/admin/students/{id}', [StudentDirectoryController::class, 'show']);
+        Route::delete('/admin/students/bulk', [StudentDirectoryController::class, 'bulkDestroy']);
+        Route::post('/admin/students/{student}/suspend', [StudentDirectoryController::class, 'suspend']);
+        Route::post('/admin/students/{student}/unsuspend', [StudentDirectoryController::class, 'unsuspend']);
+        Route::get('/admin/students/{id}/activity', [StudentDirectoryController::class, 'activityLog']);
 
         // Staff & Personnel Management
         Route::get('/admin/staff', [\App\Modules\Admin\Controllers\StaffManagementController::class, 'index']);
@@ -165,6 +168,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Scholarship Sync
         Route::post('/scholarships/sync', [ScholarshipController::class, 'triggerFetch']);
+
+        // Scholarship Management (Sprint 24)
+        Route::get('/scholarships/admin', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'index']);
+        Route::get('/scholarships/partners', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'partners']);
+        Route::post('/scholarships/partners', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'storePartner']);
+        Route::post('/scholarships/admin', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'storeScholarship']);
+        Route::get('/scholarships/awards', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'awards']);
+        Route::post('/scholarships/awards', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'awardScholarship']);
+        Route::patch('/scholarships/awards/{award}', [\App\Modules\Admin\Controllers\ScholarshipManagementController::class, 'updateAwardStatus']);
 
         // Branding & Global Settings
         Route::patch('/branding', [BrandingController::class, 'update']);
