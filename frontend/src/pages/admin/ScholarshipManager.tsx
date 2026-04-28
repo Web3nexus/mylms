@@ -148,7 +148,7 @@ export default function ScholarshipManager() {
            <h1 className="text-4xl font-black text-text-main tracking-tighter uppercase leading-none">Scholarship Management</h1>
            
            <div className="flex gap-10 mt-10">
-              {(['awards', 'scholarships', 'partners'] as const).map(tab => (
+              {(['partners', 'scholarships', 'awards'] as const).map(tab => (
                 <button 
                   key={tab}
                   onClick={() => setActiveTab(tab)}
