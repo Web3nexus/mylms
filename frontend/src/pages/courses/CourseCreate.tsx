@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface Department {
   id: number;
@@ -23,6 +24,7 @@ export default function CourseCreate() {
   
   const navigate = useNavigate();
   const token = useAuthStore((state) => state.token);
+  const { notify } = useNotificationStore();
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -48,7 +50,8 @@ export default function CourseCreate() {
       await client.post('/courses', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      navigate('/office/portal');
+      notify('Course proposal created successfully!', 'success');
+      navigate('/office/courses');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create course. Please try again.');
     } finally {

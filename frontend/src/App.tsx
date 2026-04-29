@@ -236,6 +236,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'Dashboard', path: '/campus', icon: <LayoutDashboard size={18} /> },
         { name: 'Site Home', path: '/', icon: <Library size={18} /> },
         { name: 'Calendar', path: '/campus/calendar', icon: <Calendar size={18} /> },
+        { name: 'Profile', path: '/profile', icon: <User size={18} /> },
       ]
     } else if (user?.student_id) {
       // Approved Students in Portal
@@ -341,6 +342,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
     if (userRole === 'advisor') {
       sidebarLinks.push({ name: 'Advisor Desk', path: '/office/advisor', icon: <ShieldCheck size={18} /> });
+      sidebarLinks.push({ name: 'My Profile', path: '/profile', icon: <User size={18} /> });
     }
   }
 

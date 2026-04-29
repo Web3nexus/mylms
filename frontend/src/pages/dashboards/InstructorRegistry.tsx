@@ -41,10 +41,10 @@ export default function InstructorDashboard() {
     const fetchData = async () => {
       try {
         const [coursesRes, statsRes] = await Promise.all([
-          client.get('/my-courses', { headers }),
+          client.get('/instructor/courses', { headers }),
           client.get('/instructor/stats', { headers })
         ]);
-        setCourses(coursesRes.data?.data || coursesRes.data || []);
+        setCourses(coursesRes.data);
         setStats(statsRes.data);
       } catch (err) {
         console.error('Error fetching instructor data:', err);
