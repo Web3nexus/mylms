@@ -12,7 +12,9 @@ import {
   GraduationCap,
   Sparkles,
   ChevronRight,
-  Globe
+  Globe,
+  QrCode,
+  Key
 } from 'lucide-react';
 import { useBranding } from '../hooks/useBranding';
 import { useAppConfig } from '../hooks/useAppConfig';
@@ -25,6 +27,11 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [loginContext, setLoginContext] = useState<'portal' | 'campus'>('portal');
+  
+  // 2FA States
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [userIdFor2FA, setUserIdFor2FA] = useState<number | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,6 +57,14 @@ export default function Login() {
         password,
         context: loginContext
       });
+
+      if (response.data.requires_2fa) {
+        setRequires2FA(true);
+        setUserIdFor2FA(response.data.user_id);
+        setLoading(false);
+        return;
+      }
+
       const { user, access_token } = response.data;
 
       // ROLE ENFORCEMENT
@@ -73,6 +88,31 @@ export default function Login() {
 
     } catch (err: any) {
       setError(err.response?.data?.message || 'Authentication failed. Please verify your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handle2FAVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await client.post('/auth/2fa/verify-login', { 
+        user_id: userIdFor2FA,
+        code: twoFactorCode
+      });
+      const { user, access_token } = response.data;
+      
+      setAuth(user, access_token);
+      
+      if (user.role === 'admin') navigate('/admin/portal');
+      else if (user.role === 'instructor') navigate('/office/portal');
+      else navigate('/portal');
+
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Invalid 2FA code.');
     } finally {
       setLoading(false);
     }
@@ -152,7 +192,7 @@ export default function Login() {
                        isSecurityGate ? 'SG' : isStaffGate ? 'SO' : 'ML'
                      )}
                   </div>
-                  {isStudentGate && (
+                  {isStudentGate && !requires2FA && (
                     <div className="flex bg-offwhite p-1 rounded-xl border border-border-soft shadow-inner">
                        <button 
                          onClick={() => setLoginContext('portal')}
@@ -166,10 +206,10 @@ export default function Login() {
                   )}
                </div>
                <h2 className={`text-3xl font-black tracking-tighter uppercase leading-none ${isSecurityGate ? 'text-mylms-rose' : 'text-text-main'}`}>
-                  {gateName}
+                  {requires2FA ? 'Identity Verification' : gateName}
                </h2>
                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mt-4 opacity-70">
-                 {isSecurityGate ? branding?.institutional_name : 'Unified Academic Network Entry'}
+                 {requires2FA ? 'Enter Multi-Factor Protocol Code' : isSecurityGate ? branding?.institutional_name : 'Unified Academic Network Entry'}
                </p>
             </div>
 
@@ -180,51 +220,92 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="premium-input-wrapper group/input">
-                <label className="premium-label">
-                  {isStudentGate ? (loginContext === 'portal' ? 'Email Address' : 'Student Number') : 'Institutional ID'}
-                </label>
-                <div className="relative">
-                  <Mail className="premium-input-icon" size={20} />
-                  <input 
-                    type={isStudentGate && loginContext === 'portal' ? 'email' : 'text'}
-                    required
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    className="premium-input" 
-                    placeholder="Enter Credentials"
-                  />
+            {!requires2FA ? (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="premium-input-wrapper group/input">
+                  <label className="premium-label">
+                    {isStudentGate ? (loginContext === 'portal' ? 'Email Address' : 'Student Number') : 'Institutional ID'}
+                  </label>
+                  <div className="relative">
+                    <Mail className="premium-input-icon" size={20} />
+                    <input 
+                      type={isStudentGate && loginContext === 'portal' ? 'email' : 'text'}
+                      required
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      className="premium-input" 
+                      placeholder="Enter Credentials"
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <div className="premium-input-wrapper group/input">
-                <div className="flex justify-between items-center mb-4">
-                  <label className="premium-label !text-white !text-[8px] tracking-widest !mb-0">Security Protocol</label>
-                  <Link to="/forgot-password" className="text-[9px] font-black text-mylms-rose hover:-translate-x-1 transition-all uppercase tracking-widest">Forgot?</Link>
+                
+                <div className="premium-input-wrapper group/input">
+                  <div className="flex justify-between items-center mb-4">
+                    <label className="premium-label !text-white !text-[8px] tracking-widest !mb-0">Security Protocol</label>
+                    <Link to="/forgot-password" className="text-[9px] font-black text-mylms-rose hover:-translate-x-1 transition-all uppercase tracking-widest">Forgot?</Link>
+                  </div>
+                  <div className="relative">
+                    <Lock className="premium-input-icon" size={20} />
+                    <input 
+                      type="password" 
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="premium-input" 
+                      placeholder="••••••••"
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <Lock className="premium-input-icon" size={20} />
-                  <input 
-                    type="password" 
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="premium-input" 
-                    placeholder="••••••••"
-                  />
+                
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className={`w-full py-5 mt-6 rounded-2xl font-black text-white uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 disabled:opacity-50 relative overflow-hidden group/btn shadow-2xl active:scale-95 transition-all ${isSecurityGate ? 'bg-mylms-rose shadow-mylms-rose/20' : 'bg-mylms-purple shadow-mylms-purple/20'}`}
+                >
+                  {loading ? 'Validating Unified Protocol...' : gateName === 'Student Registry' ? `Enter ${appName} Campus` : 'Authorize Security Gateway'}
+                  <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handle2FAVerify} className="space-y-6">
+                <div className="premium-input-wrapper group/input">
+                  <label className="premium-label">2FA AUTHENTICATION CODE</label>
+                  <div className="relative">
+                    <Key className="premium-input-icon" size={20} />
+                    <input 
+                      type="text"
+                      required
+                      autoFocus
+                      value={twoFactorCode}
+                      onChange={(e) => setTwoFactorCode(e.target.value)}
+                      className="premium-input tracking-[0.5em] text-center text-xl" 
+                      placeholder="000000"
+                      maxLength={6}
+                    />
+                  </div>
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-4 text-center">
+                    Enter the 6-digit code from your authenticator app.
+                  </p>
                 </div>
-              </div>
-              
-              <button 
-                type="submit" 
-                disabled={loading}
-                className={`w-full py-5 mt-6 rounded-2xl font-black text-white uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 disabled:opacity-50 relative overflow-hidden group/btn shadow-2xl active:scale-95 transition-all ${isSecurityGate ? 'bg-mylms-rose shadow-mylms-rose/20' : 'bg-mylms-purple shadow-mylms-purple/20'}`}
-              >
-                {loading ? 'Validating Unified Protocol...' : gateName === 'Student Registry' ? `Enter ${appName} Campus` : 'Authorize Security Gateway'}
-                <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
-              </button>
-            </form>
+
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className={`w-full py-5 mt-6 rounded-2xl font-black text-white uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 disabled:opacity-50 relative overflow-hidden group/btn shadow-2xl active:scale-95 transition-all ${isSecurityGate ? 'bg-mylms-rose shadow-mylms-rose/20' : 'bg-mylms-purple shadow-mylms-purple/20'}`}
+                >
+                  {loading ? 'Verifying Identity...' : 'Confirm Verification'}
+                  <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={() => setRequires2FA(false)}
+                  className="w-full text-[9px] font-black text-gray-400 uppercase tracking-widest mt-4 hover:text-mylms-purple transition-colors"
+                >
+                  Back to standard login
+                </button>
+              </form>
+            )}
 
             <div className="mt-12 text-center pt-8 border-t border-offwhite">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -249,3 +330,4 @@ export default function Login() {
     </div>
   );
 }
+

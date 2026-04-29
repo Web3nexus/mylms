@@ -67,20 +67,19 @@ class AuthController extends Controller
         $context = $validated['context'] ?? 'portal';
         $isEmail = filter_var($identifier, FILTER_VALIDATE_EMAIL);
 
-        // 1. Cross-Exclusion Logic
-        if ($context === 'portal' && !$isEmail) {
-            return response()->json([
-                'message' => 'The Admission Portal requires a verified email address.',
-            ], 422);
+        // 1. Strict Cross-Exclusion Logic
+        if ($context === 'portal') {
+            if (!$isEmail) {
+                return response()->json([
+                    'message' => 'The Admission Portal requires your registered Email Address. If you already have a Matric Number, please use the Campus login portal.',
+                ], 422);
+            }
         }
 
-        if ($context === 'campus' && $isEmail) {
-            // Check if this email belongs to a student
-            $tempUser = User::where('email', $identifier)->first();
-            if ($tempUser && $tempUser->isStudent() && $tempUser->student_id) {
-                $appName = config('app.name', 'MyLMS');
+        if ($context === 'campus') {
+            if ($isEmail) {
                 return response()->json([
-                    'message' => "Please use your Student ID (Matric Number) to access the {$appName} Campus.",
+                    'message' => 'The Campus Portal requires your Student ID (Matric Number). If you are a new applicant without an ID, please use the Admission login portal.',
                 ], 422);
             }
         }
@@ -118,6 +117,15 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Your Student ID has not been generated yet. Please finalize your admission protocol.',
             ], 403);
+        }
+
+        // 7. 2FA Check
+        if ($user->two_factor_enabled) {
+            return response()->json([
+                'requires_2fa' => true,
+                'user_id' => $user->id,
+                'message' => 'Two-Factor Authentication required.'
+            ]);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;

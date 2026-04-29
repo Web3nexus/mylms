@@ -1,40 +1,33 @@
 import { useState, useEffect } from 'react';
-import { 
-  Megaphone, 
-  Plus, 
-  Send,
-  Trash2,
-  Bell,
-  Search,
-  Calendar,
-  Clock,
-  ExternalLink
-} from 'lucide-react';
+import { Megaphone, Plus, Send, Trash2, Bell, Search, Calendar, Clock, ExternalLink } from 'lucide-react';
 import client from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 
 export default function InstructorAnnouncements() {
-  const { token, user } = useAuthStore();
+  const { token } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   
+  // Target Options
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [levels, setLevels] = useState<any[]>([]);
+
   // New Announcement State
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [departmentId, setDepartmentId] = useState('');
+  const [levelId, setLevelId] = useState('');
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+    fetchTargetOptions();
+  }, [token]);
 
   const fetchAnnouncements = async () => {
     try {
-      // In this system, announcements are CMS pages with 'announcement' in slug
-      const res = await client.get('/admin/pages', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const filtered = res.data.filter((p: any) => p.slug.startsWith('announcement'));
-      setAnnouncements(filtered);
+      const res = await client.get('/announcements', { headers: { Authorization: `Bearer ${token}` } });
+      setAnnouncements(res.data);
     } catch (err) {
       console.error('Error fetching announcements:', err);
     } finally {
@@ -42,14 +35,31 @@ export default function InstructorAnnouncements() {
     }
   };
 
+  const fetchTargetOptions = async () => {
+      try {
+          const res = await client.get('/instructor/announcements/targets', { headers: { Authorization: `Bearer ${token}` } });
+          setDepartments(res.data.departments || []);
+          setLevels(res.data.levels || []);
+      } catch (err) {
+          console.error('Error fetching target options:', err);
+      }
+  };
+
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-        await client.post('/announcements', { title, content }, {
+        await client.post('/announcements', { 
+            title, 
+            content,
+            department_id: departmentId || null,
+            level_id: levelId || null
+        }, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setTitle('');
         setContent('');
+        setDepartmentId('');
+        setLevelId('');
         setShowCreate(false);
         fetchAnnouncements();
         alert('Institutional Announcement Dispatched successfully.');
@@ -98,6 +108,32 @@ export default function InstructorAnnouncements() {
                         required
                     />
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">Target Department (Optional)</label>
+                        <select 
+                            value={departmentId}
+                            onChange={e => setDepartmentId(e.target.value)}
+                            className="w-full p-6 bg-offwhite border border-border-soft rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-mylms-purple appearance-none"
+                        >
+                            <option value="">All Departments</option>
+                            {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">Target Level (Optional)</label>
+                        <select 
+                            value={levelId}
+                            onChange={e => setLevelId(e.target.value)}
+                            className="w-full p-6 bg-offwhite border border-border-soft rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-mylms-purple appearance-none"
+                        >
+                            <option value="">All Levels</option>
+                            {levels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                        </select>
+                    </div>
+                </div>
+
                 <div className="mb-8">
                     <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">Broadcasting Content (Synthesized)</label>
                     <textarea 
@@ -133,6 +169,11 @@ export default function InstructorAnnouncements() {
                         <div>
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="text-[9px] font-black uppercase tracking-widest text-mylms-rose bg-mylms-rose/5 px-3 py-1 rounded-lg italic">Published Registry</span>
+                                {(ann.department || ann.level) && (
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-mylms-purple bg-mylms-purple/5 px-3 py-1 rounded-lg">
+                                        Target: {ann.department?.name || 'All Depts'} • {ann.level?.name || 'All Levels'}
+                                    </span>
+                                )}
                                 <h3 className="text-sm font-black text-text-main uppercase tracking-tight">{ann.title}</h3>
                             </div>
                             <div className="flex items-center gap-6 text-[9px] font-bold text-gray-400 uppercase tracking-widest">

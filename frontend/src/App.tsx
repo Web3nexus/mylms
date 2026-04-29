@@ -41,7 +41,8 @@ import {
   UploadCloud,
   Users2,
   PieChart,
-  Activity
+  Activity,
+  Video
 } from 'lucide-react'
 
 // Auth & API
@@ -119,8 +120,12 @@ import {
   AssignmentSetupHub,
   QuizBuilderHub,
   GradingHub,
-  ForumModerationHub
+  ForumModerationHub,
+  RubricsHub
 } from './pages/dashboards/InstructorHubs'
+import LiveClassHub from './pages/dashboards/LiveClassHub'
+import LiveClassRoom from './pages/dashboards/LiveClassRoom'
+import StudentLiveClasses from './pages/dashboards/StudentLiveClasses'
 import AdminOperations from './pages/dashboards/AdminOperations'
 import BrandingManager from './pages/admin/BrandingManager'
 import CommunicationManager from './pages/admin/CommunicationManager'
@@ -209,7 +214,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const dashboardRoutes = ['/profile', '/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses'];
+  const dashboardRoutes = ['/profile', '/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses', '/student/live-classes'];
   const isDashboardRoute = isAuthenticated && dashboardRoutes.some(route => location.pathname.startsWith(route));
 
   // Sidebar link definitions mirroring MyLMS structure
@@ -244,6 +249,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'Home', path: '/portal', icon: <LayoutDashboard size={18} /> },
         { name: 'My Payments', path: '/billing', icon: <CreditCard size={18} /> },
         { name: 'My Courses', path: '/register-courses', icon: <Library size={18} /> },
+        { name: 'Live Classes', path: '/student/live-classes', icon: <Video size={18} /> },
         { name: 'Transcript', path: '/transcript', icon: <TrendingUp size={18} /> },
         { name: 'Self Service', path: '/portal/forms', icon: <Layers size={18} /> },
         { name: 'My Scholarship', path: '/student/scholarship', icon: <Award size={18} /> },
@@ -270,6 +276,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       sidebarLinks.push({ name: 'Faculty Registry', path: '/office/portal', icon: <Briefcase size={18} /> });
       sidebarLinks.push({ name: 'Course Management', path: '/office/courses', icon: <Library size={18} /> });
       sidebarLinks.push({ name: 'Gradebook', path: '/office/gradebook', icon: <CheckSquare size={18} /> });
+      sidebarLinks.push({ name: 'Grading Rubrics', path: '/office/rubrics', icon: <Award size={18} /> });
+      sidebarLinks.push({ name: 'Live Classes', path: '/office/live-classes', icon: <Video size={18} /> });
       sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
       sidebarLinks.push({ name: 'My Profile', path: '/profile', icon: <User size={18} /> });
     }
@@ -521,6 +529,7 @@ function App() {
 
           <Route element={<ProtectedRoute roles={['student']} />}>
             <Route path="/portal" element={user?.student_id ? <StudentPortal /> : <Navigate to="/apply/dashboard" replace />} />
+            <Route path="/student/live-classes" element={<StudentLiveClasses />} />
             <Route path="/apply/dashboard" element={<AdmissionDashboard />} />
             <Route path="/apply/wizard" element={<AdmissionWizard />} />
             <Route path="/apply" element={<AdmissionsPage />} />
@@ -555,7 +564,9 @@ function App() {
             <Route path="/office/assignments" element={<AssignmentSetupHub />} />
             <Route path="/office/quizzes" element={<QuizBuilderHub />} />
             <Route path="/office/gradebook" element={<GradingHub />} />
-            <Route path="/office/rubrics" element={<GradingHub />} />
+            <Route path="/office/rubrics" element={<RubricsHub />} />
+            <Route path="/office/live-classes" element={<LiveClassHub />} />
+            <Route path="/office/live-classes/room/:roomName" element={<LiveClassRoom />} />
             <Route path="/office/peer-reviews" element={<GradingHub />} />
             <Route path="/office/forums" element={<ForumModerationHub />} />
             <Route path="/office/analytics" element={<InstructorAnalytics />} />

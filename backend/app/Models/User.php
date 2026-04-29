@@ -50,6 +50,10 @@ class User extends Authenticatable
         'permissions',
         'academic_advisor_id',
         'scholarship_id',
+        'last_login_at',
+        'avatar_url',
+        'two_factor_enabled',
+        'two_factor_secret',
     ];
 
     /**
@@ -61,6 +65,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'otp_code',
+        'two_factor_secret',
     ];
 
     /**
@@ -196,6 +201,11 @@ class User extends Authenticatable
     public function courseOfferings()
     {
         return $this->hasMany(CourseOffering::class, 'instructor_id');
+    }
+
+    public function badges()
+    {
+        return $this->belongsToMany(Badge::class, 'user_badges')->withPivot('awarded_at');
     }
 
     public function audits()

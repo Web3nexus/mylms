@@ -16,9 +16,10 @@ import {
   MessageCircle,
   FileText,
   Mic2,
-  ChevronRight,
   Loader2,
-  Activity
+  Activity,
+  Video,
+  ChevronRight
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import client from '../../api/client';
@@ -140,6 +141,20 @@ export default function InstructorDashboard() {
       desc: 'Manage peer assessment tasks',
       icon: <Users size={22} />,
       to: '/office/peer-reviews',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Grading Rubrics',
+      desc: 'Standardize evaluation criteria',
+      icon: <Award size={22} />,
+      to: '/office/rubrics',
+      color: 'bg-white border border-gray-200 text-gray-800',
+    },
+    {
+      label: 'Live Classes',
+      desc: 'Host interactive video sessions',
+      icon: <Video size={22} />,
+      to: '/office/live-classes',
       color: 'bg-white border border-gray-200 text-gray-800',
     },
   ];

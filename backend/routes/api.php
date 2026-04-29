@@ -27,8 +27,12 @@ use App\Modules\Admissions\Controllers\AdmissionWizardController;
 use App\Modules\Courses\Controllers\PeerReviewController;
 use App\Modules\Courses\Controllers\RubricController;
 use App\Modules\Courses\Controllers\LessonNoteController;
+use App\Modules\Courses\Controllers\LiveClassController;
+use App\Modules\Admin\Controllers\AdminScholarshipController;
 use App\Http\Controllers\CommandCenterController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TwoFactorAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +47,7 @@ Route::post('/announcements', [PageController::class, 'storeAnnouncement']);
 Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/2fa/verify-login', [TwoFactorAuthController::class, 'verifyLogin']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
@@ -112,9 +117,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/courses/{course}/assessments/generate', [AssessmentController::class, 'generate']);
     Route::post('/assessments/{assessment}/questions', [AssessmentController::class, 'addQuestions']);
 
-    // Manage Grades & Results (Instructors)
     Route::get('/courses/{course}/gradebook', [InstructorGradeController::class, 'index']);
     Route::post('/courses/{course}/gradebook/{registration}', [InstructorGradeController::class, 'update']);
+
+    // Instructor Targeted Announcements
+    Route::get('/instructor/announcements/targets', [AnnouncementController::class, 'getTargetOptions']);
+    Route::get('/announcements', [AnnouncementController::class, 'index']);
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
+
+    // Manage Live Classes (Instructors)
+    Route::get('/live-classes', [LiveClassController::class, 'index']);
+    Route::post('/live-classes', [LiveClassController::class, 'store']);
+    Route::post('/live-classes/{liveClass}/start', [LiveClassController::class, 'start']);
+    Route::post('/live-classes/{liveClass}/end', [LiveClassController::class, 'end']);
 
     // Unified Academic & Enrollment Management (Admins/Management)
     Route::prefix('admin/academic')->group(function () {
@@ -150,6 +165,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admissions/fields', [AdmissionFieldController::class, 'store']);
     Route::post('/admissions/fields/{field}/toggle', [AdmissionFieldController::class, 'toggle']);
     Route::delete('/admissions/fields/{field}', [AdmissionFieldController::class, 'destroy']);
+
+    // Admin Scholarship Management
+    Route::get('/admin/scholarships/partners', [AdminScholarshipController::class, 'getPartners']);
+    Route::post('/admin/scholarships/partners', [AdminScholarshipController::class, 'storePartner']);
+    Route::get('/admin/scholarships/admin', [AdminScholarshipController::class, 'getScholarships']);
+    Route::post('/admin/scholarships/admin', [AdminScholarshipController::class, 'storeScholarship']);
+    Route::get('/admin/scholarships/awards', [AdminScholarshipController::class, 'getAwards']);
+    Route::patch('/admin/scholarships/awards/{id}', [AdminScholarshipController::class, 'updateAwardStatus']);
 
     // Manage Finances (Admins)
     Route::get('/finance/dashboard', [FinanceController::class, 'dashboardMetrics']);
@@ -322,6 +345,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Unified Student Dashboard (Spring 2026 Stability)
     Route::get('/student/dashboard-home', [\App\Http\Controllers\StudentDashboardController::class, 'index']);
+    Route::get('/student/live-classes', [LiveClassController::class, 'studentIndex']);
 
     // Self-Service Form Requests
     Route::get('/student/form-requests', [\App\Http\Controllers\StudentFormRequestController::class, 'index']);
@@ -334,9 +358,18 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public Payment Webhooks
 Route::post('/webhooks/payments/{gateway}', [App\Modules\Finance\Controllers\WebhookController::class, 'handle']);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    // Profile and 2FA
+    Route::get('/user/profile', [ProfileController::class, 'show']);
+    Route::post('/user/profile', [ProfileController::class, 'update']);
+    Route::post('/2fa/generate', [TwoFactorAuthController::class, 'generate']);
+    Route::post('/2fa/enable', [TwoFactorAuthController::class, 'enable']);
+    Route::post('/2fa/disable', [TwoFactorAuthController::class, 'disable']);
+});
+
 
 // Temporary route to allow database migrations on shared hosting without SSH
 Route::get('/force-migrate', function () {

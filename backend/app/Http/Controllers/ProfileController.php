@@ -4,88 +4,68 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Certificate;
 
 class ProfileController extends Controller
 {
     /**
-     * Get the authenticated user's profile with extended information.
+     * Get the authenticated user's full profile including achievements
      */
-    public function me(Request $request)
+    public function show(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user()->load(['badges', 'department', 'faculty', 'program', 'level']);
         
-        // Load common relationships
-        $user->load(['program.department.faculty', 'level']);
-        
-        if ($user->isStudent()) {
-            $user->load(['advisor']);
-            
-            // Add dynamic WhatsApp links based on department and level
-            $deptName = $user->program?->department?->name ?? 'General';
-            $levelName = $user->level?->name ?? 'All';
-            
-            $user->whatsapp_groups = [
-                [
-                    'name' => 'General Student Community',
-                    'link' => 'https://chat.whatsapp.com/LMSGeneral',
-                    'type' => 'general'
-                ],
-                [
-                    'name' => $deptName . ' Department Group',
-                    'link' => 'https://chat.whatsapp.com/' . str_replace(' ', '', $deptName) . 'Dept',
-                    'type' => 'department'
-                ],
-                [
-                    'name' => $levelName . ' Year Group (' . $deptName . ')',
-                    'link' => 'https://chat.whatsapp.com/' . str_replace(' ', '', $deptName) . $levelName,
-                    'type' => 'level'
-                ]
-            ];
+        // Fetch certificates if they are a student
+        $certificates = [];
+        if ($user->role === 'student') {
+            // Mocking or fetching real certificates depending on if the model is fully built
+            if (class_exists(Certificate::class)) {
+                $certificates = Certificate::where('student_id', $user->id)
+                    ->with('course')
+                    ->get();
+            }
         }
 
-        return response()->json($user);
+        return response()->json([
+            'user' => $user,
+            'certificates' => $certificates
+        ]);
     }
 
     /**
-     * Update the authenticated user's profile information.
+     * Update profile (including avatar upload)
      */
     public function update(Request $request)
     {
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'name' => 'sometimes|string|max:255',
+            'avatar' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $user->update($validated);
+        if ($request->has('name')) {
+            $user->name = $validated['name'];
+        }
+
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if it exists
+            if ($user->avatar_url) {
+                $oldPath = str_replace(url('storage') . '/', '', $user->avatar_url);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            // Store new avatar
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar_url = url('storage/' . $path);
+        }
+
+        $user->save();
 
         return response()->json([
             'message' => 'Profile updated successfully',
             'user' => $user
-        ]);
-    }
-
-    /**
-     * Update the authenticated user's password.
-     */
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-        ]);
-
-        $user = Auth::user();
-
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'message' => 'Password updated successfully'
         ]);
     }
 }

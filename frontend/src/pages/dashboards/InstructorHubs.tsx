@@ -59,3 +59,13 @@ export function ForumModerationHub() {
     />
   );
 }
+
+export function RubricsHub() {
+  return (
+    <InstructorCourseSelector 
+      title="Grading Rubrics Hub" 
+      subtitle="Standardize evaluation criteria and establish consistent grading frameworks across courses."
+      linkBuilder={(slug) => `/courses/${slug}/rubrics`} 
+    />
+  );
+}
