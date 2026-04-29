@@ -18,6 +18,7 @@ export default function ProfileSettings() {
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [passwordData, setPasswordData] = useState({ current_password: '', password: '', password_confirmation: '' });
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 2FA States
@@ -60,6 +61,8 @@ export default function ProfileSettings() {
       });
       setFullUser(res.data.user);
       setUser(res.data.user); // Update global store
+      setAvatarPreview(null);
+      setAvatarFile(null);
       setSuccess('Profile updated successfully!');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update profile');
@@ -169,7 +172,9 @@ export default function ProfileSettings() {
               
               <div className="relative mb-6">
                 <div className="w-28 h-28 rounded-full bg-mylms-purple flex items-center justify-center text-white text-4xl font-black shadow-xl ring-8 ring-mylms-purple/10 overflow-hidden">
-                  {user.avatar_url ? (
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : user.avatar_url ? (
                     <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
                     user.name?.charAt(0) || '?'
@@ -226,7 +231,19 @@ export default function ProfileSettings() {
                   ref={fileInputRef} 
                   className="hidden" 
                   accept="image/*"
-                  onChange={e => setAvatarFile(e.target.files?.[0] || null)}
+                  onChange={e => {
+                    const file = e.target.files?.[0] || null;
+                    setAvatarFile(file);
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setAvatarPreview(reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    } else {
+                      setAvatarPreview(null);
+                    }
+                  }}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
