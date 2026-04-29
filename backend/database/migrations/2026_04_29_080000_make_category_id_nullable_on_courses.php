@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            $table->foreignId('category_id')->nullable()->change();
+            $table->integer('credits')->nullable()->change();
+            $table->foreignId('semester_id')->nullable()->constrained('semesters')->onDelete('set null')->after('level_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('courses', function (Blueprint $table) {
+            $table->foreignId('category_id')->nullable(false)->change();
+            $table->integer('credits')->nullable(false)->change();
+            $table->dropConstrainedForeignId('semester_id');
+        });
+    }
+};

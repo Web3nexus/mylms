@@ -28,6 +28,7 @@ use App\Modules\Courses\Controllers\PeerReviewController;
 use App\Modules\Courses\Controllers\RubricController;
 use App\Modules\Courses\Controllers\LessonNoteController;
 use App\Http\Controllers\CommandCenterController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,8 +47,12 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/me', [AuthController::class, 'me']);
+        Route::get('/me', [ProfileController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        
+        // Profile Management
+        Route::patch('/profile', [ProfileController::class, 'update']);
+        Route::patch('/profile/password', [ProfileController::class, 'updatePassword']);
         
         // OTP Verification
         Route::post('/verify-otp', [\App\Modules\Auth\Controllers\VerifyController::class, 'verifyOtp']);

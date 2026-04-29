@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Modules\Academic\Models\Program;
+use App\Modules\Academic\Models\Department;
 use App\Modules\Courses\Models\Submission;
+use App\Modules\Courses\Models\Enrollment;
 use App\Modules\Admissions\Models\AdmissionApplication;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -219,5 +221,21 @@ class User extends Authenticatable
     public function assignedStudents()
     {
         return $this->hasMany(User::class, 'academic_advisor_id');
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function department()
+    {
+        // Students are linked to departments through programs
+        if ($this->program_id) {
+            return $this->belongsToThrough(Department::class, Program::class);
+        }
+        
+        // Instructors might be directly assigned to departments (handled via assignments)
+        return null; 
     }
 }

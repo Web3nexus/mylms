@@ -186,6 +186,47 @@ export default function StudentCampus() {
                </div>
             </div>
 
+            {/* Support & Community Widget */}
+            <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-8 space-y-8">
+               <h4 className="text-[10px] font-black uppercase text-text-main tracking-[0.3em] pb-4 border-b border-border-soft">Support & Community</h4>
+               
+               {/* Advisor */}
+               {user?.advisor && (
+                  <div className="flex items-start gap-3">
+                     <div className="w-10 h-10 rounded-xl bg-mylms-rose/10 flex items-center justify-center text-mylms-rose shrink-0">
+                        <User size={18} />
+                     </div>
+                     <div className="min-w-0">
+                        <p className="text-[8px] font-black text-mylms-rose uppercase tracking-widest mb-1">Academic Advisor</p>
+                        <p className="text-[10px] font-black text-text-main uppercase truncate mb-2">{user.advisor.name}</p>
+                        <a href={`mailto:${user.advisor.email}`} className="text-[9px] font-black text-mylms-purple uppercase tracking-widest hover:underline flex items-center gap-1">
+                           Contact <ArrowRight size={10} />
+                        </a>
+                     </div>
+                  </div>
+               )}
+
+               {/* WhatsApp Links */}
+               <div className="space-y-4">
+                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest px-1">Dedicated Groups</p>
+                  {(user as any)?.whatsapp_groups?.map((group: any, i: number) => (
+                     <a 
+                        key={i} 
+                        href={group.link} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="flex items-center justify-between p-3 bg-offwhite rounded-xl border border-border-soft hover:border-green-500 transition-all group"
+                     >
+                        <div className="flex items-center gap-3">
+                           <MessageSquare size={14} className="text-green-600" />
+                           <span className="text-[9px] font-black text-text-main uppercase truncate max-w-[120px]">{group.name}</span>
+                        </div>
+                        <ArrowRight size={12} className="text-gray-300 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
+                     </a>
+                  ))}
+               </div>
+            </div>
+
             {/* Profile Logic Widget */}
             <div className="bg-white rounded-2xl border border-border-soft shadow-sm p-8 flex items-center gap-4 group">
                <div className="w-12 h-12 rounded-xl bg-offwhite border border-border-soft flex items-center justify-center text-mylms-purple text-xl font-black group-hover:bg-mylms-purple group-hover:text-white transition-all shrink-0">

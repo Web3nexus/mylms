@@ -130,6 +130,7 @@ import ScholarshipManager from './pages/admin/ScholarshipManager'
 import CommandCenter from './pages/admin/CommandCenter'
 import PaymentSettings from './pages/admin/PaymentSettings'
 import AdvisorPortal from './pages/advisors/AdvisorPortal'
+import ProfileSettings from './pages/shared/ProfileSettings'
 
 // Hooks
 import { useBranding } from './hooks/useBranding'
@@ -245,6 +246,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         { name: 'Transcript', path: '/transcript', icon: <TrendingUp size={18} /> },
         { name: 'Self Service', path: '/portal/forms', icon: <Layers size={18} /> },
         { name: 'My Scholarship', path: '/student/scholarship', icon: <Award size={18} /> },
+        { name: 'Profile', path: '/profile', icon: <User size={18} /> },
       ]
     } else {
       // Applicants/Candidates
@@ -268,6 +270,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       sidebarLinks.push({ name: 'Course Management', path: '/office/courses', icon: <Library size={18} /> });
       sidebarLinks.push({ name: 'Gradebook', path: '/office/gradebook', icon: <CheckSquare size={18} /> });
       sidebarLinks.push({ name: 'Announcements', path: '/office/announcements', icon: <Mail size={18} /> });
+      sidebarLinks.push({ name: 'My Profile', path: '/profile', icon: <User size={18} /> });
     }
 
 
@@ -330,6 +333,10 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     // --- Developer ONLY ---
     if (isDeveloper) {
       sidebarLinks.push({ name: 'Command Center', path: '/admin/command-center', icon: <Terminal size={18} /> });
+    }
+
+    if (isAdmin || isDeveloper) {
+      sidebarLinks.push({ name: 'System Profile', path: '/profile', icon: <User size={18} /> });
     }
 
     if (userRole === 'advisor') {
@@ -589,6 +596,8 @@ function App() {
             <Route path="/admin/communications/gateways" element={<EmailAccountManager />} />
             <Route path="/admin/command-center" element={<CommandCenter />} />
           </Route>
+
+          <Route path="/profile" element={<ProfileSettings />} />
 
           <Route path="/:slug" element={<PublicPage />} />
           <Route path="/p/:slug" element={<PublicPage />} />

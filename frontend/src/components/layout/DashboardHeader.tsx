@@ -1,5 +1,6 @@
-import { Search, Clock, Menu } from 'lucide-react';
+import { Search, Clock, Menu, GraduationCap } from 'lucide-react';
 import NotificationDropdown from '../NotificationDropdown';
+import { useAuthStore } from '../../store/authStore';
 
 interface DashboardHeaderProps {
   systemTime: Date;
@@ -7,6 +8,9 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({ systemTime, onToggleMobileSidebar }: DashboardHeaderProps) {
+  const user = useAuthStore(state => state.user);
+  const isStudent = user?.role === 'student';
+
   return (
     <header className="bg-white border-b border-border-soft py-4 px-6 lg:px-12 flex justify-between items-center sticky top-0 z-30 shrink-0">
       {/* Mobile Menu & Search Bar */}
@@ -30,6 +34,17 @@ export default function DashboardHeader({ systemTime, onToggleMobileSidebar }: D
       
       {/* Right Side Actions */}
       <div className="flex items-center gap-6">
+        {/* Matric ID for Students */}
+        {isStudent && user?.student_id && (
+          <div className="hidden xl:flex items-center gap-3 bg-mylms-purple/5 border border-mylms-purple/20 px-4 py-2 rounded-xl">
+            <GraduationCap size={14} className="text-mylms-purple" />
+            <div className="flex flex-col">
+              <span className="text-[7px] font-black uppercase tracking-widest text-mylms-purple/60">Matriculation ID</span>
+              <span className="text-[11px] font-black font-mono text-mylms-purple">{user.student_id}</span>
+            </div>
+          </div>
+        )}
+
         <div className="hidden lg:flex items-center gap-4 bg-offwhite px-4 py-2 rounded-lg border border-border-soft">
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></div>
