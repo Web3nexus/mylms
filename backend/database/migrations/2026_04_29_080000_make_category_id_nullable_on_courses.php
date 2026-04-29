@@ -27,4 +27,4 @@ return new class extends Migration
             $table->integer('credits')->nullable(false)->change();
         });
     }
-}
+};
