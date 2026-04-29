@@ -5,7 +5,7 @@ export function InstructorCoursesHub() {
     <InstructorCourseSelector 
       title="Course Management Hub" 
       subtitle="Lifecycle management and administrative oversight for your assigned academic programs."
-      linkBuilder={(slug) => `/courses/${slug}`} 
+      linkBuilder={(slug) => `/courses/${slug}/curriculum`} 
     />
   );
 }

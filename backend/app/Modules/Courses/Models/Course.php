@@ -38,6 +38,13 @@ class Course extends Model
         'credit_hours' => 'integer',
     ];
 
+    protected $appends = ['is_published'];
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return $this->status === 'published';
+    }
+
     protected static function boot()
     {
         parent::boot();

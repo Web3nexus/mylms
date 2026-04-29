@@ -44,7 +44,7 @@ export default function InstructorDashboard() {
           client.get('/instructor/courses', { headers }),
           client.get('/instructor/stats', { headers })
         ]);
-        setCourses(coursesRes.data);
+        setCourses(Array.isArray(coursesRes.data) ? coursesRes.data : (coursesRes.data?.data || []));
         setStats(statsRes.data);
       } catch (err) {
         console.error('Error fetching instructor data:', err);
