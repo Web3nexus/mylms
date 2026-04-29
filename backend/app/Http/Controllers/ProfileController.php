@@ -58,7 +58,7 @@ class ProfileController extends Controller
 
             // Store new avatar
             $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar_url = url('storage/' . $path);
+            $user->avatar_url = Storage::disk('public')->url($path);
         }
 
         $user->save();
