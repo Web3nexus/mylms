@@ -10,11 +10,26 @@ use App\Models\Certificate;
 class ProfileController extends Controller
 {
     /**
+     * Legacy me() method for /auth/me compatibility
+     */
+    public function me(Request $request)
+    {
+        return $this->show($request);
+    }
+
+    /**
      * Get the authenticated user's full profile including achievements
      */
     public function show(Request $request)
     {
-        $user = Auth::user()->load(['badges', 'department', 'faculty', 'program.department', 'level']);
+        $user = Auth::user();
+        
+        try {
+            $user->load(['badges', 'department', 'faculty', 'program.department', 'level']);
+        } catch (\Exception $e) {
+            // Log the error but continue - likely missing tables due to pending migrations
+            \Log::warning("Profile load relationships failed: " . $e->getMessage());
+        }
         
         // Fetch certificates if they are a student
         $certificates = [];
