@@ -84,7 +84,16 @@ export default function Login() {
       
       if (user.role === 'admin') navigate('/admin/portal');
       else if (user.role === 'instructor') navigate('/office/portal');
-      else navigate('/portal');
+      else {
+        // Smart Redirection for Students/Applicants
+        if (loginContext === 'campus' && user.student_id) {
+          navigate('/portal'); // Main Campus Entry
+        } else if (loginContext === 'portal' && !user.student_id) {
+          navigate('/apply/dashboard'); // Admission Dashboard
+        } else {
+          navigate('/portal'); // Default fallback
+        }
+      }
 
     } catch (err: any) {
       setError(err.response?.data?.message || 'Authentication failed. Please verify your credentials.');
@@ -109,7 +118,16 @@ export default function Login() {
       
       if (user.role === 'admin') navigate('/admin/portal');
       else if (user.role === 'instructor') navigate('/office/portal');
-      else navigate('/portal');
+      else {
+        // Smart Redirection for Students/Applicants
+        if (loginContext === 'campus' && user.student_id) {
+          navigate('/portal'); // Main Campus Entry
+        } else if (loginContext === 'portal' && !user.student_id) {
+          navigate('/apply/dashboard'); // Admission Dashboard
+        } else {
+          navigate('/portal'); // Default fallback
+        }
+      }
 
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid 2FA code.');
