@@ -1,4 +1,5 @@
 import { Search, Clock, Menu, GraduationCap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import NotificationDropdown from '../NotificationDropdown';
 import { useAuthStore } from '../../store/authStore';
 
@@ -59,7 +60,22 @@ export default function DashboardHeader({ systemTime, onToggleMobileSidebar }: D
           </div>
         </div>
         
-        <NotificationDropdown />
+        <div className="flex items-center gap-4">
+          <NotificationDropdown />
+          <div className="w-px h-6 bg-gray-200 hidden sm:block"></div>
+          <Link 
+            to="/profile" 
+            className="flex items-center gap-3 p-1 pr-4 bg-offwhite hover:bg-mylms-purple/5 border border-border-soft rounded-full transition-all group"
+          >
+            <div className="w-8 h-8 rounded-full bg-mylms-purple flex items-center justify-center text-white text-[10px] font-black group-hover:scale-105 transition-transform shadow-md">
+              {user?.name?.charAt(0) || 'U'}
+            </div>
+            <div className="hidden sm:block text-left">
+              <p className="text-[9px] font-black text-text-main uppercase tracking-tight leading-none mb-1">{user?.name?.split(' ')[0]}</p>
+              <p className="text-[7px] font-black text-mylms-rose uppercase tracking-widest leading-none opacity-60">Account</p>
+            </div>
+          </Link>
+        </div>
       </div>
     </header>
   );

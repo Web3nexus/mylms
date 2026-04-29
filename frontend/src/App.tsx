@@ -209,7 +209,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const dashboardRoutes = ['/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses'];
+  const dashboardRoutes = ['/portal', '/campus', '/admin', '/office', '/billing', '/register-courses', '/transcript', '/apply', '/branding', '/courses/create', '/courses', '/profile'];
   const isDashboardRoute = isAuthenticated && dashboardRoutes.some(route => location.pathname.startsWith(route));
 
   // Sidebar link definitions mirroring MyLMS structure
