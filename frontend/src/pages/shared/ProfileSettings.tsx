@@ -32,11 +32,13 @@ export default function ProfileSettings() {
   const fetchProfile = async () => {
     try {
       const res = await client.get('/user/profile', { headers: { Authorization: `Bearer ${token}` } });
-      setFullUser(res.data.user);
+      const userData = res.data.user;
+      setFullUser(userData);
       setCertificates(res.data.certificates || []);
-      setFormData({ name: res.data.user.name, email: res.data.user.email });
+      setFormData({ name: userData?.name || '', email: userData?.email || '' });
     } catch (err) {
       console.error('Error fetching profile:', err);
+      setError('Failed to load profile. Please ensure migrations are run.');
     } finally {
       setLoading(false);
     }
@@ -113,11 +115,21 @@ export default function ProfileSettings() {
     }
   };
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="py-20 flex flex-col justify-center items-center h-full">
         <div className="w-10 h-10 border-4 border-mylms-purple border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-mylms-purple font-black uppercase tracking-widest text-[9px]">Synchronizing Identity...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-7xl mx-auto py-12 px-8 text-center">
+        <h2 className="text-2xl font-black text-text-main uppercase mb-4">Profile Unavailable</h2>
+        <p className="text-gray-500 mb-8">{error || 'Unable to sync with registry. Please verify your connection.'}</p>
+        <button onClick={fetchProfile} className="bg-mylms-purple text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">Retry Sync</button>
       </div>
     );
   }
@@ -160,7 +172,7 @@ export default function ProfileSettings() {
                   {user.avatar_url ? (
                     <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    user.name.charAt(0)
+                    user.name?.charAt(0) || '?'
                   )}
                 </div>
                 {activeTab === 'general' && (
@@ -186,7 +198,7 @@ export default function ProfileSettings() {
               <div className="w-full pt-6 border-t border-gray-50 space-y-4">
                 <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
                   <span>Department</span>
-                  <span className="text-text-main">{user.department?.name || 'N/A'}</span>
+                  <span className="text-text-main">{user.department?.name || user.program?.department?.name || 'N/A'}</span>
                 </div>
                 <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
                   <span>Level</span>

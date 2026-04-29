@@ -240,12 +240,7 @@ class User extends Authenticatable
 
     public function department()
     {
-        // Students are linked to departments through programs
-        if ($this->program_id) {
-            return $this->belongsToThrough(Department::class, Program::class);
-        }
-        
-        // Instructors might be directly assigned to departments (handled via assignments)
-        return null; 
+        // Fallback for eager loading compatibility
+        return $this->belongsTo(Department::class, 'department_id'); 
     }
 }

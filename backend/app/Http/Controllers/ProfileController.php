@@ -14,7 +14,7 @@ class ProfileController extends Controller
      */
     public function show(Request $request)
     {
-        $user = Auth::user()->load(['badges', 'department', 'faculty', 'program', 'level']);
+        $user = Auth::user()->load(['badges', 'department', 'faculty', 'program.department', 'level']);
         
         // Fetch certificates if they are a student
         $certificates = [];
