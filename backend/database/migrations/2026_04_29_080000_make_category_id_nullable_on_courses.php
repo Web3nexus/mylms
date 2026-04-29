@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::table('courses', function (Blueprint $table) {
             $table->foreignId('category_id')->nullable()->change();
             $table->integer('credits')->nullable()->change();
-            $table->foreignId('semester_id')->nullable()->constrained('semesters')->onDelete('set null')->after('level_id');
         });
     }
 
@@ -26,7 +25,6 @@ return new class extends Migration
         Schema::table('courses', function (Blueprint $table) {
             $table->foreignId('category_id')->nullable(false)->change();
             $table->integer('credits')->nullable(false)->change();
-            $table->dropConstrainedForeignId('semester_id');
         });
     }
-};
+}
